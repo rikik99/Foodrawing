@@ -271,7 +271,7 @@ padding-top:50px;}
 </head>
 <body>
 <div class="container">
-  <h3 id="preferences-title">선호하는 영양소를 선택하세요</h3>
+  <h3 id="preferences-title">선호하는 영양소를 선택하세요 </h3>
   <div class="buttons-container">
     <!-- 각 영양소별로 선호도를 설정하는 버튼들 -->
     <button class="btn6 protein-btn" onclick="togglePreference('protein', 10, this)">단백질이 많은 음식</button>
