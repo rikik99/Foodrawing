@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.food.domain.product.mapper.ProductMapper">
+
+  <select id="selectByCriteria" resultType="com.food.domain.product.dto.ProductNutritionDTO">
+    SELECT *
+    FROM PRODUCT_NUTRITION_TB
+    <where>
+        <if test="protein != null">
+            PROTEIN &gt;= #{protein}
+        </if>
+        <if test="transFat != null">
+            AND TRANS_FAT &lt;= #{transFat}
+        </if>
+        <if test="saturatedFat != null">
+            AND SATURATED_FAT &lt;= #{saturatedFat}
+        </if>
+        <if test="sugar != null">
+            AND SUGAR &lt;= #{sugar}
+        </if>
+        <if test="sodium != null">
+            AND SODIUM &lt;= #{sodium}
+        </if>
+        <if test="carbohydrate != null">
+            AND CARBOHYDRATE &gt;= #{carbohydrate}
+        </if>
+    </where>
+</select>
+
+<select id="selectByResults" resultType="com.food.domain.product.dto.ProductDTO">
+    SELECT PRODUCT_NUMBER, NAME, DESCRIPTION, PRICE, QUANTITY, CREATED_DATE
+    FROM PRODUCT_TB
+    WHERE PRODUCT_NUMBER = #{productNumber}
+</select>
+
+<select id="fileByResults" resultType="com.food.domain.product.dto.ProductFileDTO">
+    SELECT ID, PRODUCT_NUMBER, ORIGINAL_NAME, FILE_PATH, FILE_TYPE, UPLOAD_DATE
+    FROM PRODUCT_FILE_TB
+    WHERE PRODUCT_NUMBER = #{productNumber}
+</select>
+
+
+</mapper>
