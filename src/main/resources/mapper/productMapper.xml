@@ -39,5 +39,14 @@
     WHERE PRODUCT_NUMBER = #{productNumber}
 </select>
 
+<select id="getProductById">
+		SELECT PRODUCT_NUMBER, NAME, DESCRIPTION, PRICE, QUANTITY, CREATED_DATE
+		FROM PRODUCT_TB
+		WHERE PRODUCT_NUMBER = #{arg0}
+	</select>
+	
+	<select id="findById" resultType="com.food.domain.product.dto.ProductDTO">
+        SELECT * FROM PRODUCT_TB WHERE PRODUCT_NUMBER = #{productNumber}
+    </select>
 
 </mapper>
