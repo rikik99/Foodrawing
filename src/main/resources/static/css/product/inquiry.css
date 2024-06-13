@@ -1,0 +1,57 @@
+@charset "UTF-8";
+
+.inquiry-section {
+            width: 100%;
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .inquiry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .inquiry-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .inquiry-item {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+        .inquiry-item:last-child {
+            border-bottom: none;
+        }
+        .inquiry-info {
+            display: flex;
+            align-items: center;
+        }
+        .inquiry-info .inquiry-badge {
+            margin-right: 10px;
+            display: flex; /* Flex container for alignment */
+            align-items: center; /* Vertically center the badge */
+        }
+        .inquiry-info .inquiry-content {
+            margin-right: 20px;
+            flex-grow: 1; /* Allow content to take remaining space */
+        }
+        .inquiry-info .inquiry-author,
+        .inquiry-info .inquiry-date {
+            color: #aaa;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+        }
+        .pagination li {
+            margin: 0 5px;
+        }

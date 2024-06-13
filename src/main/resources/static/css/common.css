@@ -1,0 +1,129 @@
+@charset "UTF-8";
+
+ * {
+     margin : 0; padding:0;
+     box-sizing : border-box;
+  }
+  
+  @font-face {
+    font-family: 'SejonghospitalBold';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2312-1@1.1/SejonghospitalBold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+	}
+	
+	* {
+		font-family: 'SejonghospitalBold', sans-serif;
+	}
+   
+  #headerLogo {
+  	height: 100px; 
+  }
+  
+  .logoText {
+    font-family: 'SejonghospitalBold', sans-serif;
+    font-size: xx-large;
+    color: #5dad52;
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+	}
+	
+	.header-inner {
+		border-bottom: 1px solid #e5e5e5;
+	}
+	
+	.nav-inner {
+		border-bottom: 1px solid #e5e5e5;
+	}
+	
+	.category {
+		border-left: 1px solid #e5e5e5;
+		border-right: 1px solid #e5e5e5;
+		margin-right: 5px;
+	}
+	
+	.nav-util .login, .nav-util .cs {
+		color: grey;
+		text-decoration: none;
+	}
+	
+	.login:hover {
+		text-decoration: underline
+	}
+	
+	.nav-inner-in {
+		width: 65%;
+		margin: 0 auto;
+	}
+	
+	.nav-util .loginli {
+		padding-right: 10px;
+		border-right: 1px solid #e5e5e5;
+	}
+	
+	.nav-util .csli {
+		padding-left: 10px;
+	}
+	
+	.footergroup {
+		border-top: 1px solid #e5e5e5;
+	}
+	
+	.menuitems > li {
+		margin-right: 5px;
+	}
+	
+	.nav-menu {
+		padding-left: 120px;
+	}
+	
+	.btn-search, .btn-alarm-icon, .btn-cart-icon {
+		height: 50px;
+	}
+	
+	#search-btn {
+		background-image: url('/images/svg/search.svg');
+		background-size: contain; /* 원하는 크기에 맞게 조정 */
+	  background-repeat: no-repeat; /* 배경 이미지 반복 없음 */
+	  /* 버튼 숨김 */
+	  appearance: none; /* 기본 버튼 스타일 제거 (크로스 브라우징을 위해) */
+	  border: none; /* 테두리 없음 */
+	  padding: 0; /* 내부 여백 없음 */
+	  cursor: pointer;
+	  color: transparent;
+	}
+	
+	.searchForm {
+		border-bottom: 2px solid #5dad52;
+	}
+	
+	.btn-cart {
+		position: relative;
+  	display: inline-block;
+	}
+	
+	.btn-cart .count {
+		position: absolute; /* 상대적으로 포지션되는 요소를 기준으로 절대적인 위치를 지정합니다. */
+	  top: -7px; /* 원하는 위치로 조정하세요. */
+	  right: -7px; /* 원하는 위치로 조정하세요. */
+	  background-color: red; /* 배경색을 설정합니다. */
+	  color: white; /* 텍스트 색상을 설정합니다. */
+	  border-radius: 50%; /* 원 모양으로 모서리를 둥글게 만듭니다. */
+	  padding: 1px 5px 1px 5px;
+	}
+	
+	.btn-alarm {
+  position: relative;
+  display: inline-block;
+}
+
+ .btn-alarm .count {
+  position: absolute; /* 상대적으로 포지션되는 요소를 기준으로 절대적인 위치를 지정합니다. */
+	  top: -7px; /* 원하는 위치로 조정하세요. */
+	  right: -7px; /* 원하는 위치로 조정하세요. */
+	  background-color: black; /* 배경색을 설정합니다. */
+	  color: white; /* 텍스트 색상을 설정합니다. */
+	  border-radius: 50%; /* 원 모양으로 모서리를 둥글게 만듭니다. */
+	  padding: 1px 5px 1px 5px;
+}

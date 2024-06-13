@@ -41,4 +41,8 @@ public class ProductService {
 		
 		return files;
 	}
+
+    public ProductDTO findById(String productId) {
+        return productMapper.findById(productId);
+    }
 }
