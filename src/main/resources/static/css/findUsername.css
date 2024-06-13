@@ -1,0 +1,76 @@
+body {
+	font-family: Arial, sans-serif;
+	background-color: #F5F5F5;
+	vertical-align: middle;
+}
+
+.container {
+	max-width: 450px;
+	min-height: 550px;
+	height: auto;
+	margin : 50px auto;
+	padding: 20px 30px;
+	border: 1px solid #ddd;
+	border-radius: 15px;
+	background-color: white;
+	margin: 50px auto;
+}
+
+h2 {
+	text-align: center;
+	margin-top: 50px;
+}
+
+form {
+	display: flex;
+	flex-direction: column;
+}
+
+.find-input {
+	margin-top: 3px;
+	margin-bottom: 15px;
+	padding: 15px 12px;
+	border: 1px solid #ccc;
+	border-radius: 5px; /* 둥근 모서리 */
+	box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1); /* 그림자 */
+	font-size: 16px; /* 글꼴 크기 */
+}
+
+.find-input::placeholder {
+	color: #aaa;
+	font-size: 14px;
+}
+
+button {
+	padding: 16px;
+	background-color: black;
+	border: none;
+	color: white;
+	border-radius: 12px;
+	cursor: pointer;
+	font-weight: bold;
+	margin-top: 20px;
+	border: none;
+	margin-bottom: 20px;
+}
+
+button:disabled {
+	background-color: #DEDADA;
+	cursor: not-allowed;
+}
+
+.email-label {
+	margin-top: 20px;
+	margin-bottom: 10px;
+}
+
+.name-label {
+	margin-bottom: 10px;
+}
+
+.error-message {
+	color: red;
+	font-size: 12px;
+	display: none;
+	margin-bottom: 10px;
+}

@@ -31,7 +31,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	// Security Starter 
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-	
+	implementation 'org.springframework.security:spring-security-oauth2-client'
 	// MyBatis Starter
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
 	
@@ -65,6 +65,13 @@ dependencies {
     implementation 'jakarta.servlet:jakarta.servlet-api' //스프링부트 3.0 이상
     implementation 'jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api' // 스프링부트 3.0 이상
     implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl' //스프링부트 3.0 이상
+    
+    // 이메일 인증
+ 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+ 	
+ 	 implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2' // for JSON parsing
 }
 
 tasks.named('test') {
