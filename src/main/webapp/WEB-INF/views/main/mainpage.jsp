@@ -135,7 +135,7 @@
 <body>
 <main>
 <div class="image-container" >
-    <img id="image-container" src="/img/balance.jpg" alt="이미지" style="width: 100%; height: 100%; object-fit: contain;">
+    <img id="image-container" src="/images/balance.jpg" alt="이미지" style="width: 100%; height: 100%; object-fit: contain;">
 		<div class="image-controls">
 			<button id="prev-btn" class="prev-btn">
 				<i class="fas fa-chevron-left"></i>
@@ -150,11 +150,11 @@
 
 <div class="section grid" style="border: 1px solid #ccc; padding: 20px; margin-top:20px;">
   <div class="grid-item">
-    <h3 style="text-align:center; font-weight:bold">할인품목<img src="/img/saleicon.png" class="saleicon"></h3>
+    <h3 style="text-align:center; font-weight:bold">할인품목<img src="/images/saleicon.png" class="saleicon"></h3>
     <div class="now-top item-area" id="discountMainArea">
       <div class="box">
         <a href="#" class="item-link">
-          <img src="/img/Na.jpg" style="margin: 10px; min-width: 230px; max-width: 315px; width: 100%;">
+          <img src="/images/Na.jpg" style="margin: 10px; min-width: 230px; max-width: 315px; width: 100%;">
         
 
         <div class="box_list_title" style="text-align:left;">메뉴 제목</div>
@@ -173,7 +173,7 @@
 <div class="slide_div">
   <a href="#" class="item-link">
     <div class="content-wrapper" style="display: flex; align-items: center;">
-      <img src="/img/balance.jpg" alt="균형잡힌 식단">
+      <img src="/images/balance.jpg" alt="균형잡힌 식단">
       <div style="text-align:left;">
         <h4>균형잡힌 식단</h4>
          </a>
@@ -185,7 +185,7 @@
 <div class="slide_div">
   <a href="#" class="item-link">
     <div class="content-wrapper" style="display: flex; align-items: center;">
-      <img src="/img/balance.jpg" alt="균형잡힌 식단">
+      <img src="/images/balance.jpg" alt="균형잡힌 식단">
       <div style="text-align:left;">
         <h4>균형잡힌 식단</h4>
          </a>
@@ -197,7 +197,7 @@
 <div class="slide_div">
   <a href="#" class="item-link">
     <div class="content-wrapper" style="display: flex; align-items: center;">
-      <img src="/img/balance.jpg" alt="균형잡힌 식단">
+      <img src="/images/balance.jpg" alt="균형잡힌 식단">
       <div style="text-align:left;">
         <h4>균형잡힌 식단</h4>
          </a>
@@ -209,7 +209,7 @@
 <div class="slide_div">
   <a href="#" class="item-link">
     <div class="content-wrapper" style="display: flex; align-items: center;">
-      <img src="/img/balance.jpg" alt="균형잡힌 식단">
+      <img src="/images/balance.jpg" alt="균형잡힌 식단">
       <div style="text-align:left;">
         <h4>균형잡힌 식단</h4>
          </a>
@@ -221,7 +221,7 @@
 <div class="slide_div">
   <a href="#" class="item-link">
     <div class="content-wrapper" style="display: flex; align-items: center;">
-      <img src="/img/balance.jpg" alt="균형잡힌 식단">
+      <img src="/images/balance.jpg" alt="균형잡힌 식단">
       <div style="text-align:left;">
         <h4>균형잡힌 식단</h4>
          </a>
@@ -233,7 +233,7 @@
 <div class="slide_div">
   <a href="#" class="item-link">
     <div class="content-wrapper" style="display: flex; align-items: center;">
-      <img src="/img/balance.jpg" alt="균형잡힌 식단">
+      <img src="/images/balance.jpg" alt="균형잡힌 식단">
       <div style="text-align:left;">
         <h4>균형잡힌 식단</h4>
         </a>
@@ -263,7 +263,7 @@ const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
 const imageIndex = document.getElementById('image-index');
 
-const images = ['/img/balance.jpg', '/img/Na.jpg'];
+const images = ['/images/balance.jpg', '/images/Na.jpg'];
 
 let currentIndex = 0;
 

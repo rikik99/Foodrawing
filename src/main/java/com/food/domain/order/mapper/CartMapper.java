@@ -11,7 +11,7 @@ import com.food.domain.order.dto.CartInfoDTO;
 
 @Mapper
 public interface CartMapper {
-	Optional<CartDTO> findByCustomerIdAndProductId(@Param("customerId") Long customerId, @Param("productId") String productId);
+	Optional<CartDTO> findByCustomerIdAndProductId(@Param("customerId") Long customerId, @Param("productNumber") String productNumber);
 
     void insertCart(CartDTO cart);
 

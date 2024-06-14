@@ -8,6 +8,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bibigo 왕교자</title>
+    <meta name="_csrf" content="${_csrf.token}"/>
+    <meta name="_csrf_header" content="${_csrf.headerName}"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/bestpage.css">
@@ -461,26 +463,30 @@
             const cartButton = document.querySelector('.cart-button');
             const buyButton = document.querySelector('.buy-button');
             const quantityInput = document.querySelector('.quantity');
-            const productIdInput = document.getElementById('product_number');
-
+            const productNumberInput = document.getElementById('product_number');
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+            
+            
             cartButton.addEventListener('click', function () {
                 const quantity = parseInt(quantityInput.value);
-                const productId = productIdInput.value; // 실제 제품 ID로 교체
+                const productNumber = productNumberInput.value; // 실제 제품 ID로 교체
                 const customerId = 1; // 실제 사용자 ID로 교체
 
-                checkStock(productId, quantity, customerId);
+                checkStock(productNumber, quantity, customerId);
             });
 
             buyButton.addEventListener('click', function () {
                 // 바로구매 로직
             });
 
-            function checkStock(productId, quantity, customerId) {
-                const data = { productId, quantity, customerId };
+            function checkStock(productNumber, quantity, customerId) {
+                const data = { productNumber, quantity, customerId };
                 fetch('/cart/checkStock', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
                     },
                     body: JSON.stringify(data),
                 })
@@ -490,10 +496,10 @@
                         if (data.stockAvailable) {
                             if (data.inCart) {
                                 if (confirm('장바구니에 이미 있는 상품입니다. 수량을 추가하시겠습니까?')) {
-                                    addToCart(productId, quantity, customerId);
+                                    addToCart(productNumber, quantity, customerId);
                                 }
                             } else {
-                                addToCart(productId, quantity, customerId);
+                                addToCart(productNumber, quantity, customerId);
                             }
                         } else {
                             alert('재고가 부족합니다.');
@@ -508,12 +514,13 @@
                 });
             }
 
-            function addToCart(productId, quantity, customerId) {
-                const data = { productId, quantity, customerId };
+            function addToCart(productNumber, quantity, customerId) {
+                const data = { productNumber, quantity, customerId };
                 fetch('/cart/addToCart', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
                     },
                     body: JSON.stringify(data),
                 })
@@ -597,7 +604,7 @@
                     </div>
                 </div>
                 <div class="right-column">
-                		<input type="hidden" id="product_number" name="product_number" value="${productinfo.productNumber}">
+                		<input type="hidden" id="product_number" name="productNumber" value="${productinfo.productNumber}">
                     <h1>${productinfo.name} 1.05kg</h1>
                     <div class="product-info" style="text-align: left;">
                     		<input type="hidden" id="productprice" name="productprice" class="productprice" value="${productinfo.price}">

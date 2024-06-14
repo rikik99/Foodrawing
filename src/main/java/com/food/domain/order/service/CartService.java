@@ -25,7 +25,7 @@ public class CartService {
     private final CustomerMapper customerMapper;
 
     public CartResponseDTO checkStock(CartRequestDTO cartRequest) {
-        ProductDTO product = productMapper.findById(cartRequest.getProductId());
+        ProductDTO product = productMapper.findById(cartRequest.getProductNumber());
         if (product == null) {
             return new CartResponseDTO(false, false, false);
         }
@@ -34,7 +34,7 @@ public class CartService {
             return new CartResponseDTO(false, false, false);
         }
 
-        Optional<CartDTO> cartOptional = cartMapper.findByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductId());
+        Optional<CartDTO> cartOptional = cartMapper.findByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductNumber());
         if (cartOptional.isPresent()) {
             return new CartResponseDTO(true, true, true);
         } else {
@@ -43,7 +43,7 @@ public class CartService {
     }
 
     public CartResponseDTO addToCart(CartRequestDTO cartRequest) {
-        ProductDTO product = productMapper.findById(cartRequest.getProductId());
+        ProductDTO product = productMapper.findById(cartRequest.getProductNumber());
         if (product == null) {
             return new CartResponseDTO(false, false, false);
         }
@@ -53,7 +53,7 @@ public class CartService {
             return new CartResponseDTO(false, false, false);
         }
 
-        Optional<CartDTO> cartOptional = cartMapper.findByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductId());
+        Optional<CartDTO> cartOptional = cartMapper.findByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductNumber());
         if (cartOptional.isPresent()) {
             CartDTO cart = cartOptional.get();
             cart.setQuantity(cart.getQuantity() + cartRequest.getQuantity());
@@ -61,7 +61,7 @@ public class CartService {
         } else {
             CartDTO cart = CartDTO.builder()
                 .customerId(customer.getId())
-                .productId(product.getProductNumber())
+                .productNumber(product.getProductNumber())
                 .quantity((long) cartRequest.getQuantity())
                 .lastDate(LocalDateTime.now())
                 .build();

@@ -297,7 +297,7 @@ padding-top:50px;}
           <g id="hexagon">
             <path class="hexagon" opacity=".8" d="M106.14 309.33V190.21l103.15-59.56 103.17 59.56v119.12l-103.17 59.56-103.15-59.56z"/>
             <!-- 각 꼭지점 이름 추가 -->
-            <text x="209.29" y="115" class="text">PROTEIN</text>
+            <text x="209.29" y="115" class="text">PROTEIN</text> 
             <text x="80" y="190.21" class="text">TRANS_FAT</text>
             <text x="80" y="309.33" class="text">SATURATED_FAT</text>
             <text x="209.29" y="385" class="text">SUGAR</text>

@@ -33,16 +33,18 @@ public class ProductService {
 
 	public List<ProductFileDTO> getProductFile(List<ProductNutritionDTO> results) {
 		List<ProductFileDTO> files = new ArrayList<>();
-		
 		for(int i = 0; i < results.size(); i++) {
-			ProductFileDTO file = productMapper.fileByResults(results.get(i));
-			files.add(file);
+			String productNumber = results.get(i).getProductNumber();
+			ProductFileDTO file = productMapper.fileByResults(productNumber);
+			 if (file != null) {
+		            files.add(file);
+		        }
 		}
 		
 		return files;
 	}
 
-    public ProductDTO findById(String productId) {
-        return productMapper.findById(productId);
+    public ProductDTO findById(String productNumber) {
+        return productMapper.findById(productNumber);
     }
 }
