@@ -33,7 +33,7 @@
     WHERE PRODUCT_NUMBER = #{productNumber}
 </select>
 
-<select id="fileByResults" resultType="com.food.domain.product.dto.ProductFileDTO">
+<select id="fileByResults"  parameterType="String" resultType="com.food.domain.product.dto.ProductFileDTO">
     SELECT ID, PRODUCT_NUMBER, ORIGINAL_NAME, FILE_PATH, FILE_TYPE, UPLOAD_DATE
     FROM PRODUCT_FILE_TB
     WHERE PRODUCT_NUMBER = #{productNumber}

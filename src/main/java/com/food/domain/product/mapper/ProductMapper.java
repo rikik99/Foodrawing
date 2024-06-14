@@ -14,7 +14,7 @@ public interface ProductMapper {
 
 	ProductDTO selectByResults(ProductNutritionDTO productNutritionDTO);
 
-	ProductFileDTO fileByResults(ProductNutritionDTO productNutritionDTO);
+	ProductFileDTO fileByResults(String productNumber);
 	
 	ProductDTO getProductById(String productId);
 

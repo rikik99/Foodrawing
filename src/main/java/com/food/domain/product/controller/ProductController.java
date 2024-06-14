@@ -1,5 +1,6 @@
 package com.food.domain.product.controller;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +52,19 @@ public class ProductController {
 
         List<CustomPageDTO> customList = new ArrayList<>();
 
-        for(int i = 0; i < results.size(); i++) {
+        for (int i = 0; i < results.size(); i++) {
+            String productName = (i < productList.size()) ? productList.get(i).getName() : null;
+            String productDescription = (i < productList.size()) ? productList.get(i).getDescription() : null;
+            Long productPrice = (i < productList.size()) ? productList.get(i).getPrice() : null;
+            Long productQuantity = (i < productList.size()) ? productList.get(i).getQuantity() : null;
+            LocalDateTime productCreatedDate = (i < productList.size()) ? productList.get(i).getCreatedDate() : null;
+
+            Long fileId = (i < fileList.size() && fileList.get(i) != null) ? fileList.get(i).getId() : null;
+            String fileOriginalName = (i < fileList.size() && fileList.get(i) != null) ? fileList.get(i).getOriginalName() : null;
+            String filePath = (i < fileList.size() && fileList.get(i) != null) ? fileList.get(i).getFilePath() : null;
+            String fileType = (i < fileList.size() && fileList.get(i) != null) ? fileList.get(i).getFileType() : null;
+            LocalDateTime fileUploadDate = (i < fileList.size() && fileList.get(i) != null) ? fileList.get(i).getUploadDate() : null;
+
             customList.add(new CustomPageDTO(
                 results.get(i).getProductNumber(),
                 results.get(i).getCalorie(),
@@ -64,16 +77,16 @@ public class ProductController {
                 results.get(i).getSodium(),
                 results.get(i).getCholesterol(),
                 results.get(i).getWeight(),
-                productList.get(i).getName(),
-                productList.get(i).getDescription(),
-                productList.get(i).getPrice(),
-                productList.get(i).getQuantity(),
-                productList.get(i).getCreatedDate(),
-                fileList.get(i).getId(),
-                fileList.get(i).getOriginalName(),
-                fileList.get(i).getFilePath(),
-                fileList.get(i).getFileType(),
-                fileList.get(i).getUploadDate()
+                productName,
+                productDescription,
+                productPrice,
+                productQuantity,
+                productCreatedDate,
+                fileId,
+                fileOriginalName,
+                filePath,
+                fileType,
+                fileUploadDate
             ));
         }
 

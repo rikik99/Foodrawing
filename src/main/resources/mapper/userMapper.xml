@@ -42,7 +42,7 @@
 		INSERT INTO
 		USER_TB(USERNAME, PASSWORD, ROLE, CREATED_DATE, DELETED_YN)
 		VALUES
-		(#{userName}, #{password}, 1, CURRENT_TIMESTAMP, 'N')
+		(#{username}, #{password}, 1, CURRENT_TIMESTAMP, 'N')
 	</insert>
 	<select id="loadUser" parameterType="String"
 		resultType="com.food.domain.user.dto.UserDTO">
@@ -52,7 +52,7 @@
 	</select>
 	<select id="findByUsername" parameterType="String"
 		resultType="com.food.domain.user.dto.UserDTO">
-		SELECT * FROM USER_TB WHERE USERNAME = #{userName}
+		SELECT * FROM USER_TB WHERE USERNAME = #{username}
 	</select>
 	<delete id="deleteToken" parameterType="String">
 		DELETE FROM

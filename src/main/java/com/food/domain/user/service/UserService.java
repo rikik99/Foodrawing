@@ -41,22 +41,29 @@ public class UserService {
 		return userMapper.loadUser(username);
 	}
 
-    public String sendVerificationEmail(String email) {
-        String token = UUID.randomUUID().toString();
-        VerificationTokenDTO verificationToken = new VerificationTokenDTO(null, token, email, LocalDateTime.now().plusMinutes(5), "N");
-        userMapper.insertToken(verificationToken);
+	public String sendVerificationEmail(String email) {
+	    // 이메일 인증 상태를 확인합니다.
+	    int verifiedCount = userMapper.isEmailVerified(email);
+	    
+	    if (verifiedCount > 0) {
+	        return "이미 인증된 이메일입니다.";
+	    }
 
-        String verificationLink = "http://localhost:9093/verify?token=" + token;
-        String subject = "이메일 인증";
-        String text = "<p>다음 링크를 클릭하여 이메일을 인증하세요:</p><a href=\"" + verificationLink + "\">" + verificationLink + "</a>";
+	    String token = UUID.randomUUID().toString();
+	    VerificationTokenDTO verificationToken = new VerificationTokenDTO(null, token, email, LocalDateTime.now().plusMinutes(5), "N");
+	    userMapper.insertToken(verificationToken);
 
-        try {
-            emailService.sendEmail(email, subject, text);
-            return "인증 이메일이 발송되었습니다.";
-        } catch (MessagingException e) {
-            return "인증 이메일 발송에 실패했습니다.";
-        }
-    }
+	    String verificationLink = "http://localhost:9093/verify?token=" + token;
+	    String subject = "이메일 인증";
+	    String text = "<p>다음 링크를 클릭하여 이메일을 인증하세요:</p><a href=\"" + verificationLink + "\">" + verificationLink + "</a>";
+
+	    try {
+	        emailService.sendEmail(email, subject, text);
+	        return "인증 이메일이 발송되었습니다.";
+	    } catch (MessagingException e) {
+	        return "인증 이메일 발송에 실패했습니다.";
+	    }
+	}
 
 	public String verifyUser(String token) {
 		VerificationTokenDTO verificationToken = userMapper.findByToken(token);

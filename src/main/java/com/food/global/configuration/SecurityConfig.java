@@ -69,7 +69,7 @@ public class SecurityConfig {
                         .failureUrl("/loginFail").permitAll())
                 .oauth2Login(oauth2Login -> oauth2Login.loginPage("/login")
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
-                        .successHandler(customOAuth2SuccessHandler) // 수정된 부분
+                        .successHandler(customOAuth2SuccessHandler)
                         .failureHandler(customOAuth2FailureHandler))
                 .logout(logout -> logout.logoutUrl("/logout").logoutSuccessHandler((request, response, authentication) -> {
                     Cookie cookie = new Cookie("jwt", null);

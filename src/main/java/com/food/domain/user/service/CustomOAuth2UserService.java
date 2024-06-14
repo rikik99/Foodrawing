@@ -39,20 +39,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         Map<String, Object> attributes = oAuth2User.getAttributes();
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         HttpSession session = request.getSession();
-        System.out.println("attributes = " + attributes);
         String email = getEmailFromAttributes(attributes, registrationId);
         String providerId = getProviderIdFromAttributes(attributes, registrationId);
-        System.out.println("registrationId = " + registrationId);
-        System.out.println("providerId = " + providerId);
-        // 연동된 소셜 계정인지 확인
+
+        // 소셜 링크가 존재하는지 확인
         UserSocialLinksDTO socialLink = userService.findSocialLinkByProviderAndProviderId(registrationId, providerId);
         if (socialLink != null) {
-            // 연동된 계정이라면 로그인 처리
+            // 기존 사용자 로직
             CustomerDTO customer = customerMapper.findCustomerById(socialLink.getUserId());
             session.setAttribute("user", customer);
             session.setAttribute("oauth2RedirectUrl", "/");
         } else {
-            // 기존 사용자 정보가 있는지 확인 (이메일 기준)
             CustomerDTO existingCustomer = customerMapper.findCustomerByEmail(email);
             if (existingCustomer != null) {
                 session.setAttribute("provider", registrationId);
@@ -61,10 +58,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 session.setAttribute("oauth2Attributes", attributes);
                 session.setAttribute("oauth2RedirectUrl", "/linkAccount");
             } else {
-                // 새로운 사용자 처리
+                // 신규 사용자 처리 로직
                 handleNewUser(attributes, registrationId, session, providerId);
-                // 이메일 인증 완료로 설정
                 userService.markEmailAsVerified(email);
+                // 회원가입 페이지로 리다이렉션 설정
+                session.setAttribute("pendingRegistration", true);
+                session.setAttribute("oauth2RedirectUrl", "/signup");
             }
         }
 
@@ -101,7 +100,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String gender = "";
         String phoneNumber = "";
         String name = "";
-        
+
         if ("naver".equals(registrationId)) {
             Map<String, Object> responseMap = (Map<String, Object>) attributes.get("response");
             nickname = (String) responseMap.get("nickname");
@@ -115,21 +114,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             gender = (String) responseMap.get("gender");
             phoneNumber = (String) responseMap.get("mobile");
             name = (String) responseMap.get("name");
-            System.out.println("phoneNumber = " + phoneNumber);
-            
-            
-            
         } else if ("kakao".equals(registrationId)) {
             Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
             Map<String, Object> kakaoProfile = (Map<String, Object>) kakaoAccount.get("profile");
             nickname = (String) kakaoProfile.get("nickname");
             name = (String) kakaoProfile.get("nickname");
-            // 카카오의 경우 생년월일, 성별, 전화번호 등의 정보는 제공되지 않을 수 있습니다.
         }
 
         String randomPassword = generateRandomPassword();
         String password = passwordEncoder.encode(randomPassword);
-        
+
         session.setAttribute("provider", registrationId);
         session.setAttribute("providerId", providerId);
         session.setAttribute("password", password);
