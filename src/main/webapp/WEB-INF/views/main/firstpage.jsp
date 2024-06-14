@@ -242,7 +242,7 @@ $(".hover").mouseleave(
 <h2 class="title content" style="position:absolute; bottom:650px; left:100px; "><span class="letter">Custom Nutrient<br><small style="font-size:17px;">원하는 영양소를 직접 골라보세요</small></span></h2>
  
 <figure class="snip1477" >
-  <img src="/img/balance.jpg" alt="이미지" />
+  <img src="/images/balance.jpg" alt="이미지" />
   <div class="title">
     <div>
       <h2>균형잡힌 식단</h2>
@@ -256,7 +256,7 @@ $(".hover").mouseleave(
 </figure>
 
 <figure class="snip1477" style="margin-top:200px;">
-  <img src="/img/protien.jpg" alt="sample38" />
+  <img src="/images/protien.jpg" alt="sample38" />
   <div class="title">
     <div>
       <h2>단백질 위주 식단</h2>
@@ -272,7 +272,7 @@ $(".hover").mouseleave(
 
 
 <figure class="snip1477">
-  <img src="/img/diet.jpeg" alt="sample38" />
+  <img src="/images/diet.jpeg" alt="sample38" />
   <div class="title">
     <div>
       <h2>다이어트 식단</h2>
@@ -286,7 +286,7 @@ $(".hover").mouseleave(
 </figure>
 
 <figure class="snip1477" style="margin-top:200px;">
-  <img src="/img/Na.jpg" alt="sample38" />
+  <img src="/images/Na.jpg" alt="sample38" />
   <div class="title">
     <div>
       <h2>저염 식단</h2>

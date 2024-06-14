@@ -1,5 +1,31 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.food.user.mapper.CustomerMapper">
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.food.domain.user.mapper.CustomerMapper">
 
+	<select id="findById"
+		resultType="com.food.domain.user.dto.CustomerDTO">
+		SELECT * FROM CUSTOMER_TB WHERE ID = #{id}
+	</select>
+	<insert id="insertCustomer"
+		parameterType="com.food.domain.user.dto.CustomerDTO"
+		useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
+		INSERT INTO
+		CUSTOMER_TB (USER_ID, NICKNAME, NAME, GENDER, PHONE, EMAIL,
+		BIRTHDATE,
+		ADDRESS, ADDRESS_DETAIL, ZIPCODE)
+		VALUES (#{userId}, #{nickname},
+		#{name}, #{gender}, #{phone}, #{email},
+		#{birthDate}, #{address},
+		#{addressDetail}, #{zipcode})
+	</insert>
+	<select id="findCustomerByEmail" parameterType="String"
+		resultType="com.food.domain.user.dto.CustomerDTO">
+		SELECT * FROM CUSTOMER_TB WHERE EMAIL = #{email}
+	</select>
+	<select id="findCustomerById" parameterType="Long"
+		resultType="com.food.domain.user.dto.CustomerDTO">
+		SELECT * FROM CUSTOMER_TB WHERE ID = #{userId}
+	</select>
 </mapper>

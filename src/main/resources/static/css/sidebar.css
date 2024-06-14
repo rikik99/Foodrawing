@@ -1,0 +1,53 @@
+@charset "UTF-8";
+
+ .sidebar {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            width: 100px; /* Increased width for more content space */
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px 0 0 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            z-index: 1000;
+        }
+        .sidebar a {
+            margin: 20px 0;
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            text-align: center;
+        }
+        .sidebar a img {
+            width: 24px;
+            height: 24px;
+            display: block;
+            margin: 0 auto;
+        }
+        .sidebar .cart-link {
+            position: relative;
+        }
+        .sidebar .cart-link .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            left: revert-layer;
+        }
+        .sidebar .top-button {
+            margin-top: auto;
+            margin-bottom: 10px;
+        }
+        .sidebar .top-button img {
+            width: 32px;
+            height: 32px;
+        }
