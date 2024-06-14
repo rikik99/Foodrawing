@@ -16,7 +16,7 @@ public interface UserMapper {
 
 	void deleteToken(@Param("email") String email);
 
-	 Integer isEmailVerified(String email);
+	Integer isEmailVerified(String email);
 
 	void updateEmailVerified(@Param("email") String email, @Param("verified") String verified);
 

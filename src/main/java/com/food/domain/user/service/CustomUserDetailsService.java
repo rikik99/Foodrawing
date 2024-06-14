@@ -2,9 +2,8 @@ package com.food.domain.user.service;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
+import com.food.global.auth.UserNotFoundException;
 import com.food.domain.user.dto.UserDTO;
 import com.food.global.auth.CustomUserDetails;
 
@@ -18,11 +17,11 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws UserNotFoundException {
         UserDTO userDTO = userService.loadUser(username);
         System.out.println("로그인한 userVo = "+userDTO);
         if (userDTO == null) {
-            throw new UsernameNotFoundException("User not found");
+            throw new UserNotFoundException("User not found");
         }
         return new CustomUserDetails(userDTO);
     }

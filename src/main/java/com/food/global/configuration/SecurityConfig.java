@@ -62,15 +62,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/", "/login", "/loginFail", "/signup", "/WEB-INF/views/**", "/css/**",
                                 "/js/**", "/images/**", "/sendVerificationEmail", "/verify", "/signupInfo", "/main/custompage","/main/mainpage", "/nutrition",
-                                "/verificationSuccess", "/verificationFail", "/checkDuplicateUsername", "/invalidateSession", "/linkAccount", "/findUsername","/verify-id-code","/showUsername","/findPassword", "/sendPasswordResetCode","/verify-password-code","/passwordReset",
-                                "/best", "/ProductDetail", "/cart")
+                                "/verificationSuccess", "/verificationFail", "/checkDuplicateUsername", "/invalidateSession", "/linkAccount", "/findUsername","/verify-id-code","/showUsername","/findPassword", "/sendPasswordResetCode","/verify-password-code","/passwordReset")
                         .permitAll().anyRequest().authenticated())
                 .formLogin(formLogin -> formLogin.loginPage("/login").defaultSuccessUrl("/", true)
                         .successHandler(customAuthenticationSuccessHandler)
                         .failureUrl("/loginFail").permitAll())
                 .oauth2Login(oauth2Login -> oauth2Login.loginPage("/login")
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
-                        .successHandler(customOAuth2SuccessHandler) // 수정된 부분
+                        .successHandler(customOAuth2SuccessHandler)
                         .failureHandler(customOAuth2FailureHandler))
                 .logout(logout -> logout.logoutUrl("/logout").logoutSuccessHandler((request, response, authentication) -> {
                     Cookie cookie = new Cookie("jwt", null);

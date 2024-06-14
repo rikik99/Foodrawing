@@ -138,6 +138,7 @@
 </head>
 
 <body>
+<<<<<<< HEAD
 	<main>
 		<div class="image-container">
 			<img id="image-container" src="/images/2.png" alt="이미지"
@@ -151,9 +152,22 @@
 				</button>
 			</div>
 			<div id="image-index" class="image-index">1/5</div>
+=======
+<main>
+<div class="image-container" >
+    <img id="image-container" src="/images/balance.jpg" alt="이미지" style="width: 100%; height: 100%; object-fit: contain;">
+		<div class="image-controls">
+			<button id="prev-btn" class="prev-btn">
+				<i class="fas fa-chevron-left"></i>
+			</button>
+			<button id="next-btn" class="next-btn">
+				<i class="fas fa-chevron-right"></i>
+			</button>
+>>>>>>> branch 'develop' of https://github.com/rikik99/Foodrawing.git
 		</div>
 
 
+<<<<<<< HEAD
 		<div class="section grid"
 			style="border: 1px solid #ccc; padding: 20px; margin-top: 20px;">
 			<div class="grid-item">
@@ -164,7 +178,108 @@
 					<div class="box">
 						<a href="#" class="item-link"> <img src="/images/Na.jpg"
 							style="margin: 10px; min-width: 230px; max-width: 315px; width: 100%;">
+=======
+<div class="section grid" style="border: 1px solid #ccc; padding: 20px; margin-top:20px;">
+  <div class="grid-item">
+    <h3 style="text-align:center; font-weight:bold">할인품목<img src="/images/saleicon.png" class="saleicon"></h3>
+    <div class="now-top item-area" id="discountMainArea">
+      <div class="box">
+        <a href="#" class="item-link">
+          <img src="/images/Na.jpg" style="margin: 10px; min-width: 230px; max-width: 315px; width: 100%;">
+        
+>>>>>>> branch 'develop' of https://github.com/rikik99/Foodrawing.git
 
+<<<<<<< HEAD
+=======
+        <div class="box_list_title" style="text-align:left;">메뉴 제목</div>
+        </a>
+        <div class="box_list_sub" style="text-align:left;">메뉴 설명</div>
+        <div class="box_list_price" style="text-align:left;">10000원</div>
+       
+      </div>
+    </div>
+  </div>
+  
+<!--   슬릭슬라이드 -->
+  
+<div class="grid-item" style="display: flex; flex-direction: column; align-items: left; padding-left: 20px;">
+<div class="slick_slider">
+<div class="slide_div">
+  <a href="#" class="item-link">
+    <div class="content-wrapper" style="display: flex; align-items: center;">
+      <img src="/images/balance.jpg" alt="균형잡힌 식단">
+      <div style="text-align:left;">
+        <h4>균형잡힌 식단</h4>
+         </a>
+        <p>가격</p>
+        <p>다양한 영양소가 포함된 균형잡힌 식단을 제공합니다.</p>
+      </div>
+    </div>
+</div>
+<div class="slide_div">
+  <a href="#" class="item-link">
+    <div class="content-wrapper" style="display: flex; align-items: center;">
+      <img src="/images/balance.jpg" alt="균형잡힌 식단">
+      <div style="text-align:left;">
+        <h4>균형잡힌 식단</h4>
+         </a>
+        <p>가격</p>
+        <p>다양한 영양소가 포함된 균형잡힌 식단을 제공합니다.</p>
+      </div>
+    </div>
+</div>
+<div class="slide_div">
+  <a href="#" class="item-link">
+    <div class="content-wrapper" style="display: flex; align-items: center;">
+      <img src="/images/balance.jpg" alt="균형잡힌 식단">
+      <div style="text-align:left;">
+        <h4>균형잡힌 식단</h4>
+         </a>
+        <p>가격</p>
+        <p>다양한 영양소가 포함된 균형잡힌 식단을 제공합니다.</p>
+      </div>
+    </div>
+</div>
+<div class="slide_div">
+  <a href="#" class="item-link">
+    <div class="content-wrapper" style="display: flex; align-items: center;">
+      <img src="/images/balance.jpg" alt="균형잡힌 식단">
+      <div style="text-align:left;">
+        <h4>균형잡힌 식단</h4>
+         </a>
+        <p>가격</p>
+        <p>다양한 영양소가 포함된 균형잡힌 식단을 제공합니다.</p>
+      </div>
+    </div>
+</div>
+<div class="slide_div">
+  <a href="#" class="item-link">
+    <div class="content-wrapper" style="display: flex; align-items: center;">
+      <img src="/images/balance.jpg" alt="균형잡힌 식단">
+      <div style="text-align:left;">
+        <h4>균형잡힌 식단</h4>
+         </a>
+        <p>가격</p>
+        <p>다양한 영양소가 포함된 균형잡힌 식단을 제공합니다.</p>
+      </div>
+    </div>
+</div>
+<div class="slide_div">
+  <a href="#" class="item-link">
+    <div class="content-wrapper" style="display: flex; align-items: center;">
+      <img src="/images/balance.jpg" alt="균형잡힌 식단">
+      <div style="text-align:left;">
+        <h4>균형잡힌 식단</h4>
+        </a>
+        <p>가격</p>
+        <p>다양한 영양소가 포함된 균형잡힌 식단을 제공합니다.</p>
+      </div>
+    </div>
+</div>
+</div>
+</div>
+</div>
+>>>>>>> branch 'develop' of https://github.com/rikik99/Foodrawing.git
 
 							<div class="box_list_title" style="text-align: left;">메뉴 제목</div>
 						</a>
@@ -284,7 +399,11 @@ const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
 const imageIndex = document.getElementById('image-index');
 
+<<<<<<< HEAD
 const images = ['/images/2.png', '/images/3.png','/images/7.png','/images/8.png','/images/9.png'];
+=======
+const images = ['/images/balance.jpg', '/images/Na.jpg'];
+>>>>>>> branch 'develop' of https://github.com/rikik99/Foodrawing.git
 
 let currentIndex = 0;
 

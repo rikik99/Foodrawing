@@ -8,6 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bibigo 왕교자</title>
+<<<<<<< HEAD
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/bestpage.css">
@@ -598,6 +599,605 @@
                 </div>
                 <div class="right-column">
                 		<input type="hidden" id="product_number" name="product_number" value="${productinfo.productNumber}">
+=======
+    <meta name="_csrf" content="${_csrf.token}"/>
+    <meta name="_csrf_header" content="${_csrf.headerName}"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/bestpage.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/product/productimage.css">
+    <link rel="stylesheet" href="css/product/slider.css">
+    <link rel="stylesheet" href="css/product/cart.css">
+    <link rel="stylesheet" href="css/product/reviewchartbox.css">
+    <link rel="stylesheet" href="css/product/review.css">
+    <link rel="stylesheet" href="css/product/inquiry.css">
+    <style>
+        .detail-top {
+            margin: 0;
+            padding: 0;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .detail-container {
+            width: 100%;
+            max-width: 1200px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center; /* Center align the detail-container */
+        }
+        .product-section {
+            display: flex;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .left-column {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .right-column {
+            flex: 1;
+        }
+        
+        
+        .product-info {
+            font-size: 14px;
+        }
+        .price {
+            color: red;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .original-price {
+            text-decoration: line-through;
+            color: gray;
+        }
+        .rating {
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .purchase-buttons {
+            margin-top: 20px;
+        }
+        .purchase-buttons button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .cart-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+        .buy-button {
+            background-color: #FFA500;
+            color: white;
+            border: none;
+        }
+        
+        .sticky-wrap {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0px;
+            width: 100%;
+            z-index: 1000;
+        }
+        .sticky-content {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            background: white;
+        }
+        .sticky-content .nav-tabs {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            justify-content: center;
+        }
+        .sticky-content .nav-tabs .nav-item {
+            margin-right: 20px;
+        }
+        .sticky-content .nav-tabs .nav-link {
+            padding: 10px 15px;
+            color: #555;
+            border: 1px solid transparent;
+            transition: background-color 0.3s;
+        }
+        .sticky-content .nav-tabs .nav-link.active {
+            background-color: #f8f8f8;
+            border-color: #ddd #ddd #fff;
+        }
+        .contents-wrapper {
+            display: flex;
+            justify-content: center; /* Center align the contents-wrapper */
+            margin-top: 20px; /* Add some margin to ensure it doesn't overlap with sticky-wrap */
+            margin: 0 auto;
+        }
+        .contents {
+            flex: 1;
+            width: 1000px; /* Limit the max width of the contents */
+            padding: 20px;
+        }
+        .detail-content {
+            margin-bottom: 40px;
+        }
+        .detail-content h2,
+        .detail-content h3 {
+            margin-top: 20px;
+        }
+        
+        .product-detail {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align items to the start */
+            flex-direction: column;
+        }
+        
+        .review-badge, .inquiry-badge {
+        	border: 2px solid rgb(255 193 7);
+        	padding-left: 5px;
+        	padding-right: 5px;
+        }
+        
+        .review-section {
+            width: 100%;
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .review-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .review-header .sort-options {
+            display: flex;
+            align-items: center;
+        }
+        .review-header .sort-options select,
+        .review-header .sort-options button {
+            margin-left: 10px;
+        }
+        /*.review-item {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }*/
+        
+        .review-details {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+        .review-item {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+}
+
+
+        .review-item:last-child {
+            border-bottom: none;
+        }
+        .review-info {
+            display: flex;
+            align-items: center;
+        }
+        .review-info .review-rating {
+            color: #f5a623;
+            margin-right: 10px;
+        }
+        .review-info .review-author {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .review-info .review-date {
+            color: #aaa;
+        }
+        .review-content {
+            display: flex;
+				    flex-direction: column;
+				    align-items: flex-start;
+				    margin: 10px 0;
+        }
+        .review-image img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+        }
+        .pagination li {
+            margin: 0 5px;
+        }
+        
+        .inquiry-section {
+            width: 100%;
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .inquiry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .inquiry-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .inquiry-item {
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+            cursor: pointer;
+        }
+        .inquiry-item:last-child {
+            border-bottom: none;
+        }
+        .inquiry-info {
+            display: flex;
+            align-items: center;
+        }
+        .inquiry-info .inquiry-badge {
+            margin-right: 10px;
+            display: flex; /* Flex container for alignment */
+            align-items: center; /* Vertically center the badge */
+        }
+        .inquiry-info .inquiry-content {
+            margin-right: 20px;
+            flex-grow: 1; /* Allow content to take remaining space */
+        }
+        .inquiry-info .inquiry-author,
+        .inquiry-info .inquiry-date {
+            color: #aaa;
+        }
+        .inquiry-answer {
+            display: none;
+            flex-direction: column;
+            margin-top: 10px;
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+        }
+        .pagination li {
+            margin: 0 5px;
+        }
+        
+        
+        .detail-cart-wrap {
+            width: 100%; /* Adjust this width as needed */
+            background: #f8f8f8;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .sticky-sidebar {
+            width: 300px;
+            position: -webkit-sticky;
+            position: sticky;
+            top: 70px; /* Adjust this value to control the sticky position */
+            margin-right: 0px; /* Remove left margin */
+            
+				   
+        }
+
+.cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .cart-item div {
+            flex: 1;
+            text-align: center;
+        }
+        .cart-item .item-info {
+            flex: 3;
+            text-align: left;
+        }
+        .cart-item .item-quantity {
+            display: flex;
+            align-items: center;
+        }
+        .cart-item .item-quantity button {
+            border: none;
+            background: none;
+            font-size: 16px;
+            padding: 0 10px;
+        }
+        .cart-item .item-quantity input {
+            width: 40px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 0 10px;
+        }
+        .cart-total {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .sticky-sidebar .cart-item {
+            display: inline-block;
+        }
+        
+        .sticky-cart {
+				    max-width: 305px;
+				}
+        
+        
+        
+        .review {
+            margin-top: 10px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 900px;
+        }
+
+        .review-thumbnail img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .more-content {
+            display: none;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .full-size-img {
+            width: 70%;
+            height: auto;
+            margin-top: 10px;
+        }
+
+        .more-btn {
+            color: #007bff;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 10px;
+        }
+        .review .review-answer {
+        	background-color: #e5e5e5;
+        	padding: 20px;
+        	border-radius: 5px;
+        	width: 900px;
+        }
+        .review .review-comment {
+        	width: 900px;
+        }
+        
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+		<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const quantityInputs = document.querySelectorAll('.quantity');
+            const totalPriceElements = document.querySelectorAll('.total-price');
+            const pricePerItem = parseInt(document.getElementById('productprice').value);
+
+            function updateTotalPrice() {
+                const quantity = parseInt(quantityInputs[0].value);
+                totalPriceElements.forEach(totalPriceElement => {
+                    const totalPrice = quantity * pricePerItem;
+                    totalPriceElement.innerText = totalPrice.toLocaleString() + '원';
+                });
+                quantityInputs.forEach(input => {
+                    input.value = quantity;
+                });
+            }
+
+            document.querySelectorAll('.increment').forEach(button => {
+                button.addEventListener('click', function() {
+                    const quantity = parseInt(quantityInputs[0].value) + 1;
+                    quantityInputs.forEach(input => input.value = quantity);
+                    updateTotalPrice();
+                });
+            });
+
+            document.querySelectorAll('.decrement').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (quantityInputs[0].value > 1) {
+                        const quantity = parseInt(quantityInputs[0].value) - 1;
+                        quantityInputs.forEach(input => input.value = quantity);
+                        updateTotalPrice();
+                    }
+                });
+            });
+
+            updateTotalPrice();
+        });
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            const cartButton = document.querySelector('.cart-button');
+            const buyButton = document.querySelector('.buy-button');
+            const quantityInput = document.querySelector('.quantity');
+            const productNumberInput = document.getElementById('product_number');
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+            
+            
+            cartButton.addEventListener('click', function () {
+                const quantity = parseInt(quantityInput.value);
+                const productNumber = productNumberInput.value; // 실제 제품 ID로 교체
+                const customerId = 1; // 실제 사용자 ID로 교체
+
+                checkStock(productNumber, quantity, customerId);
+            });
+
+            buyButton.addEventListener('click', function () {
+                // 바로구매 로직
+            });
+
+            function checkStock(productNumber, quantity, customerId) {
+                const data = { productNumber, quantity, customerId };
+                fetch('/cart/checkStock', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify(data),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.stockAvailable) {
+                            if (data.inCart) {
+                                if (confirm('장바구니에 이미 있는 상품입니다. 수량을 추가하시겠습니까?')) {
+                                    addToCart(productNumber, quantity, customerId);
+                                }
+                            } else {
+                                addToCart(productNumber, quantity, customerId);
+                            }
+                        } else {
+                            alert('재고가 부족합니다.');
+                        }
+                    } else {
+                        alert('장바구니에 담는데 문제가 발생했습니다');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('장바구니에 담는데 문제가 발생했습니다');
+                });
+            }
+
+            function addToCart(productNumber, quantity, customerId) {
+                const data = { productNumber, quantity, customerId };
+                fetch('/cart/addToCart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify(data),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('장바구니에 담겼습니다');
+                        updateCartCount(quantity);
+                    } else {
+                        alert('장바구니에 담는데 문제가 발생했습니다');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('장바구니에 담는데 문제가 발생했습니다');
+                });
+            }
+
+            function updateCartCount(quantity) {
+                const headerCartCount = document.getElementById('headerCartCount');
+                const cartBadge = document.querySelector('.cart-link .badge');
+
+                if (headerCartCount) {
+                    const currentCount = parseInt(headerCartCount.textContent) || 0;
+                    headerCartCount.textContent = currentCount + quantity;
+                }
+
+                if (cartBadge) {
+                    const currentBadgeCount = parseInt(cartBadge.textContent) || 0;
+                    cartBadge.textContent = currentBadgeCount + quantity;
+                }
+            }
+        });
+    </script>
+    
+    <script>
+    function toggleMoreContent(id) {
+        var content = document.getElementById('more-content-' + id);
+        var btn = document.getElementById('more-btn-' + id);
+        var thumbnail = document.getElementById('thumbnail-' + id);
+
+        if (content.style.display === 'none' || content.style.display === '') {
+            content.style.display = 'flex';
+            thumbnail.style.display = 'none'; // 작은 이미지 숨기기
+            btn.innerText = '닫기';
+        } else {
+            content.style.display = 'none';
+            thumbnail.style.display = 'block'; // 작은 이미지 보이기
+            btn.innerText = '더보기';
+        }
+    }
+    
+    function toggleInquiryAnswer(id) {
+        var answer = document.getElementById('inquiry-answer-' + id);
+        if (answer.style.display === 'none' || answer.style.display === '') {
+            answer.style.display = 'flex';
+        } else {
+            answer.style.display = 'none';
+        }
+    }
+    </script>
+</head>
+<body>
+    <div class="header-wrap">
+        <%@include file="/WEB-INF/include/header.jsp"%>
+        <%@include file="/WEB-INF/include/nav.jsp"%>
+    </div>
+    <div class="detail-top">
+        <div class="detail-container">
+            <div class="product-section">
+                <div class="left-column">
+                    <div class="big" id="bigImageContainer">
+                        <img id="bigImage" src="images/20240517_CaTchWorkFavicon.png" alt="bigimage">
+                    </div>
+                    <div class="mini">
+                        <span data-image="images/20240517_CaTchWorkFavicon.png"><img src="images/20240517_CaTchWorkFavicon.png" alt="1"></span>
+                        <span data-image="images/logo_default.jpg"><img src="images/logo_default.jpg" alt="2"></span>
+                        <span data-image="images/cblank_profile.jpg"><img src="images/cblank_profile.jpg" alt="3"></span>
+                        <span data-image="images/cblank_profile.jpg"><img src="images/cblank_profile.jpg" alt="4"></span>
+                        <span data-image="images/cblank_profile.jpg"><img src="images/cblank_profile.jpg" alt="5"></span>
+                    </div>
+                </div>
+                <div class="right-column">
+                		<input type="hidden" id="product_number" name="productNumber" value="${productinfo.productNumber}">
+>>>>>>> branch 'develop' of https://github.com/rikik99/Foodrawing.git
                     <h1>${productinfo.name} 1.05kg</h1>
                     <div class="product-info" style="text-align: left;">
                     		<input type="hidden" id="productprice" name="productprice" class="productprice" value="${productinfo.price}">
