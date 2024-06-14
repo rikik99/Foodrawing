@@ -8,8 +8,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bibigo 왕교자</title>
-    <meta name="_csrf" content="${_csrf.token}"/>
-    <meta name="_csrf_header" content="${_csrf.headerName}"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/bestpage.css">
@@ -463,10 +461,7 @@
             const cartButton = document.querySelector('.cart-button');
             const buyButton = document.querySelector('.buy-button');
             const quantityInput = document.querySelector('.quantity');
-            const productNumberInput = document.getElementById('product_number');
-            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-            
+            const productNumberInput = document.getElementById('product_number');           
             
             cartButton.addEventListener('click', function () {
                 const quantity = parseInt(quantityInput.value);
@@ -485,8 +480,7 @@
                 fetch('/cart/checkStock', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        [csrfHeader]: csrfToken
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data),
                 })
@@ -520,7 +514,6 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        [csrfHeader]: csrfToken
                     },
                     body: JSON.stringify(data),
                 })

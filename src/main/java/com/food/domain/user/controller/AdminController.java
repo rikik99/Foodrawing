@@ -15,4 +15,12 @@ public class AdminController {
         mv.addObject("message", "Welcome to the admin login page");
         return mv;
     }
+    @GetMapping("/dashboard")
+    public ModelAndView admindashboard() {
+    	ModelAndView mv = new ModelAndView();
+    	// 필요한 경우 추가 데이터를 모델에 추가
+    	mv.setViewName("admin/adminMain");
+    	mv.addObject("message", "Welcome to the admin login page");
+    	return mv;
+    }
 }

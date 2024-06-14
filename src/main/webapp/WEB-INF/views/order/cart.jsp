@@ -227,7 +227,7 @@ function updateCartItem(button) {
             },
             body: JSON.stringify({
                 customerId: customerId,
-                productId: productId,
+                productNumber: productId,
                 quantity: newQuantity
             }),
         })
@@ -322,7 +322,6 @@ function checkoutSelectedItems() {
 
 function checkoutAllItems() {
     var customerId = 1/* 고객 ID를 적절히 넣어야 합니다 */;
-    
     fetch('/order/prepareCheckoutAll', {
         method: 'POST',
         headers: {

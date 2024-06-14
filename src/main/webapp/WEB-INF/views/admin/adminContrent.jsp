@@ -11,9 +11,12 @@
     <div class="login-header">
         <h1>Admin Login</h1>
     </div>
-    <form class="login-form" action="/admin/login" method="post">
-        <!-- CSRF Token -->
-        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+        <c:if test="${param.error != null}">
+        <div class="login-error">
+            아이디나 비밀번호가 잘못되었거나 권한이 없습니다.
+        </div>
+    </c:if>
+    <form action="<c:url value='/admin/login' />" method="post">
         <div class="login-input">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" placeholder="Enter your username" required>

@@ -1,6 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
     const loginMain = document.querySelector('.login-main');
 
     // 페이지 로드 시 저장된 상태가 있는지 확인
@@ -11,11 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('keydown', function(event) {
         if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 'a') { // 예: Ctrl + Alt + A
             console.log('Ctrl + Alt + A detected');
-            fetch('/admin/loginContent', {
-                headers: {
-                    [csrfHeader]: csrfToken
-                },
-            })
+            fetch('/admin/loginContent')
             .then(response => {
                 console.log('Fetch response status:', response.status);
                 return response.text();
