@@ -26,20 +26,12 @@ public class CartService {
 
     public CartResponseDTO checkStock(CartRequestDTO cartRequest) {
         ProductDTO product = productMapper.findById(cartRequest.getProductId());
-        if (product == null) {
-            return new CartResponseDTO(false, false, false);
-        }
-
-        if (product.getQuantity() < cartRequest.getQuantity()) {
+        if (product == null || product.getQuantity() < cartRequest.getQuantity()) {
             return new CartResponseDTO(false, false, false);
         }
 
         Optional<CartDTO> cartOptional = cartMapper.findByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductId());
-        if (cartOptional.isPresent()) {
-            return new CartResponseDTO(true, true, true);
-        } else {
-            return new CartResponseDTO(true, true, false);
-        }
+        return cartOptional.isPresent() ? new CartResponseDTO(true, true, true) : new CartResponseDTO(true, true, false);
     }
 
     public CartResponseDTO addToCart(CartRequestDTO cartRequest) {
@@ -69,5 +61,29 @@ public class CartService {
         }
 
         return new CartResponseDTO(true, true, true);
+    }
+
+    public CartResponseDTO updateCartItem(CartRequestDTO cartRequest) {
+        Optional<CartDTO> cartOptional = cartMapper.findByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductId());
+        if (cartOptional.isPresent()) {
+            CartDTO cart = cartOptional.get();
+            cart.setQuantity((long) cartRequest.getQuantity());
+            cart.setLastDate(LocalDateTime.now());
+            cartMapper.updateCart(cart);
+            return new CartResponseDTO(true, true, true);
+        } else {
+            return new CartResponseDTO(false, false, false);
+        }
+    }
+
+    public void deleteCartItem(CartRequestDTO cartRequest) {
+        cartMapper.deleteByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductId());
+    }
+
+    public void checkoutSelectedItems(CartRequestDTO cartRequest) {
+        // 선택된 아이템을 주문 처리하는 로직 구현
+        for (Long productId : cartRequest.getProductIds()) {
+            cartMapper.deleteByCustomerIdAndProductId(cartRequest.getCustomerId(), productId);
+        }
     }
 }

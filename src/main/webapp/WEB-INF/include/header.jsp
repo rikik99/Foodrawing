@@ -24,7 +24,7 @@
 		      		<img class="btn-alarm-icon" src="/images/alarm.png">
 		      		<span class="count" id="headerAlarmCount">0</span>
 		      	</a>
-		      	<a href="#" class="btn-cart ms-2">
+		      	<a href="/cart" class="btn-cart ms-2">
 		      		<img class="btn-cart-icon" src="/images/basket-icon.png">
 		      		<span class="count" id="headerCartCount">${cartItemCount}</span>
 		      	</a>

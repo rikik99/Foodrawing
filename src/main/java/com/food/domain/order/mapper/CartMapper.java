@@ -18,4 +18,14 @@ public interface CartMapper {
     void updateCart(CartDTO cart);
 
 	List<CartInfoDTO> getCartListByCustomerId(Long id);
+
+	void deleteByCustomerIdAndProductId(Long customerId, String productId);
+
+	void deleteByCustomerIdAndProductId(Long customerId, Long productId);
+
+	void deleteAllByCustomerId(Long customerId);
+
+	List<CartDTO> findItemsByIds(List<String> productIds);
+
+	List<CartDTO> findAllItemsByCustomerId(Long customerId);
 }

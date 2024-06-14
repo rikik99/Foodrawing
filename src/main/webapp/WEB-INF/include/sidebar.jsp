@@ -2,7 +2,7 @@
     pageEncoding="UTF-8"%>
 
 <div class="sidebar">
-            <a href="#" class="cart-link">
+            <a href="/cart" class="cart-link">
                 <img src="/images/basket-icon.png" alt="Cart Icon">
                 <div class="badge">${cartItemCount}</div>
                 장바구니
@@ -11,7 +11,7 @@
                 최근 본
                 <!-- Add content here as needed -->
             </a>
-            <a href="#" class="top-button">
+            <a href="" class="top-button">
                 <img src="/images/btn_top_quick.png" alt="Top">
                 TOP
             </a>
