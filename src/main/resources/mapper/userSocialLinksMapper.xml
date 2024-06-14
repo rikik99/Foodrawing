@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.food.domain.user.mapper.UserSocialLinksMapper">
+
+<insert id="insertLinks" parameterType="com.food.domain.user.dto.UserSocialLinksDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
+    INSERT INTO user_social_links (user_id, provider, provider_id)
+    VALUES (#{userId}, #{provider}, #{providerId})
+</insert>
+
+    <select id="findByUserId" parameterType="Long" resultType="com.food.domain.user.dto.UserSocialLinksDTO">
+        SELECT * FROM user_social_links WHERE user_id = #{userId}
+    </select>
+
+    <select id="findByProviderAndProviderId" parameterType="map" resultType="com.food.domain.user.dto.UserSocialLinksDTO">
+        SELECT * FROM user_social_links WHERE provider = #{provider} AND provider_id = #{providerId}
+    </select>
+
+</mapper>

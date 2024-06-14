@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class CartDTO {
     private Long id;
     private Long customerId;
-    private String productId;
+    private String productNumber;
     private Long quantity;
     private LocalDateTime lastDate;
 }

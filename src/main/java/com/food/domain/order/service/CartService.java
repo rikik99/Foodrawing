@@ -25,17 +25,25 @@ public class CartService {
     private final CustomerMapper customerMapper;
 
     public CartResponseDTO checkStock(CartRequestDTO cartRequest) {
-        ProductDTO product = productMapper.findById(cartRequest.getProductId());
-        if (product == null || product.getQuantity() < cartRequest.getQuantity()) {
+        ProductDTO product = productMapper.findById(cartRequest.getProductNumber());
+        if (product == null) {
             return new CartResponseDTO(false, false, false);
         }
 
-        Optional<CartDTO> cartOptional = cartMapper.findByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductId());
-        return cartOptional.isPresent() ? new CartResponseDTO(true, true, true) : new CartResponseDTO(true, true, false);
+        if (product.getQuantity() < cartRequest.getQuantity()) {
+            return new CartResponseDTO(false, false, false);
+        }
+
+        Optional<CartDTO> cartOptional = cartMapper.findByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductNumber());
+        if (cartOptional.isPresent()) {
+            return new CartResponseDTO(true, true, true);
+        } else {
+            return new CartResponseDTO(true, true, false);
+        }
     }
 
     public CartResponseDTO addToCart(CartRequestDTO cartRequest) {
-        ProductDTO product = productMapper.findById(cartRequest.getProductId());
+        ProductDTO product = productMapper.findById(cartRequest.getProductNumber());
         if (product == null) {
             return new CartResponseDTO(false, false, false);
         }
@@ -45,7 +53,7 @@ public class CartService {
             return new CartResponseDTO(false, false, false);
         }
 
-        Optional<CartDTO> cartOptional = cartMapper.findByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductId());
+        Optional<CartDTO> cartOptional = cartMapper.findByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductNumber());
         if (cartOptional.isPresent()) {
             CartDTO cart = cartOptional.get();
             cart.setQuantity(cart.getQuantity() + cartRequest.getQuantity());
@@ -53,7 +61,7 @@ public class CartService {
         } else {
             CartDTO cart = CartDTO.builder()
                 .customerId(customer.getId())
-                .productId(product.getProductNumber())
+                .productNumber(product.getProductNumber())
                 .quantity((long) cartRequest.getQuantity())
                 .lastDate(LocalDateTime.now())
                 .build();
@@ -64,7 +72,7 @@ public class CartService {
     }
 
     public CartResponseDTO updateCartItem(CartRequestDTO cartRequest) {
-        Optional<CartDTO> cartOptional = cartMapper.findByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductId());
+        Optional<CartDTO> cartOptional = cartMapper.findByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductNumber());
         if (cartOptional.isPresent()) {
             CartDTO cart = cartOptional.get();
             cart.setQuantity((long) cartRequest.getQuantity());
@@ -77,7 +85,7 @@ public class CartService {
     }
 
     public void deleteCartItem(CartRequestDTO cartRequest) {
-        cartMapper.deleteByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductId());
+        cartMapper.deleteByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductNumber());
     }
 
     public void checkoutSelectedItems(CartRequestDTO cartRequest) {

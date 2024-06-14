@@ -23,7 +23,7 @@ public class ProductCategoryMapping {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "PRODUCT_ID", nullable = false)
+    @JoinColumn(name = "PRODUCT_NUMBER", nullable = false)
     private Product product;
 
     @ManyToOne
