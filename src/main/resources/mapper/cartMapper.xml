@@ -69,7 +69,13 @@
 			    d.TYPE,
 			    d.DISCOUNT_VALUE,
 			    d.MAX_DISCOUNT
-
-
     </select>
+    
+    <delete id="deleteByCustomerIdAndProductId">
+        DELETE FROM CART_TB WHERE CUSTOMER_ID = #{customerId} AND PRODUCT_ID = #{productId}
+    </delete>
+    
+    <delete id="deleteAllByCustomerId">
+        DELETE FROM CART_TB WHERE CUSTOMER_ID = #{customerId}
+    </delete>
 </mapper>

@@ -13,7 +13,6 @@ import com.food.domain.order.service.CartService;
 
 import lombok.RequiredArgsConstructor;
 
-
 @RestController
 @RequestMapping("/cart")
 @RequiredArgsConstructor
@@ -40,6 +39,28 @@ public class CartController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CartResponseDTO(false, false, false));
+        }
+    }
+
+    @PostMapping("/updateCartItem")
+    public ResponseEntity<CartResponseDTO> updateCartItem(@RequestBody CartRequestDTO cartRequest) {
+        try {
+            CartResponseDTO response = cartService.updateCartItem(cartRequest);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CartResponseDTO(false, false, false));
+        }
+    }
+
+    @PostMapping("/deleteCartItem")
+    public ResponseEntity<Void> deleteCartItem(@RequestBody CartRequestDTO cartRequest) {
+        try {
+            cartService.deleteCartItem(cartRequest);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }
