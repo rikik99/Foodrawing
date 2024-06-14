@@ -70,4 +70,28 @@ public class CartService {
 
         return new CartResponseDTO(true, true, true);
     }
+
+    public CartResponseDTO updateCartItem(CartRequestDTO cartRequest) {
+        Optional<CartDTO> cartOptional = cartMapper.findByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductNumber());
+        if (cartOptional.isPresent()) {
+            CartDTO cart = cartOptional.get();
+            cart.setQuantity((long) cartRequest.getQuantity());
+            cart.setLastDate(LocalDateTime.now());
+            cartMapper.updateCart(cart);
+            return new CartResponseDTO(true, true, true);
+        } else {
+            return new CartResponseDTO(false, false, false);
+        }
+    }
+
+    public void deleteCartItem(CartRequestDTO cartRequest) {
+        cartMapper.deleteByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductNumber());
+    }
+
+    public void checkoutSelectedItems(CartRequestDTO cartRequest) {
+        // 선택된 아이템을 주문 처리하는 로직 구현
+        for (Long productId : cartRequest.getProductIds()) {
+            cartMapper.deleteByCustomerIdAndProductId(cartRequest.getCustomerId(), productId);
+        }
+    }
 }

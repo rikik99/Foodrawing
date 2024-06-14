@@ -1,38 +1,46 @@
 package com.food.domain.order.controller;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.food.domain.order.dto.CartDTO;
-import com.food.domain.order.dto.CartInfoDTO;
-import com.food.domain.order.mapper.CartMapper;
-import com.food.domain.user.dto.CustomerDTO;
+import com.food.domain.order.dto.CheckoutRequestDTO;
+import com.food.domain.order.service.OrderService;
 
-@Controller
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/order")
+@RequiredArgsConstructor
 public class OrderController {
-	@Autowired
-	private CartMapper cartMapper;
-	
-	@RequestMapping("/cart")
-	public ModelAndView orderCart() {
-		ModelAndView mv = new ModelAndView();
-		
-		//로그인 한 회원 정보
-		CustomerDTO customer = new CustomerDTO();
-		customer.setId(1L);
-		
-		//장바구니 정보
-		List<CartInfoDTO> cartItems = cartMapper.getCartListByCustomerId(customer.getId());
 
-		
-		mv.addObject("cartItems", cartItems);
-		
-		mv.setViewName("order/order");
-		
-		return mv; 
-	}
+    private final OrderService orderService;
+
+    @PostMapping("/prepareCheckout")
+    public ResponseEntity<Void> prepareCheckout(@RequestBody CheckoutRequestDTO request, HttpSession session) {
+        try {
+            session.setAttribute("checkoutItems", request.getProductIds());
+            session.setAttribute("customerId", request.getCustomerId());
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/prepareCheckoutAll")
+    public ResponseEntity<Void> prepareCheckoutAll(@RequestBody CheckoutRequestDTO request, HttpSession session) {
+        try {
+            session.setAttribute("checkoutAll", true);
+            session.setAttribute("customerId", request.getCustomerId());
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
