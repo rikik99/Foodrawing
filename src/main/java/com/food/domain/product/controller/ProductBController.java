@@ -43,7 +43,6 @@ public class ProductBController {
        boolean isLoggedIn = authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal());
        
        mv.addObject("isLoggedIn", isLoggedIn);
-       
 	   
        mv.setViewName("product/productDetail");
        return mv;

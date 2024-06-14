@@ -224,7 +224,7 @@ h1 {
 /* 데이터아이템 헤더폰트 */
 h2 {
   position: relative;
-  padding: 0;
+  padding: 0;	
   margin: 0;
   font-family: "Raleway", sans-serif;
   font-weight: 300;
