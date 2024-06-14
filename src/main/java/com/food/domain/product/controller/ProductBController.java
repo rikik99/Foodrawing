@@ -32,12 +32,18 @@ public class ProductBController {
    public ModelAndView productDetail() {
 	   ModelAndView mv = new ModelAndView();
 	   
-	   String productId = "MK001";
+	   String productNumber = "ST001";
 	   
 	   //상품 정보, 현재 하나로 고정
-	   ProductDTO productinfo = productMapper.getProductById(productId);
-	   
+	   ProductDTO productinfo = productMapper.getProductById(productNumber);
+	   System.out.println("product = " + productinfo);
 	   mv.addObject("productinfo", productinfo);
+	   
+	   Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+       boolean isLoggedIn = authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal());
+       
+       mv.addObject("isLoggedIn", isLoggedIn);
+       
 	   
        mv.setViewName("product/productDetail");
        return mv;
