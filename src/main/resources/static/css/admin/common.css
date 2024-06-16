@@ -1,8 +1,6 @@
-/* 기본 스타일 */
+/* 공통 스타일 */
 body {
     font-family: 'Poppins', sans-serif;
-    background: #f8f9fa;
-    color: #212529;
     height: 100vh;
     margin: 0;
     padding: 0;
@@ -11,9 +9,14 @@ body {
     transition: background-color 0.3s, color 0.3s;
 }
 
+body.light-mode {
+    background: #f8f9fa;
+    color: #212529;
+}
+
 body.dark-mode {
-    background: #212529;
-    color: #f8f9fa;
+    background: #070F25;
+    color: #ffffff;
 }
 
 .dashboard-container {
@@ -24,16 +27,17 @@ body.dark-mode {
 
 .sidebar {
     width: 250px;
-    background: #343a40;
-    color: #ffffff;
+    background-color: #081028;
+    color: white;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     transition: background-color 0.3s, color 0.3s;
+    border-right: 1px solid #34495e;
 }
 
-.sidebar.dark-mode {
-    background: #1c1e21;
+.sidebar.light-mode {
+    background: #343a40;
 }
 
 .sidebar ul {
@@ -80,7 +84,7 @@ body.dark-mode {
 
 .sidebar .dropdown-menu {
     display: none;
-    background-color: #343a40;
+    background-color: #081028;
     list-style: none;
     padding: 0;
     transition: all 0.3s ease;
@@ -91,6 +95,7 @@ body.dark-mode {
 .sidebar .dropdown-menu.visible {
     display: block;
     max-height: 500px;
+    opacity: 1;
 }
 
 .sidebar .dropdown-menu li {
@@ -111,20 +116,27 @@ body.dark-mode {
 
 .main-content {
     flex-grow: 1;
-    background: #f8f9fa;
     padding: 20px;
-    color: #212529;
     overflow-y: auto;
     transition: background-color 0.3s, color 0.3s;
 }
 
+.main-content.light-mode {
+    background: #f8f9fa;
+    color: #212529;
+}
+
 .main-content.dark-mode {
-    background: #212529;
-    color: #f8f9fa;
+    background: #070F25;
+    color: #ffffff;
+}
+
+.main-content h1, .main-content h2, .main-content h3, .main-content p {
+    color: inherit;
 }
 
 button#toggleMode {
-    position: absolute;
+    position: fixed;
     top: 20px;
     right: 20px;
     padding: 10px 20px;
@@ -142,15 +154,28 @@ button#toggleMode:hover {
 
 .logout-btn {
     padding: 15px 20px;
-    color: #ffffff;
     text-decoration: none;
     display: flex;
     align-items: center;
-    background-color: #343a40;
     transition: background-color 0.3s ease;
 }
 
-.logout-btn:hover {
+.logout-btn.light-mode {
+    background-color: #343a40;
+    color: #ffffff;
+}
+
+.logout-btn.light-mode:hover {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+.logout-btn.dark-mode {
+    background-color: #081028;
+    color: white;
+}
+
+.logout-btn.dark-mode:hover {
     background-color: #007bff;
     color: #ffffff;
 }
@@ -160,4 +185,41 @@ button#toggleMode:hover {
     height: 20px;
     fill: #ffffff; /* 아이콘 색상 */
     transition: transform 0.3s;
+}
+
+.notifications, .recent-orders, .popular-products, .customer-reviews, .summary-box {
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 5px;
+    background: #1c2331; /* 배경색 추가 */
+    border: 1px solid #34495e; /* 테두리 추가 */
+}
+
+.notifications.light-mode, .recent-orders.light-mode, .popular-products.light-mode, .customer-reviews.light-mode, .summary-box.light-mode {
+    background: #f8f9fa;
+    color: #212529;
+    border: none; /* 테두리 제거 */
+}
+
+.notifications h2, .recent-orders h2, .popular-products h2, .customer-reviews h2, .summary-box h2 {
+    margin-bottom: 10px;
+    color: #ffffff; /* 기본 텍스트 색을 흰색으로 변경 */
+}
+
+.notifications.light-mode h2, .recent-orders.light-mode h2, .popular-products.light-mode h2, .customer-reviews.light-mode h2, .summary-box.light-mode h2 {
+    color: #212529;
+}
+
+.notification-box {
+    background: #1c2331;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    color: #ffffff; /* 기본 텍스트 색을 흰색으로 변경 */
+}
+
+.notification-box.light-mode {
+    background: #ffffff;
+    color: #212529;
+    border: 1px solid #ddd;
 }

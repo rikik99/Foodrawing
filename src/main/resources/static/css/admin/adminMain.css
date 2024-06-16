@@ -1,0 +1,114 @@
+/* 페이지 전용 스타일 */
+.stats-summary {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.stat-box {
+    flex: 1;
+    background: #1c2331;
+    padding: 20px;
+    margin: 0 10px;
+    border-radius: 5px;
+    text-align: center;
+    color: #ffffff; /* 글자 색을 흰색으로 변경 */
+    border: 1px solid #34495e; /* 테두리 추가 */
+}
+
+.stat-box.light-mode {
+    background: #ffffff;
+    color: #212529;
+    border: 1px solid #ddd;
+}
+
+.recent-orders table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #1c2331; /* 다크 모드에서 테이블 배경색 어둡게 */
+}
+
+.recent-orders.light-mode table {
+    background: #ffffff; /* 라이트 모드에서 테이블 배경색 흰색 */
+}
+
+.recent-orders th, .recent-orders td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #34495e;
+    color: #ffffff; /* 기본 텍스트 색을 흰색으로 변경 */
+}
+
+.recent-orders.light-mode th, .recent-orders.light-mode td {
+    color: #212529;
+    border-bottom: 1px solid #ddd;
+}
+
+.popular-products ul, .customer-reviews ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.popular-products li, .customer-reviews li {
+    background: #1c2331;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #34495e; /* 테두리 추가 */
+    color: #ffffff; /* 기본 텍스트 색을 흰색으로 변경 */
+}
+
+.popular-products.light-mode li, .customer-reviews.light-mode li {
+    background: #ffffff;
+    color: #212529;
+    border: 1px solid #ddd;
+}
+
+/* 추가된 스타일 */
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px; /* 간격 일정하게 */
+}
+
+.summary-box {
+    flex: 1;
+    margin: 0 10px;
+    padding: 20px;
+    border-radius: 5px;
+    background: #1c2331;
+    border: 1px solid #34495e;
+    color: #ffffff;
+}
+
+.summary-box.light-mode {
+    background: #ffffff;
+    color: #212529;
+    border: 1px solid #ddd;
+}
+
+.summary-box h2 {
+    margin-bottom: 10px;
+}
+
+.summary-box table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #1c2331; /* 다크 모드에서 테이블 배경색 어둡게 */
+}
+
+.summary-box.light-mode table {
+    background: #ffffff; /* 라이트 모드에서 테이블 배경색 흰색 */
+}
+
+.summary-box th, .summary-box td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #34495e;
+    color: #ffffff;
+}
+
+.summary-box.light-mode th, .summary-box.light-mode td {
+    color: #212529;
+    border-bottom: 1px solid #ddd;
+}

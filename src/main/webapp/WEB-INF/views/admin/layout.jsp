@@ -17,7 +17,7 @@
                 </li>
             </ul>
             <ul class="dropdown-menu">
-                <li><a href="#" data-target="addProduct">상품 목록</a></li>
+                <li><a href="#" data-target="productManagement">상품 목록</a></li>
                 <li><a href="#" data-target="deleteProduct">상품 수정</a></li>
                 <li><a href="#" data-target="updateInventory">재고 관리</a></li>
             </ul>

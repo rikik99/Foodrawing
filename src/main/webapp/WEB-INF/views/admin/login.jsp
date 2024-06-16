@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <link rel="stylesheet" type="text/css" href="<c:url value='/css/adminLogin.css' />">
+    <link rel="stylesheet" type="text/css" href="<c:url value='/css/admin/adminLogin.css' />">
 </head>
 <body>
         <%@ include file="/WEB-INF/views/admin/adminMain.jsp"%>

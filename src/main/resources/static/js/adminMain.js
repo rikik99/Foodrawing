@@ -88,12 +88,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function toggleMode() {
         body.classList.toggle('dark-mode');
         body.classList.toggle('light-mode');
-        const sidebar = document.querySelector('.sidebar');
-        const mainContent = document.querySelector('.main-content');
-        sidebar.classList.toggle('dark-mode');
-        sidebar.classList.toggle('light-mode');
-        mainContent.classList.toggle('dark-mode');
-        mainContent.classList.toggle('light-mode');
+        const elements = document.querySelectorAll('.sidebar, .main-content, .summary-row, .summary-box, .notifications, .recent-orders, .popular-products, .customer-reviews, .notification-box');
+        elements.forEach(el => {
+            el.classList.toggle('dark-mode');
+            el.classList.toggle('light-mode');
+        });
     }
 
     if (toggleModeButton) {

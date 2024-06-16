@@ -1,0 +1,151 @@
+.search-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: flex-start; /* 요소들을 좌측에 배치 */
+}
+
+.search-bar > div.full-width {
+    flex: 1 1 100%;
+    display: flex;
+    justify-content: flex-start; /* 요소들을 좌측에 배치 */
+    align-items: center;
+    gap: 10px;
+}
+
+.search-bar > div.half-width {
+    flex: 1 1 48%;
+    display: flex;
+    flex-direction: column;
+}
+
+.search-bar .date-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1 1 auto; /* 요소 크기 조정 */
+}
+
+.search-bar .date-group input {
+    width: 150px; /* date input 크기 줄이기 */
+    flex: none;
+}
+
+.search-bar .btn_group {
+    display: flex;
+    gap: 5px;
+}
+
+.search-bar .number-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-bar .number-group input {
+    width: auto;
+    flex: 1;
+}
+
+.search-bar label {
+    margin-bottom: 5px;
+}
+
+.search-bar input[type="text"],
+.search-bar select,
+.search-bar input[type="date"],
+.search-bar input[type="number"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.search-buttons {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    gap: 10px;
+}
+
+.search-buttons button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.search-buttons button[type="reset"] {
+    background-color: grey;
+}
+
+.search-bar button:hover {
+    background-color: #0056b3;
+}
+
+button#deleteSelectedButton {
+    padding: 10px 20px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button#deleteSelectedButton:hover {
+    background-color: #c82333;
+}
+
+.product-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.product-list-header div {
+    display: flex;
+    align-items: center;
+}
+
+.product-list-header span {
+    font-size: 18px;
+    margin-right: 20px;
+}
+.product-list {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.product-list th, .product-list td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #34495e;
+    color: #ffffff;
+}
+
+.product-list th {
+    background-color: #1c2331;
+}
+
+.product-list tr:nth-child(even) {
+    background-color: #1c2331;
+}
+button.editButton {
+    padding: 5px 10px;
+    border: none;
+    background-color: #ffc107;
+    color: #212529;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button.editButton:hover {
+    background-color: #e0a800;
+}
