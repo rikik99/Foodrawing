@@ -1,4 +1,5 @@
 package com.food.global.auth;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -47,13 +48,10 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         Collection<SimpleGrantedAuthority> authorities = (Collection<SimpleGrantedAuthority>) authentication.getAuthorities();
         boolean isAdmin = authorities.stream().anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
 
-        if (isAdmin && request.getRequestURI().contains("/admin/login")) {
-            response.sendRedirect("/admin/dashboard");
-        } else if (!isAdmin && !request.getRequestURI().contains("/admin/login")) {
-            response.sendRedirect("/");
+        if (isAdmin) {
+            response.sendRedirect("/admin/main");
         } else {
-            // 로그인 실패 처리
-            response.sendRedirect("/login?error=true");
+            response.sendRedirect("/");
         }
     }
 }

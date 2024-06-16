@@ -1,26 +1,45 @@
 package com.food.domain.user.controller;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+
 @RequestMapping("/admin")
 @Controller
 public class AdminController {
-    @GetMapping("/loginContent")
-    public ModelAndView adminLoginContent() {
+    @GetMapping("/login")
+    public ModelAndView login(Authentication authentication) {
+        // 로그인된 사용자가 로그인 페이지로 접근할 경우 메인 페이지로 리다이렉트
+        if (authentication != null && authentication.isAuthenticated()) {
+            return new ModelAndView("redirect:/admin/main");
+        }
         ModelAndView mv = new ModelAndView();
-        // 필요한 경우 추가 데이터를 모델에 추가
-        mv.setViewName("admin/adminContrent");
-        mv.addObject("message", "Welcome to the admin login page");
+        mv.setViewName("admin/login");
         return mv;
     }
-    @GetMapping("/dashboard")
+
+    @GetMapping("/main")
     public ModelAndView admindashboard() {
-    	ModelAndView mv = new ModelAndView();
-    	// 필요한 경우 추가 데이터를 모델에 추가
-    	mv.setViewName("admin/adminMain");
-    	mv.addObject("message", "Welcome to the admin login page");
-    	return mv;
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("admin/adminMain");
+        return mv;
     }
+
+    @GetMapping("/mainContent")
+    public ModelAndView adminMain() {
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("admin/mainContent");
+        return mv;
+    }
+
+    @GetMapping("/productManagement")
+    public ModelAndView productManagement() {
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("admin/productManagement");
+        return mv;
+    }
+
+    // 추가로 필요한 다른 매핑들도 같은 방식으로 작성
 }

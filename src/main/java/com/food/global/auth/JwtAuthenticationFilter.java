@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -30,6 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String token = null;
+        String refreshToken = null;
 
         // 우선 쿠키에서 토큰을 찾습니다.
         Cookie[] cookies = request.getCookies();
@@ -37,7 +39,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("jwt")) {
                     token = cookie.getValue();
-                    break;
+                } else if (cookie.getName().equals("refreshToken")) {
+                    refreshToken = cookie.getValue();
                 }
             }
         }
@@ -47,28 +50,45 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             token = (String) request.getSession().getAttribute("jwt");
         }
 
-        if (token != null && jwtUtil.validateToken(token)) {
-            String username = jwtUtil.extractUsername(token);
-            UserDetails userDetails;
+        if (token != null) {
             try {
-                userDetails = userDetailsService.loadUserByUsername(username);
-            } catch (UserNotFoundException ex) {
-                // 사용자 미발견 시 리다이렉션 처리
-                response.sendRedirect("/signup");
-                return;
-            }
+                if (jwtUtil.validateToken(token)) {
+                    String username = jwtUtil.extractUsername(token);
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            if (jwtUtil.validateToken(token, userDetails)) {
-                UsernamePasswordAuthenticationToken authentication = 
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    if (jwtUtil.validateToken(token, userDetails)) {
+                        UsernamePasswordAuthenticationToken authentication = 
+                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                }
+            } catch (ExpiredJwtException e) {
+                // JWT가 만료된 경우 리프레시 토큰을 검증하고, 유효한 경우 새로운 JWT 발급
+                if (refreshToken != null && jwtUtil.validateRefreshToken(refreshToken)) {
+                    String username = jwtUtil.extractUsername(refreshToken);
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+                    if (jwtUtil.validateToken(refreshToken, userDetails)) {
+                        String newToken = jwtUtil.generateToken(username, false);
+
+                        // 새로운 JWT를 쿠키에 추가
+                        Cookie newJwtCookie = new Cookie("jwt", newToken);
+                        newJwtCookie.setHttpOnly(true);
+                        newJwtCookie.setPath("/");
+                        response.addCookie(newJwtCookie);
+
+                        // 새로운 JWT를 세션에 추가
+                        request.getSession().setAttribute("jwt", newToken);
+
+                        // 새로운 JWT로 인증
+                        UsernamePasswordAuthenticationToken authentication = 
+                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                }
             }
         }
 
         chain.doFilter(request, response);
     }
-
-
-
 }
-	
