@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const mainContent = document.querySelector('.main-content');
     const toggleModeButton = document.getElementById('toggleMode');
     const body = document.body;
+    let currentSortColumns = [];
 
     function loadContent(url, target) {
         fetch(url)
@@ -193,43 +194,58 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.setStockRange = setStockRange;
 
-    const sortTable = (column, order) => {
+    const sortTable = () => {
         const tableBody = document.getElementById('stockTableBody');
         const rows = Array.from(tableBody.rows);
-        const dataType = rows[0].querySelector(`[data-column="${column}"]`).getAttribute('data-type');
 
-        const compare = (rowA, rowB) => {
-            let cellA = rowA.querySelector(`[data-column="${column}"]`).innerText;
-            let cellB = rowB.querySelector(`[data-column="${column}"]`).innerText;
+        rows.sort((rowA, rowB) => {
+            for (let i = 0; i < currentSortColumns.length; i++) {
+                const { column, order, type } = currentSortColumns[i];
+                let cellA = rowA.querySelector(`[data-column="${column}"]`).innerText;
+                let cellB = rowB.querySelector(`[data-column="${column}"]`).innerText;
 
-            if (dataType === 'number') {
-                cellA = parseInt(cellA);
-                cellB = parseInt(cellB);
-            } else if (dataType === 'date') {
-                cellA = new Date(cellA);
-                cellB = new Date(cellB);
+                if (type === 'number') {
+                    cellA = parseInt(cellA);
+                    cellB = parseInt(cellB);
+                } else if (type === 'date') {
+                    cellA = new Date(cellA);
+                    cellB = new Date(cellB);
+                }
+
+                if (cellA < cellB) return order === 'asc' ? -1 : 1;
+                if (cellA > cellB) return order === 'asc' ? 1 : -1;
             }
+            return 0;
+        });
 
-            if (order === 'asc') {
-                return cellA > cellB ? 1 : -1;
-            } else {
-                return cellA < cellB ? 1 : -1;
-            }
-        };
-
-        rows.sort(compare);
         tableBody.append(...rows);
     };
 
-    document.querySelectorAll('.sortable').forEach(header => {
-        header.addEventListener('click', function() {
-            const order = header.classList.contains('asc') ? 'desc' : 'asc';
-            const column = header.getAttribute('data-column');
+    function addSortEventListeners() {
+        document.querySelectorAll('.sortable').forEach(header => {
+            header.addEventListener('click', function() {
+                console.log("clicked");
+                const column = header.getAttribute('data-column');
+                const type = header.getAttribute('data-type');
+                let order = 'asc';
 
-            document.querySelectorAll('.sortable').forEach(th => th.classList.remove('asc', 'desc'));
-            header.classList.add(order);
+                if (header.classList.contains('asc')) {
+                    header.classList.remove('asc');
+                    header.classList.add('desc');
+                    order = 'desc';
+                } else {
+                    header.classList.remove('desc');
+                    header.classList.add('asc');
+                    order = 'asc';
+                }
 
-            sortTable(column, order);
+                currentSortColumns = currentSortColumns.filter(col => col.column !== column);
+                currentSortColumns.push({ column, order, type });
+
+                sortTable();
+            });
         });
-    });
+    }
+
+    addSortEventListeners();
 });

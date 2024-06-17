@@ -21,11 +21,11 @@
                 <thead>
                     <tr>
                         <th>이미지</th>
-                        <th class="sortable" data-column="product">상품명(상품 코드, 상품명)<span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
-                        <th class="sortable" data-column="type">입/출고<span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
-                        <th class="sortable" data-column="quantity">수량<span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
-                        <th class="sortable" data-column="date">입출고 날짜<span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
-                        <th class="sortable" data-column="expiration">유통 기한<span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
+                        <th class="sortable" data-column="product" data-type="string">상품명(상품 코드, 상품명)<span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
+                        <th class="sortable" data-column="type" data-type="string">입/출고<span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
+                        <th class="sortable" data-column="quantity" data-type="number">수량<span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
+                        <th class="sortable" data-column="date" data-type="date">입출고 날짜<span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
+                        <th class="sortable" data-column="expiration" data-type="date">유통 기한<span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
                     </tr>
                 </thead>
                 <tbody id="stockTableBody">
