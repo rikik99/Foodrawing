@@ -3,9 +3,7 @@
     display: flex;
     margin-bottom: 20px; /* 섹션 간격 추가 */
 }
-#addProductButton {
-    margin-left: 20px;
-}
+
 .half-width {
     display: flex;
     align-items: center; /* 수직 정렬 */
@@ -17,6 +15,7 @@
 .half-width label {
     margin-right: 10px; /* 라벨과 div 사이의 간격 */
 }
+
 .second-layer {
     margin-left: 20px;
 }
@@ -203,16 +202,25 @@ body.dark-mode input[type="button"].warning:hover {
     color: #212529; /* 모든 tr의 기본 텍스트 색상 검정으로 설정 */
 }
 
-button.editButton {
-    padding: 5px 10px;
-    border: none;
-    background-color: #ffc107;
-    color: #212529;
-    border-radius: 5px;
+/* 정렬 아이콘 스타일 */
+.sortable {
     cursor: pointer;
-    transition: background-color 0.3s;
+    display: inline-flex;
+    align-items: center;
+    padding: 5px; /* 클릭 영역 확대 */
 }
 
-button.editButton:hover {
-    background-color: #e0a800;
+.sort-icon {
+    margin-left: 5px;
+    display: inline; /* 기본적으로 표시 */
+}
+
+.sortable.asc .sort-icon.asc,
+.sortable.desc .sort-icon.desc {
+    display: inline;
+}
+
+.sortable.asc .sort-icon.desc,
+.sortable.desc .sort-icon.asc {
+    display: none;
 }

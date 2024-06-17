@@ -3,20 +3,13 @@
     display: flex;
     margin-bottom: 20px; /* 섹션 간격 추가 */
 }
-#addProductButton {
-    margin-left: 20px;
-}
+
 .half-width {
-    display: flex;
-    align-items: center; /* 수직 정렬 */
     flex: 1 1 50%;
     padding: 0 10px;
     box-sizing: border-box;
 }
 
-.half-width label {
-    margin-right: 10px; /* 라벨과 div 사이의 간격 */
-}
 .second-layer {
     margin-left: 20px;
 }

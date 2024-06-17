@@ -26,7 +26,7 @@ body.dark-mode {
 }
 
 .sidebar {
-    width: 250px;
+    width: 200px;
     background-color: #081028;
     color: white;
     display: flex;
@@ -34,6 +34,7 @@ body.dark-mode {
     justify-content: space-between;
     transition: background-color 0.3s, color 0.3s;
     border-right: 1px solid #34495e;
+    flex-shrink: 0; /* 사이드바 너비 고정 */
 }
 
 .sidebar.light-mode {
@@ -222,4 +223,37 @@ button#toggleMode:hover {
     background: #ffffff;
     color: #212529;
     border: 1px solid #ddd;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+    }
+
+    .main-content {
+        padding: 10px;
+    }
+
+    button#toggleMode {
+        top: 10px;
+        right: 10px;
+        padding: 5px 10px;
+    }
+
+    .notifications, .recent-orders, .popular-products, .customer-reviews, .summary-box {
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .notifications h2, .recent-orders h2, .popular-products h2, .customer-reviews h2, .summary-box h2 {
+        font-size: 1.2em;
+    }
+
+    .notification-box {
+        padding: 5px;
+    }
 }

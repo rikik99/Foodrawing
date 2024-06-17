@@ -40,6 +40,17 @@ public class AdminController {
         mv.setViewName("admin/productManagement");
         return mv;
     }
+    @GetMapping("/stockManagement")
+    public ModelAndView stockManagement() {
+    	ModelAndView mv = new ModelAndView();
+    	mv.setViewName("admin/stockManagement");
+    	return mv;
+    }
+    @GetMapping("/stockTransaction")
+    public ModelAndView stockTransaction() {
+    	ModelAndView mv = new ModelAndView();
+    	mv.setViewName("admin/stockTransaction");
+    	return mv;
+    }
 
-    // 추가로 필요한 다른 매핑들도 같은 방식으로 작성
 }

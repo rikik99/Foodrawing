@@ -4,6 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" type="text/css"
     href="<c:url value='/css/admin/adminMain.css'/>">
 <link rel="stylesheet" type="text/css"
@@ -11,7 +12,6 @@
 </head>
 <body class="dark-mode">
     <div class="dashboard-container">
-
         <%@ include file="/WEB-INF/views/admin/layout.jsp"%>
         <div class="main-content dark-mode" id="mainContent">
             <h1>관리자 메인 페이지</h1>

@@ -38,7 +38,7 @@ public class UserService {
 	}
 
 	public UserDTO loadUser(String username) {
-		return userMapper.loadUser(username);
+		return userMapper.findByUsername(username);
 	}
 
 	public String sendVerificationEmail(String email) {
