@@ -21,4 +21,5 @@ public class CartInfoDTO {
     private String discountType;
     private int discountValue;
     private int maxDiscount;
+    private int minPrice;
 }

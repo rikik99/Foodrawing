@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -23,12 +24,15 @@ public class ProductBController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean isLoggedIn = authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal());
         
+        
+        
         mv.addObject("isLoggedIn", isLoggedIn);
         mv.setViewName("product/best");
         return mv;
     }
    
-   @RequestMapping("/ProductDetail")
+    @RequestMapping("/productDetail")
+   //@RequestMapping("/productDetail/{productNumber}")
    public ModelAndView productDetail() {
 	   ModelAndView mv = new ModelAndView();
 	   

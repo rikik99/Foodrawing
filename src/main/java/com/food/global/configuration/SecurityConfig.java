@@ -58,11 +58,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.ignoringRequestMatchers("/sendVerificationEmail", "/verify", "/signup", "/invalidateSession", "/linkAccount", "/findUsername","/verify-id-code","/findPassword", "/sendPasswordResetCode","/verify-password-code","/passwordReset"))
+        http.csrf(csrf -> csrf.ignoringRequestMatchers("/sendVerificationEmail", "/verify", "/signup", "/cart", "/invalidateSession", "/WEB-INF/views/**", "/cart/addToCart", "/checkoutPage", "/order/prepareCheckout", "/order/prepareCheckoutAll", "/cart/deleteCartItem","/cart/updateCartItem", "/linkAccount","/cart/checkStock", "/findUsername","/verify-id-code","/findPassword", "/sendPasswordResetCode","/verify-password-code","/passwordReset"))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/", "/login", "/loginFail", "/signup", "/WEB-INF/views/**", "/css/**",
+                        .requestMatchers("/", "/login", "/loginFail", "/signup", "/WEB-INF/views/**", "/css/**", "/cart/updateCartItem", "/cart/deleteCartItem", 
                                 "/js/**", "/images/**", "/sendVerificationEmail", "/verify", "/signupInfo", "/main/custompage","/main/mainpage", "/nutrition",
-                                "/verificationSuccess", "/verificationFail", "/checkDuplicateUsername", "/invalidateSession", "/linkAccount", "/findUsername","/verify-id-code","/showUsername","/findPassword", "/sendPasswordResetCode","/verify-password-code","/passwordReset")
+                                "/verificationSuccess", "/verificationFail", "/checkDuplicateUsername", "/invalidateSession", "/linkAccount", "/findUsername","/verify-id-code","/showUsername","/findPassword", "/sendPasswordResetCode","/verify-password-code","/passwordReset",
+                                "/best", "/productDetail", "/cart", "/checkoutPage", "/order/prepareCheckout", "/cart/checkStock", "/cart/addToCart", "/order/prepareCheckoutAll")
                         .permitAll().anyRequest().authenticated())
                 .formLogin(formLogin -> formLogin.loginPage("/login").defaultSuccessUrl("/", true)
                         .successHandler(customAuthenticationSuccessHandler)
