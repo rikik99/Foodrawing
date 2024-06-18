@@ -18,4 +18,8 @@ public class ProductDTO {
     private Long price;
     private Long quantity;
     private LocalDateTime createdDate;
+	public Object getId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
