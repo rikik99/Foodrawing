@@ -1,21 +1,29 @@
 package com.food.global.auth;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import com.food.domain.user.dto.UserDTO;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
-public class CustomUserDetails implements UserDetails {
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+
+import com.food.domain.user.dto.UserDTO;
+
+public class CustomUserDetails implements UserDetails, OAuth2User {
 
     private final UserDTO userDTO;
+    private Map<String, Object> attributes;
 
     public CustomUserDetails(UserDTO userDTO) {
         this.userDTO = userDTO;
+    }
+
+    public CustomUserDetails(UserDTO userDTO, Map<String, Object> attributes) {
+        this.userDTO = userDTO;
+        this.attributes = attributes;
     }
 
     @Override
@@ -56,5 +64,15 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    @Override
+    public String getName() {
+        return String.valueOf(userDTO.getId());
     }
 }

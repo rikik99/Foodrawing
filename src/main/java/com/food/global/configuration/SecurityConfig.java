@@ -60,7 +60,30 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
+        http.securityMatcher("/admin/**")
+            .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                .requestMatchers("/admin/login", "/admin/loginFail").permitAll()
+                .anyRequest().hasAuthority("ROLE_ADMIN"))
+            .formLogin(formLogin -> formLogin
+                .loginPage("/admin/login")
+                .loginProcessingUrl("/admin/login")
+                .defaultSuccessUrl("/admin/main", true)
+                .successHandler(customAuthenticationSuccessHandler)
+                .failureHandler(customAuthenticationFailureHandler)
+                .permitAll())
+            .logout(logout -> logout
+                .logoutUrl("/admin/logout")
+                .logoutSuccessUrl("/admin/login")
+                .permitAll())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // 세션을 필요할 때만 생성하도록 설정
+            .userDetailsService(customUserDetailsService);
+
+        return http.build();
+    }
+
+    @Bean
+    public SecurityFilterChain userSecurityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                 .requestMatchers("/", "/login", "/loginFail", "/signup", "/WEB-INF/views/**", "/css/**", "/js/**",
@@ -70,20 +93,11 @@ public class SecurityConfig {
                         "/verify-id-code", "/showUsername", "/findPassword", "/sendPasswordResetCode",
                         "/verify-password-code", "/passwordReset", "/best", "/ProductDetail", "/cart/checkStock",
                         "/cart/addToCart", "/cart", "/cart/deleteCartItem", "/order/prepareCheckout", "/checkoutPage",
-                        "/order/prepareCheckoutAll", "/cart/updateCartItem", "/admin/login", "/admin/loginFail","/admin/dashboard")
-                .permitAll()
-                .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+                        "/order/prepareCheckoutAll", "/cart/updateCartItem").permitAll()
                 .anyRequest().authenticated())
             .formLogin(formLogin -> formLogin
                 .loginPage("/login")
                 .defaultSuccessUrl("/", true)
-                .successHandler(customAuthenticationSuccessHandler)
-                .failureHandler(customAuthenticationFailureHandler)
-                .permitAll())
-            .formLogin(formLogin -> formLogin
-                .loginPage("/admin/login")
-                .loginProcessingUrl("/admin/login")
-                .defaultSuccessUrl("/admin/main", true)
                 .successHandler(customAuthenticationSuccessHandler)
                 .failureHandler(customAuthenticationFailureHandler)
                 .permitAll())

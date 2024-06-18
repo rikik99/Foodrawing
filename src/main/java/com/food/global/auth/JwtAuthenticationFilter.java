@@ -9,6 +9,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.food.domain.user.service.CustomUserDetailsService;
+
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -53,8 +55,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (token != null) {
             try {
                 if (jwtUtil.validateToken(token)) {
-                    String username = jwtUtil.extractUsername(token);
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                    String email = jwtUtil.extractUsername(token); // email을 추출
+                    UserDetails userDetails = ((CustomUserDetailsService) userDetailsService).loadUserByEmail(email);
 
                     if (jwtUtil.validateToken(token, userDetails)) {
                         UsernamePasswordAuthenticationToken authentication = 
@@ -65,11 +67,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             } catch (ExpiredJwtException e) {
                 // JWT가 만료된 경우 리프레시 토큰을 검증하고, 유효한 경우 새로운 JWT 발급
                 if (refreshToken != null && jwtUtil.validateRefreshToken(refreshToken)) {
-                    String username = jwtUtil.extractUsername(refreshToken);
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                    String email = jwtUtil.extractUsername(refreshToken); // email을 추출
+                    UserDetails userDetails = ((CustomUserDetailsService) userDetailsService).loadUserByEmail(email);
 
                     if (jwtUtil.validateToken(refreshToken, userDetails)) {
-                        String newToken = jwtUtil.generateToken(username, false);
+                        String newToken = jwtUtil.generateToken(email, false, (String) request.getSession().getAttribute("provider"), null); // provider 전달
 
                         // 새로운 JWT를 쿠키에 추가
                         Cookie newJwtCookie = new Cookie("jwt", newToken);

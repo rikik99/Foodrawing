@@ -6,6 +6,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 @RequestMapping("/admin")
 @Controller
 public class AdminController {
@@ -52,5 +57,28 @@ public class AdminController {
     	mv.setViewName("admin/stockTransaction");
     	return mv;
     }
+    @GetMapping("/salesPost")
+    public ModelAndView salesPost() {
+    	ModelAndView mv = new ModelAndView();
+    	mv.setViewName("admin/salesPost");
+    	return mv;
+    }
+    
+	@GetMapping("/logout")
+	public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) {
+	    HttpSession session = request.getSession();
+	    session.invalidate();
 
+	    // JWT 쿠키 삭제
+	    Cookie cookie = new Cookie("jwt", null);
+	    cookie.setHttpOnly(true);
+	    cookie.setSecure(true);
+	    cookie.setPath("/");
+	    cookie.setMaxAge(0); // 쿠키 삭제
+	    response.addCookie(cookie);
+
+	    ModelAndView mv = new ModelAndView();
+	    mv.setViewName("redirect:/login");
+	    return mv;
+	}
 }

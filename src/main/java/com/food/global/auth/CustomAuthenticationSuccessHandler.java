@@ -24,8 +24,12 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         String rememberMeParam = request.getParameter("remember-me");
         boolean rememberMe = rememberMeParam != null && rememberMeParam.equals("on");
-        String token = jwtUtil.generateToken(authentication.getName(), rememberMe);
-
+        // 세션에서 provider 값을 가져옴
+        String provider = (String) request.getSession().getAttribute("provider");
+        
+        // 토큰 생성 시 provider 정보도 포함
+        String token = jwtUtil.generateToken(authentication.getName(), rememberMe, provider, null); // 추가 클레임을 null로 전달
+        
         if (rememberMe) {
             Cookie cookie = new Cookie("jwt", token);
             cookie.setHttpOnly(true);
@@ -36,13 +40,12 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             response.setHeader("Set-Cookie", String.format("jwt=%s; HttpOnly; Path=/; Max-Age=%d; SameSite=Lax",
                     token, cookie.getMaxAge()));
         } else {
-            Cookie sessionCookie = new Cookie("jwt", null);
+            Cookie sessionCookie = new Cookie("jwt", token);
             sessionCookie.setHttpOnly(true);
             sessionCookie.setSecure(false);
             sessionCookie.setPath("/");
-            sessionCookie.setMaxAge(0); // 쿠키 삭제
+            sessionCookie.setMaxAge(-1); // 쿠키 삭제
             response.addCookie(sessionCookie);
-            request.getSession().setAttribute("jwt", token); // 1시간 세션 유지
         }
 
         Collection<SimpleGrantedAuthority> authorities = (Collection<SimpleGrantedAuthority>) authentication.getAuthorities();

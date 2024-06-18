@@ -1,29 +1,10 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 <head>
     <link rel="stylesheet" type="text/css" href="<c:url value='/css/admin/common.css'/>">
     <link rel="stylesheet" type="text/css" href="<c:url value='/css/admin/adminProducts.css'/>">
-    <style>
-        .stock-update-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .stock-update-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
-        }
-
-        .stock-update-row select,
-        .stock-update-row input[type="number"] {
-            margin-right: 10px;
-        }
-    </style>
 </head>
 <body class="dark-mode">
     <div class="dashboard-container">
@@ -87,6 +68,10 @@
 							</span>
 						</div>
 					</div>
+										<div class="search-buttons full-width">
+						<button type="submit" class="primary">검색</button>
+						<button type="reset" class="secondary">초기화</button>
+					</div>
                 </div>
             </form>
 
@@ -96,7 +81,7 @@
                     <span>조회된 상품 개수: <strong>10</strong>개</span>
                 </div>
             </div>
-                         <table class="product-list dark-mode">
+            <table class="product-list dark-mode">
                 <thead>
                     <tr>
                         <th><input type="checkbox" id="selectAll" class="secondary"></th>
