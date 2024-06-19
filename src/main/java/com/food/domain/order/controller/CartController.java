@@ -1,8 +1,5 @@
 package com.food.domain.order.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,18 +54,13 @@ public class CartController {
     }
 
     @PostMapping("/deleteCartItem")
-    public ResponseEntity<Map<String, Object>> deleteCartItem(@RequestBody CartRequestDTO cartRequest) {
-        Map<String, Object> response = new HashMap<>();
+    public ResponseEntity<Void> deleteCartItem(@RequestBody CartRequestDTO cartRequest) {
         try {
             cartService.deleteCartItem(cartRequest);
-            response.put("success", true);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             e.printStackTrace();
-            response.put("success", false);
-            response.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
 }

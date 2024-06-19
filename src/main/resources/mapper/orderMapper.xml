@@ -18,7 +18,7 @@
             d.MAX_DISCOUNT AS maxDiscount
         FROM 
             CART_TB c
-            JOIN PRODUCT_TB p ON c.PRODUCT_NUMBER = p.PRODUCT_NUMBER
+            JOIN PRODUCT_TB p ON c.PRODUCT_ID = p.PRODUCT_NUMBER
             LEFT JOIN (
                 SELECT 
                     pf1.PRODUCT_NUMBER,
@@ -74,7 +74,7 @@
             d.MAX_DISCOUNT AS maxDiscount
         FROM 
             CART_TB c
-            JOIN PRODUCT_TB p ON c.PRODUCT_NUMBER = p.PRODUCT_NUMBER
+            JOIN PRODUCT_TB p ON c.PRODUCT_ID = p.PRODUCT_NUMBER
             LEFT JOIN (
                 SELECT 
                     pf1.PRODUCT_NUMBER,
@@ -94,10 +94,6 @@
             LEFT JOIN DISCOUNT_TB d ON dt.DISCOUNT_ID = d.ID
         WHERE 
             c.CUSTOMER_ID = #{customerId}
-            AND p.PRODUCT_NUMBER IN
-            <foreach item="item" index="index" collection="productIds" open="(" separator="," close=")">
-                #{item}
-            </foreach>
         GROUP BY 
             c.CUSTOMER_ID,
             p.PRODUCT_NUMBER,

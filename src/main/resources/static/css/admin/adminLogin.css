@@ -1,0 +1,243 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden; /* 스크롤 바를 숨깁니다 */
+}
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dashboard-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
+.dashboard-container {
+    flex-grow: 1;
+    overflow: auto;
+    position: relative;
+    filter: blur(10px); /* 블러 강도를 30px로 조절 */
+    background: rgba(0, 0, 0, 0.4); /* 반투명 어두운 오버레이 */
+    z-index: 1;
+}
+
+.login-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* 반투명 어두운 배경 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+}
+
+.login-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    animation: fadeIn 1s ease-in-out;
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-header h1 {
+    margin: 0 0 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-input {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.login-input label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.login-input input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.login-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background: #2980b9;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.login-btn:hover {
+    background: #2573a6;
+}
+
+.login-footer {
+    margin-top: 10px;
+}
+
+.login-footer a {
+    color: #2980b9;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.login-footer a:hover {
+    color: #2573a6;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #081028;
+    color: white;
+    padding-top: 20px;
+    transition: background-color 0.3s, color 0.3s;
+    border-right: 1px solid #34495e;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul li {
+    text-align: center;
+    position: relative;
+}
+
+.sidebar ul li > ul {
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul li > a {
+    padding: 15px;
+    color: white;
+    text-decoration: none;
+    display: block;
+}
+
+.sidebar ul li > ul > li > a {
+    padding: 15px;
+    color: white;
+    text-decoration: none;
+    display: block;
+}
+
+.sidebar ul li.dropdown-container > ul > li > a:hover,
+.sidebar .dropdown-menu li:hover > a {
+    background-color: rgba(52, 73, 94, 0.5);
+}
+
+.sidebar ul li.active > a {
+    color: #00ff99;
+}
+
+.sidebar .dropdown-menu {
+    display: none;
+    background-color: #081028;
+    list-style: none;
+    padding: 0;
+    margin-top: 5px;
+    width: 100%;
+    z-index: 1000;
+}
+
+.sidebar .dropdown-menu.visible {
+    display: block !important;
+}
+
+.sidebar .dropdown-menu li {
+    padding: 0;
+    text-align: center;
+    position: relative;
+}
+
+.sidebar .dropdown-menu li a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    padding: 10px 15px;
+}
+
+.sidebar .dropdown-toggle {
+    cursor: pointer;
+}
+
+body.dark-mode {
+    background-color: #1e272e;
+    color: white;
+}
+
+.sidebar.dark-mode {
+    background-color: #081028;
+    color: white;
+}
+
+body.light-mode {
+    background-color: #f4f4f4;
+    color: black;
+}
+
+.sidebar.light-mode {
+    background-color: #ffffff;
+    color: black;
+}
+
+.sidebar.light-mode ul li a {
+    color: black;
+}
+
+.sidebar.light-mode ul li.dropdown-container > ul > li > a:hover,
+.sidebar.light-mode .dropdown-menu li:hover > a {
+    background-color: rgba(221, 221, 221, 0.5);
+}
+
+.sidebar.light-mode ul li.active > a {
+    color: #007bff;
+}
+
+.sidebar.light-mode .dropdown-menu {
+    background-color: #ffffff;
+}
+
+.sidebar.light-mode .dropdown-menu li:hover > a {
+    background-color: rgba(221, 221, 221, 0.5);
+}

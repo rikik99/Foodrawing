@@ -335,6 +335,9 @@ function checkoutSelectedItems() {
 }
 
 function checkoutAllItems() {
+<<<<<<< HEAD
+    var customerId = 1/* 고객 ID를 적절히 넣어야 합니다 */;
+=======
     var customerId = 1; // 고객 ID를 적절히 넣어야 합니다
     var cartItems = document.querySelectorAll('.order-cart-item');
     var productIds = Array.from(cartItems).map(item => item.getAttribute('data-item-id'));
@@ -344,6 +347,7 @@ function checkoutAllItems() {
         return;
     }
 
+>>>>>>> branch 'develop' of https://github.com/rikik99/Foodrawing.git
     fetch('/order/prepareCheckoutAll', {
         method: 'POST',
         headers: {
