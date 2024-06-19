@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.food.domain.order.mapper.PaymentMapper">
+
+    <insert id="insertOrder">
+        INSERT INTO ORDER_TB (ID, IDENTIFIER_ID, IDENTIFIER_TYPE, ORDER_DATE, TOTAL_AMOUNT, ORDER_NUMBER) 
+        VALUES (#{id}, #{identifierId}, #{identifierType}, #{orderDate}, #{totalAmount}, #{orderNumber})
+    </insert>
+
+    <insert id="insertOrderDetail">
+        INSERT INTO ORDER_DETAIL_TB (ID, ORDER_ID, SALES_POST_ID, UNIT_PRICE, DISCOUNT_PRICE, QUANTITY) 
+        VALUES (#{id}, #{orderId}, #{salesPostId}, #{unitPrice}, #{discountPrice}, #{quantity})
+    </insert>
+
+    <insert id="insertOrderStatus">
+        INSERT INTO ORDER_STATUS_TB (ID, ORDER_ID, ORDER_STATUS, DESCRIPTION, CREATED_DATE, UPDATED_DATE) 
+        VALUES (#{id}, #{orderId}, #{orderStatus}, #{description}, #{createdDate}, #{updatedDate})
+    </insert>
+
+    <update id="updateProductQuantity">
+        UPDATE PRODUCT_TB 
+        SET QUANTITY = QUANTITY - #{quantity} 
+        WHERE PRODUCT_NUMBER = #{salesPostId}
+    </update>
+
+    <select id="existsOrderNumber" resultType="boolean">
+        SELECT COUNT(*) > 0 
+        FROM ORDER_TB 
+        WHERE ORDER_NUMBER = #{orderNumber}
+    </select>
+
+</mapper>
