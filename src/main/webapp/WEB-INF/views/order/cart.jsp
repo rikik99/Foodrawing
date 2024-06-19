@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="/css/common.css"/>
     <link rel="stylesheet" href="/css/sidebar.css"/>
     <style>
-        
-
         .order-container {
             width: 80%;
             margin: 0 auto;
@@ -184,10 +182,12 @@
     <!-- 최근 본 상품 -->
     <div class="order-recently-viewed">
         <h2>최근 본 상품</h2>
-        <c:forEach var="item" items="${recentlyViewedItems}">
+        <c:forEach var="item" items="${sessionScope.recentViewedProducts}">
             <div class="order-item">
-                <img src="${item.image}" alt="상품 이미지">
-                <p>${item.title}</p>
+                <a href="/product/${item.id}">
+                    <img src="${item.imagePath}" alt="${item.name}">
+                    <p>${item.name}</p>
+                </a>
             </div>
         </c:forEach>
     </div>
@@ -252,7 +252,8 @@ function updateCartItem(button) {
 
 function deleteCartItem(button) {
     var productId = button.getAttribute('data-product-id');
-    var customerId = 1/* 고객 ID를 적절히 넣어야 합니다 */;
+    var customerId = 1; // 고객 ID를 적절히 넣어야 합니다
+    
     fetch('/cart/deleteCartItem', {
         method: 'POST',
         headers: {
@@ -260,24 +261,30 @@ function deleteCartItem(button) {
         },
         body: JSON.stringify({
             customerId: customerId,
-            productId: productId
+            productNumber: productId
         }),
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('장바구니에서 삭제 실패: ' + productId);
+            return response.json().then(data => {
+                throw new Error(data.message || '장바구니에서 삭제 실패: ' + productId);
+            });
         }
         return response.json();
     })
     .then(data => {
-        var cartItem = document.querySelector('.order-cart-item[data-item-id="' + productId + '"]');
-        cartItem.remove();
-        alert('항목이 성공적으로 삭제되었습니다.');
-        calculateTotal();
+        if (data.success) {
+            var cartItem = document.querySelector('.order-cart-item[data-item-id="' + productId + '"]');
+            cartItem.remove();
+            alert('항목이 성공적으로 삭제되었습니다.');
+            calculateTotal();
+        } else {
+            throw new Error(data.message || '삭제에 문제가 발생했습니다.');
+        }
     })
     .catch(error => {
         console.error('삭제 오류:', error);
-        alert('항목 삭제 중 오류가 발생했습니다.');
+        alert('항목 삭제 중 오류가 발생했습니다. 에러 메시지: ' + error.message);
     });
 }
 
@@ -293,7 +300,7 @@ function deleteSelectedItems() {
 function checkoutSelectedItems() {
     var selectedItems = document.querySelectorAll('.select-item:checked');
     var selectedIds = Array.from(selectedItems).map(item => item.closest('.order-cart-item').getAttribute('data-item-id'));
-    var customerId = 1/* 고객 ID를 적절히 넣어야 합니다 */;
+    var customerId = 1; // 고객 ID를 적절히 넣어야 합니다
 
     fetch('/order/prepareCheckout', {
         method: 'POST',
@@ -309,10 +316,14 @@ function checkoutSelectedItems() {
         if (!response.ok) {
             throw new Error('선택된 항목 결제 준비 실패');
         }
-        return response.json().catch(() => ({}));  // 빈 JSON 응답을 허용
+        return response.json();
     })
     .then(data => {
-        window.location.href = '/checkoutPage';
+        // GET 요청에 필요한 URL 파라미터를 구성
+        var params = new URLSearchParams();
+        params.append('customerId', customerId);
+        selectedIds.forEach(id => params.append('productIds', id));
+        window.location.href = '/checkoutPage?' + params.toString();
     })
     .catch(error => {
         console.error('결제 준비 오류:', error);
@@ -321,14 +332,27 @@ function checkoutSelectedItems() {
 }
 
 function checkoutAllItems() {
+<<<<<<< HEAD
     var customerId = 1/* 고객 ID를 적절히 넣어야 합니다 */;
+=======
+    var customerId = 1; // 고객 ID를 적절히 넣어야 합니다
+    var cartItems = document.querySelectorAll('.order-cart-item');
+    var productIds = Array.from(cartItems).map(item => item.getAttribute('data-item-id'));
+    
+    if (productIds.length === 0) {
+        alert('장바구니에 담긴 항목이 없습니다.');
+        return;
+    }
+
+>>>>>>> branch 'develop' of https://github.com/rikik99/Foodrawing.git
     fetch('/order/prepareCheckoutAll', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            customerId: customerId
+            customerId: customerId,
+            productIds: productIds
         })
     })
     .then(response => {
@@ -338,7 +362,10 @@ function checkoutAllItems() {
         return response.json().catch(() => ({}));  // 빈 JSON 응답을 허용
     })
     .then(data => {
-        window.location.href = '/checkoutPage';
+        var params = new URLSearchParams();
+        params.append('customerId', customerId);
+        productIds.forEach(id => params.append('productIds', id));
+        window.location.href = '/checkoutPage?' + params.toString();
     })
     .catch(error => {
         console.error('결제 준비 오류:', error);
@@ -346,29 +373,29 @@ function checkoutAllItems() {
     });
 }
 
-    function toggleSelectAll(selectAllCheckbox) {
-        const selectItems = document.querySelectorAll('.select-item');
-        selectItems.forEach(item => {
-            item.checked = selectAllCheckbox.checked;
-        });
-    }
-
-    function calculateTotal() {
-        var total = 0;
-        var cartItems = document.querySelectorAll('.order-cart-item');
-        cartItems.forEach(function (item) {
-            var priceElement = item.querySelector('.price');
-            var quantityElement = item.querySelector('.order-quantity input');
-            var price = parseInt(priceElement.innerText.replace('원', '').replace(',', ''));
-            var quantity = parseInt(quantityElement.value);
-            total += price * quantity;
-        });
-        document.getElementById('total-price').innerText = '총 금액: ' + total.toLocaleString() + '원';
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        calculateTotal();
+function toggleSelectAll(selectAllCheckbox) {
+    const selectItems = document.querySelectorAll('.select-item');
+    selectItems.forEach(item => {
+        item.checked = selectAllCheckbox.checked;
     });
+}
+
+function calculateTotal() {
+    var total = 0;
+    var cartItems = document.querySelectorAll('.order-cart-item');
+    cartItems.forEach(function (item) {
+        var priceElement = item.querySelector('.price');
+        var quantityElement = item.querySelector('.order-quantity input');
+        var price = parseInt(priceElement.innerText.replace('원', '').replace(',', ''));
+        var quantity = parseInt(quantityElement.value);
+        total += price * quantity;
+    });
+    document.getElementById('total-price').innerText = '총 금액: ' + total.toLocaleString() + '원';
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    calculateTotal();
+});
 </script>
 </body>
 </html>

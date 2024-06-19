@@ -9,6 +9,8 @@
 	        <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
 	      </a>
 	      <p class="text-body-secondary">© 2024</p>
+	      <p class="text-body-secondary">(주)주니준스 컴퍼니</p>
+	      <p class="text-body-secondary">마싯는거 옆에 마싯는거</p>
 	    </div>
 	
 	    <div class="col mb-3">

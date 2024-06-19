@@ -793,7 +793,7 @@
 						                    	<div class="review-comment">
                                         <p>맛있게 빨리 먹어서 조리하고 사진을 못찍었네요~<br>
                                            넘 자극적이지하고 담백한 육개장 맛있게 먹었어요~<br>
-                                           좋아요~</p>
+                                           좋아요~</p> 
 						                    	</div>
                                         <div class="review-thumbnail">
                                             <img id="thumbnail-1" src="images/20240517_CaTchWorkFavicon.png" alt="Review Image" onclick="toggleMoreContent(1)">
