@@ -176,7 +176,9 @@
             <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
             
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+<!-- iamport.payment.js -->
+<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+
 <script>
     //본 예제에서는 도로명 주소 표기 방식에 대한 법령에 따라, 내려오는 데이터를 조합하여 올바른 주소를 구성하는 방법을 설명합니다.
     function sample4_execDaumPostcode() {
@@ -421,9 +423,12 @@
         var finalPrice = total - discount;
         document.getElementById('finalPrice').innerText = finalPrice.toLocaleString() + '원';
     });
+    
+    const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니다
+    IMP.init(userCode);
 
     function pay() {
-        var customerName = document.getElementById('customerName').value;
+    	var customerName = document.getElementById('customerName').value;
         var deliverName = document.getElementById('deliverName').value;
         const customerEmail = document.getElementById('customerEmail').value;
         var customerPhone = document.getElementById('customerPhone').value;
@@ -433,53 +438,42 @@
         const zipCode = document.getElementById('zipCode').value;
         const paymentMethod = document.querySelector('.payment-method.selected').getAttribute('data-method');
         const finalPrice = parseInt(document.getElementById('finalPrice').innerText.replace('원', '').replace(',', ''));
-        var productNumbers = document.querySelectorAll('.productNumber');
+        var productNumbers = Array.from(document.querySelectorAll('.productNumber')).map(input => input.value);
+        var discount = parseInt(document.getElementById('discountPrice').innerText.replace('원', '').replace(',', ''));
+
 
         if (paymentMethod === "card") {
-        		const pgProviders = ["uplus.tlgdacomxpay", "danal_tpay.9810030929", "nice_v2.iamport00m"]; // Add other PG providers as needed
-            const randomPgProvider = pgProviders[Math.floor(Math.random() * pgProviders.length)];
-            const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니다
-            IMP.init(userCode);
+        		const pgProviders = ["uplus.tlgdacomxpay", "danal_tpay.9810030929", "nice_v2.iamport00m", 'kicc.T5102001']; // Add other PG providers as needed
+            var randomPgProvider = pgProviders[Math.floor(Math.random() * pgProviders.length)];
 
             IMP.request_pay({
             		//pg: randomPgProvider,
-                pg: "uplus.tlgdacomxpay",
+                pg: "kicc.T5102001",
                 pay_method: "card",
                 merchant_uid: 'merchant_' + new Date().getTime(),
                 name: '주문명:결제테스트',
-                amount: 1,
+                amount: 500,
                 buyer_email: customerEmail,
                 buyer_name: customerName,
                 buyer_tel: customerPhone,
                 buyer_addr: address + ' ' + detailAddress,
                 buyer_postcode: zipCode,
-                m_redirect_url: "https://helloworld.com/payments/result", // 실제 리디렉션 URL로 변경해야 합니다
-                notice_url: "https://helloworld.com/api/v1/payments/notice",
-                confirm_url: "https://helloworld.com/api/v1/payments/confirm",
-                currency: "KRW",
-                locale: "ko",
-                custom_data: { userId: 30930 },
-                display: { card_quota: [0, 6] },
-                appCard: false,
-                useCardPoint: true,
-                bypass: {
-                    tosspayments: {
-                        useInternationalCardOnly: true
-                    }
-                }
+                m_redirect_url:  "{모바일에서 결제 완료 후 리디렉션 될 URL}", // 실제 리디렉션 URL로 변경해야 합니다
+                appCard: true,
             }, function (rsp) {
                 if (rsp.success) {
                     alert('결제가 완료되었습니다.');
-                    window.location.href = '/orderSuccess';
+                    console.log(rsp);
+                    //window.location.href = '/orderSuccess';
                     
-                    fetch('/order/result', {
+                    fetch('/payment/result', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            customerId: customerId,
-                            deliverId: deliverId,
+                            customerName: customerName,
+                            deliverName: deliverName,
                             productNumbers: productNumbers,
                             customerEmail: customerEmail,
                             customerPhone: customerPhone,
@@ -493,24 +487,30 @@
                         }),
                     })
                     .then(response => {
-                        if (!response.ok) {
-                            return response.json().then(data => {
-                                throw new Error(data.message || '장바구니에서 삭제 실패: ' + productId);
-                            });
-                        }
-                        return response.json();
+                        return response.text().then(text => {
+                            try {
+                                const json = JSON.parse(text);
+                                return json;
+                            } catch (error) {
+                                console.error('서버 응답이 유효한 JSON이 아닙니다:', text);
+                                throw new Error('서버 응답이 유효한 JSON이 아닙니다');
+                            }
+                        });
+                    })
+                    .then(data => {
+                        console.log('주문 저장 성공:', data);
                     })
                     .catch(error => {
-                        console.error('삭제 오류:', error);
-                        alert('항목 삭제 중 오류가 발생했습니다. 에러 메시지: ' + error.message);
+                        console.error('주문 저장 오류:', error);
+                        alert('주문 저장 중 오류가 발생했습니다. 에러 메시지: ' + error.message);
                     });
                     
                 } else {
                     alert('결제에 실패하였습니다. 에러 내용: ' + rsp.error_msg);
+                    console.log(rsp);
                 }
             });
-        } else if (paymentMethod === "vbank") {
-            const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니다
+        } if (paymentMethod === "vbank") {
             var today = new Date();
 
             var year = today.getFullYear();
@@ -518,7 +518,6 @@
             var day = ('0' + today.getDate()).slice(-2);
 
             var dateString = year + '-' + month  + '-' + day;
-            IMP.init(userCode);
 
             IMP.request_pay(
             		  {
@@ -567,9 +566,6 @@
                 }
             });
         } else if (paymentMethod === "tosspayments") {
-            const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니다
-            IMP.init(userCode);
-
             IMP.request_pay(
             		  {
             		    pg: "tosspay",
@@ -592,9 +588,6 @@
                 }
             });
         } else if (paymentMethod === "payco") {
-            const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니다
-            IMP.init(userCode);
-
             IMP.request_pay(
             		  {
             		    pg: "payco.PARTNERTEST",
@@ -615,9 +608,6 @@
                 }
             });
         } else if (paymentMethod === "kakaopay") {
-            const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니다
-            IMP.init(userCode);
-
             IMP.request_pay(
             		  {
             		    pg: "kakaopay.TC0ONETIME",
