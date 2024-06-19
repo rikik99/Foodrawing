@@ -56,7 +56,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 if (jwtUtil.validateToken(token)) {
                     String email = jwtUtil.extractUsername(token); // email을 추출
-                    UserDetails userDetails = ((CustomUserDetailsService) userDetailsService).loadUserByEmail(email);
+                    
+                    String provider = (String) request.getSession().getAttribute("provider");
+                    UserDetails userDetails;
+                    if (provider == null) {
+                        userDetails = ((CustomUserDetailsService) userDetailsService).loadUserByUsername(email);
+                    } else {
+                        userDetails = ((CustomUserDetailsService) userDetailsService).loadUserByEmail(email);
+                    }
 
                     if (jwtUtil.validateToken(token, userDetails)) {
                         UsernamePasswordAuthenticationToken authentication = 
@@ -68,10 +75,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // JWT가 만료된 경우 리프레시 토큰을 검증하고, 유효한 경우 새로운 JWT 발급
                 if (refreshToken != null && jwtUtil.validateRefreshToken(refreshToken)) {
                     String email = jwtUtil.extractUsername(refreshToken); // email을 추출
-                    UserDetails userDetails = ((CustomUserDetailsService) userDetailsService).loadUserByEmail(email);
+                    String provider = (String) request.getSession().getAttribute("provider");
+
+                    UserDetails userDetails;
+                    if (provider == null) {
+                        userDetails = ((CustomUserDetailsService) userDetailsService).loadUserByUsername(email);
+                    } else {
+                        userDetails = ((CustomUserDetailsService) userDetailsService).loadUserByEmail(email);
+                    }
 
                     if (jwtUtil.validateToken(refreshToken, userDetails)) {
-                        String newToken = jwtUtil.generateToken(email, false, (String) request.getSession().getAttribute("provider"), null); // provider 전달
+                        String newToken = jwtUtil.generateToken(email, false, provider, null); // provider 전달
 
                         // 새로운 JWT를 쿠키에 추가
                         Cookie newJwtCookie = new Cookie("jwt", newToken);
