@@ -11,50 +11,7 @@
 <link rel="stylesheet" href="css/bestpage.css">
 <link rel="stylesheet" href="css/sidebar.css">
 <style>
-	.product-renewal .category .temperature-badge.cold {
-    width: 40px;
-    height: 18px;
-    background-image: url(/cjom/web/images/common/icon_temperature_cold.png);
-    background-size: 40px 18px;
-}
 
-.container {
-  text-align: center;
-}
-
-.page-title {
-	margin-top: 50px;
-	margin-bottom: 20px;
-}
-
-.category-list {
-    display: flex; /* Flexbox 레이아웃을 사용합니다. */
-    flex-wrap: wrap; /* 아이템들이 넘칠 경우 줄바꿈을 허용합니다. */
-    list-style: none; /* 리스트 아이템의 기본 스타일을 제거합니다. */
-    padding: 0; /* 내부 여백을 없앱니다. */
-}
-
-.category-list li {
-	list-style-type: none;
-    width: calc(25% - 2px); /* 각 아이템의 너비를 25%로 설정하고, 테두리의 두께를 고려하여 조절합니다. */
-    border: 1px solid #ccc; /* 테두리 스타일과 색상을 설정합니다. */
-    border-radius: 5px; /* 테두리의 모서리를 둥글게 만듭니다. */
-    padding: 10px; /* 내부 여백을 추가합니다. */
-    box-sizing: border-box; /* 요소의 크기에 테두리와 패딩을 포함시킵니다. */
-    float: left; /* 요소를 왼쪽으로 띄워 정렬합니다. */
-}
-
-.product-list-body {
-            display: flex;
-            justify-content: center;
-        }
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            max-width: 1600px;
-            margin: 20px;
-        }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </head>
@@ -100,7 +57,7 @@
   	<c:forEach var="index" begin="1" end="10">
   		<div class="product-card">
 	  		<div class="product-top">
-		  		<a class="product-card-href" href="/productDetail">
+		  		<a class="product-card-href" href="/ProductDetail">
 		         <div class="badge">BEST</div>
 		         <img src="images/20240517_CaTchWorkFavicon.png" alt="Product Image">
 		      </a>
@@ -110,7 +67,7 @@
 			      </div>
 		      </a>
 	  		</div>
-  			<a class="product-card-href" href="/productDetail">
+  			<a class="product-card-href" href="/ProductDetail">
             <div class="product-details">
                <div class="product-title">
                    불향까지 살아있는 직화🔥<br>

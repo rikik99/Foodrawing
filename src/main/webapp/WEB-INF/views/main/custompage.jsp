@@ -337,10 +337,10 @@ function togglePreference(nutrient, value, element) {
 function fetchData() {
 	const query = Object.entries(preferences)
     .filter(([key, val]) => val !== 0) // 0이 아닌 값만 필터링
-    .map(([key, val]) => `${key}=${val}`)
+    .map(([key, val]) => `\${key}=\${val}`)
     .join('&');
 
-  fetch(`/nutrition?${query}`)
+  fetch(`/nutrition?\${query}`)
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok ' + response.statusText);

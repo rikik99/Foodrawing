@@ -1,6 +1,7 @@
 package com.food.global.auth;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +9,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collection;
 
 @Component
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
@@ -22,10 +24,12 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         String rememberMeParam = request.getParameter("remember-me");
         boolean rememberMe = rememberMeParam != null && rememberMeParam.equals("on");
-        System.out.println("remember-me parameter: " + rememberMeParam);
-        System.out.println("rememberMe: " + rememberMe);
-
-        String token = jwtUtil.generateToken(authentication.getName(), rememberMe);
+        // 세션에서 provider 값을 가져옴
+        String provider = (String) request.getSession().getAttribute("provider");
+        
+        // 토큰 생성 시 provider 정보도 포함
+        String token = jwtUtil.generateToken(authentication.getName(), rememberMe, provider, null); // 추가 클레임을 null로 전달
+        
         if (rememberMe) {
             Cookie cookie = new Cookie("jwt", token);
             cookie.setHttpOnly(true);
@@ -33,26 +37,24 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             cookie.setPath("/");
             cookie.setMaxAge(604800); // 7 days
             response.addCookie(cookie);
-
-            // SameSite 속성을 설정합니다.
             response.setHeader("Set-Cookie", String.format("jwt=%s; HttpOnly; Path=/; Max-Age=%d; SameSite=Lax",
                     token, cookie.getMaxAge()));
-            System.out.println("Cookie set with JWT: " + token);
         } else {
-            // 로그인 유지가 아닐 때는 세션에 JWT 토큰을 저장합니다.
-            Cookie sessionCookie = new Cookie("jwt", null);
+            Cookie sessionCookie = new Cookie("jwt", token);
             sessionCookie.setHttpOnly(true);
             sessionCookie.setSecure(false);
             sessionCookie.setPath("/");
-            sessionCookie.setMaxAge(0); // 쿠키 삭제
+            sessionCookie.setMaxAge(-1); // 쿠키 삭제
             response.addCookie(sessionCookie);
-
-            request.getSession().setAttribute("jwt", token); // 1시간 세션 유지
-            System.out.println("Session set with JWT: " + token);
         }
 
-        response.sendRedirect("/");
+        Collection<SimpleGrantedAuthority> authorities = (Collection<SimpleGrantedAuthority>) authentication.getAuthorities();
+        boolean isAdmin = authorities.stream().anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+
+        if (isAdmin) {
+            response.sendRedirect("/admin/main");
+        } else {
+            response.sendRedirect("/");
+        }
     }
-
-
 }

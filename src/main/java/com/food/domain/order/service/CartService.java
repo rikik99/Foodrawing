@@ -72,6 +72,7 @@ public class CartService {
     }
 
     public CartResponseDTO updateCartItem(CartRequestDTO cartRequest) {
+    	System.out.println("cartRequest = "+cartRequest);
         Optional<CartDTO> cartOptional = cartMapper.findByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductNumber());
         if (cartOptional.isPresent()) {
             CartDTO cart = cartOptional.get();

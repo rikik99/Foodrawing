@@ -32,4 +32,6 @@ public interface UserMapper {
 
 	void updatePasswordByEmail(@Param("email") String email, @Param("password") String newPassword);
 
+	UserDTO findById(Long userId);
+
 }

@@ -31,10 +31,9 @@
 			    pf.FILE_PATH AS filePath,
 			    pf.FILE_TYPE AS fileType,
 			    d.NAME AS discountName,
-			    d.DISCOUNT_TYPE  AS discountType,
+			    d.TYPE AS discountType,
 			    d.DISCOUNT_VALUE AS discountValue,
-			    d.MAX_DISCOUNT AS maxDiscount,
-			    d.MIN_PRICE as minPrice
+			    d.MAX_DISCOUNT AS maxDiscount
 			FROM 
 			    CART_TB c
 			    JOIN PRODUCT_TB p ON c.PRODUCT_NUMBER = p.PRODUCT_NUMBER
@@ -67,14 +66,13 @@
 			    pf.FILE_PATH,
 			    pf.FILE_TYPE,
 			    d.NAME,
-			    d.DISCOUNT_TYPE,
+			    d.TYPE,
 			    d.DISCOUNT_VALUE,
-			    d.MAX_DISCOUNT,
-			    d.MIN_PRICE
+			    d.MAX_DISCOUNT
     </select>
     
     <delete id="deleteByCustomerIdAndProductId">
-        DELETE FROM CART_TB WHERE CUSTOMER_ID = #{customerId} AND PRODUCT_Number = #{productId}
+        DELETE FROM CART_TB WHERE CUSTOMER_ID = #{customerId} AND PRODUCT_ID = #{productId}
     </delete>
     
     <delete id="deleteAllByCustomerId">

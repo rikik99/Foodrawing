@@ -1,7 +1,5 @@
 package com.food.global.auth;
 
-import java.io.IOException;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -10,6 +8,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -28,7 +29,9 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
 
         if (pendingRegistration == null || !pendingRegistration) {
             String username = authentication.getName();
-            String token = jwtUtil.generateToken(username, true); // rememberMe 기본값으로 설정
+            String provider = (String) request.getSession().getAttribute("provider");
+            Map<String, Object> additionalClaims = (Map<String, Object>) request.getSession().getAttribute("oauth2Attributes");
+            String token = jwtUtil.generateToken(username, true, provider, additionalClaims); // rememberMe 기본값으로 설정
 
             Cookie cookie = new Cookie("jwt", token);
             cookie.setHttpOnly(true);
