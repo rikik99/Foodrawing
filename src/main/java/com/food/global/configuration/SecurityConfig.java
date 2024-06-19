@@ -61,19 +61,15 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
-		http.securityMatcher("/admin/**")
+		http.securityMatcher("/admin/**").csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(
-						authorizeRequests -> authorizeRequests.requestMatchers("/admin/login", "/admin/loginFail")
+						authorizeRequests -> authorizeRequests.requestMatchers("/admin/login", "/admin/logout")
 								.permitAll().anyRequest().hasAuthority("ROLE_ADMIN"))
-				.formLogin(formLogin -> formLogin.loginPage("/admin/login").loginProcessingUrl("/admin/login")
+				.formLogin(formLogin -> formLogin.loginPage("/admin/login")
 						.defaultSuccessUrl("/admin/main", true).successHandler(customAuthenticationSuccessHandler)
 						.failureHandler(customAuthenticationFailureHandler).permitAll())
 				.logout(logout -> logout.logoutUrl("/admin/logout").logoutSuccessUrl("/admin/login").permitAll())
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // 세션을
-																												// 필요할
-																												// 때만
-																												// 생성하도록
-																												// 설정
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
 				.userDetailsService(customUserDetailsService);
 
 		return http.build();
