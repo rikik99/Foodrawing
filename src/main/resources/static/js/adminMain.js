@@ -1,246 +1,294 @@
 document.addEventListener('DOMContentLoaded', function() {
-	const mainContent = document.querySelector('.main-content');
-	const toggleModeButton = document.getElementById('toggleMode');
-	const body = document.body;
-	let currentSortColumns = [];
+    const mainContent = document.querySelector('.main-content');
+    const toggleModeButton = document.getElementById('toggleMode');
+    const body = document.body;
+    let currentSortColumns = [];
 
-	function loadContent(url, target) {
-		fetch(url)
-			.then(response => response.text())
-			.then(html => {
-				const tempDiv = document.createElement('div');
-				tempDiv.innerHTML = html;
-				const newMainContent = tempDiv.querySelector('.main-content');
-				const newStyles = tempDiv.querySelectorAll('link[rel="stylesheet"]');
+    document.addEventListener('click', function(e) {
+        const toggleRow = e.target.closest(".toggle-row");
+        if (toggleRow) {
+            console.log("Row clicked");
+            const nextRow = toggleRow.nextElementSibling;
+            if (nextRow && nextRow.classList.contains('collapse-content')) {
+                nextRow.classList.toggle('active');
+            }
+        }
 
-				if (newMainContent) {
-					newStyles.forEach(style => {
-						const existingLink = Array.from(document.head.querySelectorAll('link[rel="stylesheet"]')).find(link => link.href === style.href);
-						if (!existingLink) {
-							document.head.appendChild(style.cloneNode(true));
-						}
-					});
+	    const star = e.target.closest('.star');
+	        if (star) {
+	            const value = star.getAttribute('data-value');
+	            const ratingInput = document.getElementById('rating');
+	            const stars = document.querySelectorAll('.star-rating .star');
+	            ratingInput.value = value;
+	            stars.forEach(s => s.classList.remove('selected'));
+	            star.classList.add('selected');
+	            let previousSibling = star.previousElementSibling;
+	            while (previousSibling) {
+	                previousSibling.classList.add('selected');
+	                previousSibling = previousSibling.previousElementSibling;
+	            }
+	        }
+    });
 
-					mainContent.style.opacity = '0';
-					setTimeout(() => {
-						mainContent.innerHTML = newMainContent.innerHTML;
-						mainContent.className = newMainContent.className;
-						mainContent.style.opacity = '1';
-						setupNavigation();
-						highlightMenu(target);
-						setupCheckboxEventListeners();
-					}, 100);
-				}
-			})
-			.catch(error => console.error('Error loading content:', error));
-	}
+    document.addEventListener('mouseover', function(e) {
+        const star = e.target.closest('.star');
+        if (star) {
+            const stars = document.querySelectorAll('.star-rating .star');
+            stars.forEach(s => s.classList.remove('hover'));
+            star.classList.add('hover');
+            let previousSibling = star.previousElementSibling;
+            while (previousSibling) {
+                previousSibling.classList.add('hover');
+                previousSibling = previousSibling.previousElementSibling;
+            }
+        }
+    });
 
-	function setupNavigation() {
-		const dropdownToggles = document.querySelectorAll('.sidebar .dropdown-toggle');
+    document.addEventListener('mouseout', function(e) {
+        const star = e.target.closest('.star');
+        if (star) {
+            const stars = document.querySelectorAll('.star-rating .star');
+            stars.forEach(s => s.classList.remove('hover'));
+        }
+    });
 
-		dropdownToggles.forEach(toggle => {
-			toggle.removeEventListener('click', handleDropdownClick);
-			toggle.addEventListener('click', handleDropdownClick);
-		});
+    function loadContent(url, target) {
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const newMainContent = tempDiv.querySelector('.main-content');
+                const newStyles = tempDiv.querySelectorAll('link[rel="stylesheet"]');
 
-		const links = document.querySelectorAll('.sidebar ul li a');
+                if (newMainContent) {
+                    newStyles.forEach(style => {
+                        const existingLink = Array.from(document.head.querySelectorAll('link[rel="stylesheet"]')).find(link => link.href === style.href);
+                        if (!existingLink) {
+                            document.head.appendChild(style.cloneNode(true));
+                        }
+                    });
 
-		links.forEach(link => {
-			link.removeEventListener('click', handleLinkClick);
-			link.addEventListener('click', handleLinkClick);
-		});
-	}
+                    mainContent.style.opacity = '0';
+                    setTimeout(() => {
+                        mainContent.innerHTML = newMainContent.innerHTML;
+                        mainContent.className = newMainContent.className;
+                        mainContent.style.opacity = '1';
+                        setupNavigation();
+                        highlightMenu(target);
+                        setupCheckboxEventListeners();
+                    }, 100);
+                }
+            })
+            .catch(error => console.error('Error loading content:', error));
+    }
 
-	function handleDropdownClick(event) {
-		event.preventDefault();
-		const dropdownMenu = this.parentElement.parentElement.nextElementSibling;
-		const arrowIcon = this.querySelector('.arrow-icon');
-		if (dropdownMenu) {
-			dropdownMenu.classList.toggle('visible');
-			arrowIcon.classList.toggle('rotate');
-		}
-	}
+    function setupNavigation() {
+        const dropdownToggles = document.querySelectorAll('.sidebar .dropdown-toggle');
 
-	function handleLinkClick(event) {
-		const target = this.getAttribute('data-target');
-		if (!target) return;
+        dropdownToggles.forEach(toggle => {
+            toggle.removeEventListener('click', handleDropdownClick);
+            toggle.addEventListener('click', handleDropdownClick);
+        });
 
-		const url = `/admin/${target}`;
-		event.preventDefault();
-		history.pushState({ target: target }, '', url);
-		loadContent(url, target);
-	}
+        const links = document.querySelectorAll('.sidebar ul li a');
 
-	function highlightMenu(target) {
-		const links = document.querySelectorAll('.sidebar ul li');
-		links.forEach(link => {
-			link.classList.remove('active');
-		});
+        links.forEach(link => {
+            link.removeEventListener('click', handleLinkClick);
+            link.addEventListener('click', handleLinkClick);
+        });
+    }
 
-		const activeLink = document.querySelector(`.sidebar ul li a[data-target="${target}"]`);
-		if (activeLink) {
-			activeLink.parentElement.classList.add('active');
-		}
-	}
+    function handleDropdownClick(event) {
+        event.preventDefault();
+        const dropdownMenu = this.parentElement.parentElement.nextElementSibling;
+        const arrowIcon = this.querySelector('.arrow-icon');
+        if (dropdownMenu) {
+            dropdownMenu.classList.toggle('visible');
+            arrowIcon.classList.toggle('rotate');
+        }
+    }
 
-	window.addEventListener('popstate', function(event) {
-		if (event.state && event.state.target) {
-			loadContent(`/admin/${event.state.target}`, event.state.target);
-		} else {
-			loadContent('/admin/mainContent', 'mainContent');
-		}
-	});
+    function handleLinkClick(event) {
+        const target = this.getAttribute('data-target');
+        if (!target) return;
 
-	const pathSegments = window.location.pathname.split('/');
-	const initialPage = pathSegments[pathSegments.length - 1];
-	if (initialPage && initialPage !== 'admin') {
-		loadContent(`/admin/${initialPage}`, initialPage);
-	} else {
-		loadContent('/admin/mainContent', 'mainContent');
-	}
+        const url = `/admin/${target}`;
+        event.preventDefault();
+        history.pushState({ target: target }, '', url);
+        loadContent(url, target);
+    }
 
-	setupNavigation();
+    function highlightMenu(target) {
+        const links = document.querySelectorAll('.sidebar ul li');
+        links.forEach(link => {
+            link.classList.remove('active');
+        });
 
-	function toggleMode() {
-		body.classList.toggle('dark-mode');
-		body.classList.toggle('light-mode');
-		const elements = document.querySelectorAll('.sidebar, .main-content, .summary-row, .summary-box, .notifications, .product-list, .recent-orders, .popular-products, .customer-reviews, .notification-box');
-		elements.forEach(el => {
-			el.classList.toggle('dark-mode');
-			el.classList.toggle('light-mode');
-		});
-	}
+        const activeLink = document.querySelector(`.sidebar ul li a[data-target="${target}"]`);
+        if (activeLink) {
+            activeLink.parentElement.classList.add('active');
+        }
+    }
 
-	if (toggleModeButton) {
-		toggleModeButton.addEventListener('click', toggleMode);
-	}
+    window.addEventListener('popstate', function(event) {
+        if (event.state && event.state.target) {
+            loadContent(`/admin/${event.state.target}`, event.state.target);
+        } else {
+            loadContent('/admin/mainContent', 'mainContent');
+        }
+    });
 
-	function setupCheckboxEventListeners() {
-		const selectAll = document.getElementById('selectAll');
-		if (selectAll) {
-			selectAll.addEventListener('click', function() {
-				var isChecked = selectAll.checked;
-				var selectProducts = document.querySelectorAll('.selectProduct');
-				selectProducts.forEach(function(checkbox) {
-					checkbox.checked = isChecked;
-				});
-			});
-		}
-	}
+    const pathSegments = window.location.pathname.split('/');
+    const initialPage = pathSegments[pathSegments.length - 1];
+    if (initialPage && initialPage !== 'admin') {
+        loadContent(`/admin/${initialPage}`, initialPage);
+    } else {
+        loadContent('/admin/mainContent', 'mainContent');
+    }
 
-	setupCheckboxEventListeners();
+    setupNavigation();
 
-	function setDateRange(range, group) {
-		const today = new Date();
-		let startDate, endDate;
+    function toggleMode() {
+        body.classList.toggle('dark-mode');
+        body.classList.toggle('light-mode');
+        const elements = document.querySelectorAll('.sidebar, .main-content, .summary-row, .summary-box, .notifications, .product-list, .recent-orders, .popular-products, .customer-reviews, .notification-box');
+        elements.forEach(el => {
+            el.classList.toggle('dark-mode');
+            el.classList.toggle('light-mode');
+        });
+    }
 
-		switch (range) {
-			case 'today':
-				startDate = endDate = today.toISOString().split('T')[0];
-				break;
-			case 'yesterday':
-				today.setDate(today.getDate() - 1);
-				startDate = endDate = today.toISOString().split('T')[0];
-				break;
-			case 'week':
-				endDate = today.toISOString().split('T')[0];
-				today.setDate(today.getDate() - 7);
-				startDate = today.toISOString().split('T')[0];
-				break;
-			case 'month':
-				endDate = today.toISOString().split('T')[0];
-				today.setMonth(today.getMonth() - 1);
-				startDate = today.toISOString().split('T')[0];
-				break;
-			case '3months':
-				endDate = today.toISOString().split('T')[0];
-				today.setMonth(today.getMonth() - 3);
-				startDate = today.toISOString().split('T')[0];
-				break;
-			case 'all':
-				startDate = endDate = '';
-				break;
-		}
+    if (toggleModeButton) {
+        toggleModeButton.addEventListener('click', toggleMode);
+    }
 
-		if (group === 'last') {
-			document.getElementById('last_fr_date').value = startDate;
-			document.getElementById('last_to_date').value = endDate;
-		} else {
-			document.getElementById('fr_date').value = startDate;
-			document.getElementById('to_date').value = endDate;
-		}
-	}
+    function setupCheckboxEventListeners() {
+        const selectAll = document.getElementById('selectAll');
+        if (selectAll) {
+            selectAll.addEventListener('click', function() {
+                var isChecked = selectAll.checked;
+                var selectProducts = document.querySelectorAll('.selectProduct');
+                selectProducts.forEach(function(checkbox) {
+                    checkbox.checked = isChecked;
+                });
+            });
+        }
+    }
 
-	window.setDateRange = setDateRange;
+    setupCheckboxEventListeners();
 
-	function setStockRange(range) {
-		let stockMin = document.getElementById('stock_min');
-		let stockMax = document.getElementById('stock_max');
+    function setDateRange(range, group) {
+        const today = new Date();
+        let startDate, endDate;
 
-		switch (range) {
-			case 'all':
-				stockMin.value = '';
-				stockMax.value = '';
-				break;
-			case 'soldOut':
-				stockMin.value = 0;
-				stockMax.value = 0;
-				break;
-			case 'outOfStock':
-				stockMin.value = 1;
-				stockMax.value = 500;
-				break;
-			case 'availability':
-				stockMin.value = 1001;
-				stockMax.value = '';
-				break;
-		}
-	}
+        switch (range) {
+            case 'today':
+                startDate = endDate = today.toISOString().split('T')[0];
+                break;
+            case 'yesterday':
+                today.setDate(today.getDate() - 1);
+                startDate = endDate = today.toISOString().split('T')[0];
+                break;
+            case 'week':
+                endDate = today.toISOString().split('T')[0];
+                today.setDate(today.getDate() - 7);
+                startDate = today.toISOString().split('T')[0];
+                break;
+            case 'month':
+                endDate = today.toISOString().split('T')[0];
+                today.setMonth(today.getMonth() - 1);
+                startDate = today.toISOString().split('T')[0];
+                break;
+            case '3months':
+                endDate = today.toISOString().split('T')[0];
+                today.setMonth(today.getMonth() - 3);
+                startDate = today.toISOString().split('T')[0];
+                break;
+            case 'all':
+                startDate = endDate = '';
+                break;
+        }
 
-	window.setStockRange = setStockRange;
+        if (group === 'last') {
+            document.getElementById('last_fr_date').value = startDate;
+            document.getElementById('last_to_date').value = endDate;
+        } else {
+            document.getElementById('fr_date').value = startDate;
+            document.getElementById('to_date').value = endDate;
+        }
+    }
 
-	const sortTable = () => {
-		const tableBody = document.getElementById('stockTableBody');
-		const rows = Array.from(tableBody.rows);
+    window.setDateRange = setDateRange;
 
-		rows.sort((rowA, rowB) => {
-			for (let i = 0; i < currentSortColumns.length; i++) {
-				const { column, order, type } = currentSortColumns[i];
-				let cellA = rowA.querySelector(`[data-column="${column}"]`).innerText;
-				let cellB = rowB.querySelector(`[data-column="${column}"]`).innerText;
+    function setStockRange(range) {
+        let stockMin = document.getElementById('stock_min');
+        let stockMax = document.getElementById('stock_max');
 
-				if (type === 'number') {
-					cellA = parseInt(cellA);
-					cellB = parseInt(cellB);
-				} else if (type === 'date') {
-					cellA = new Date(cellA);
-					cellB = new Date(cellB);
-				}
+        switch (range) {
+            case 'all':
+                stockMin.value = '';
+                stockMax.value = '';
+                break;
+            case 'soldOut':
+                stockMin.value = 0;
+                stockMax.value = 0;
+                break;
+            case 'outOfStock':
+                stockMin.value = 1;
+                stockMax.value = 500;
+                break;
+            case 'availability':
+                stockMin.value = 1001;
+                stockMax.value = '';
+                break;
+        }
+    }
 
-				if (cellA < cellB) return order === 'asc' ? -1 : 1;
-				if (cellA > cellB) return order === 'asc' ? 1 : -1;
-			}
-			return 0;
-		});
+    window.setStockRange = setStockRange;
 
-		tableBody.append(...rows);
-	};
-	document.addEventListener('click', function(e) {
-		const header = e.target.closest('.sortable');
-		if (header) {
-			const ascIcon = header.querySelector('.sort-icon.asc');
-			const descIcon = header.querySelector('.sort-icon.desc');
-			if (header.classList.contains('asc')) {
-				header.classList.remove('asc');
-				header.classList.add('desc');
-				if (ascIcon) ascIcon.style.display = 'none';
-				if (descIcon) descIcon.style.display = 'inline';
-			} else {
-				header.classList.remove('desc');
-				header.classList.add('asc');
-				if (ascIcon) ascIcon.style.display = 'inline';
-				if (descIcon) ascIcon.style.display = 'none';
-			}
-		}
-	});
+    const sortTable = () => {
+        const tableBody = document.getElementById('stockTableBody');
+        const rows = Array.from(tableBody.rows);
+
+        rows.sort((rowA, rowB) => {
+            for (let i = 0; i < currentSortColumns.length; i++) {
+                const { column, order, type } = currentSortColumns[i];
+                let cellA = rowA.querySelector(`[data-column="${column}"]`).innerText;
+                let cellB = rowB.querySelector(`[data-column="${column}"]`).innerText;
+
+                if (type === 'number') {
+                    cellA = parseInt(cellA);
+                    cellB = parseInt(cellB);
+                } else if (type === 'date') {
+                    cellA = new Date(cellA);
+                    cellB = new Date(cellB);
+                }
+
+                if (cellA < cellB) return order === 'asc' ? -1 : 1;
+                if (cellA > cellB) return order === 'asc' ? 1 : -1;
+            }
+            return 0;
+        });
+
+        tableBody.append(...rows);
+    };
+    document.addEventListener('click', function(e) {
+        const header = e.target.closest('.sortable');
+        if (header) {
+            const ascIcon = header.querySelector('.sort-icon.asc');
+            const descIcon = header.querySelector('.sort-icon.desc');
+            if (header.classList.contains('asc')) {
+                header.classList.remove('asc');
+                header.classList.add('desc');
+                if (ascIcon) ascIcon.style.display = 'none';
+                if (descIcon) descIcon.style.display = 'inline';
+            } else {
+                header.classList.remove('desc');
+                header.classList.add('asc');
+                if (ascIcon) ascIcon.style.display = 'inline';
+                if (descIcon) descIcon.style.display = 'none';
+            }
+        }
+    });
 });

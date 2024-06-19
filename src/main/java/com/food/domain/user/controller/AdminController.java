@@ -69,6 +69,12 @@ public class AdminController {
     	mv.setViewName("admin/salesInquiry");
     	return mv;
     }
+    @GetMapping("/salesReview")
+    public ModelAndView salesReview() {
+    	ModelAndView mv = new ModelAndView();
+    	mv.setViewName("admin/salesReview");
+    	return mv;
+    }
     
 	@GetMapping("/logout")
 	public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) {
