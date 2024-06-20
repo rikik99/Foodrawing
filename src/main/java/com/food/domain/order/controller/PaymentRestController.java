@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.food.domain.order.dto.PaymentRequest;
-import com.food.domain.order.service.PaymenyService;
+import com.food.domain.order.service.PaymentService;
 
 @RestController
 @RequestMapping("/payment")
 public class PaymentRestController {
 	@Autowired
-    private PaymenyService paymenyService;
+    private PaymentService paymenyService;
 
     @PostMapping("/result")
     public ResponseEntity<?> handleOrderResult(@RequestBody PaymentRequest paymentRequest) {
