@@ -14,7 +14,7 @@ import com.food.domain.order.dto.PaymentRequest;
 import com.food.domain.order.mapper.PaymentMapper;
 
 @Service
-public class PaymenyService {
+public class PaymentService {
 
     @Autowired
     private PaymentMapper paymentMapper;
