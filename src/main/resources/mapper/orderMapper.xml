@@ -18,7 +18,7 @@
             d.MAX_DISCOUNT AS maxDiscount
         FROM 
             CART_TB c
-            JOIN PRODUCT_TB p ON c.PRODUCT_ID = p.PRODUCT_NUMBER
+            JOIN PRODUCT_TB p ON c.PRODUCT_NUMBER = p.PRODUCT_NUMBER
             LEFT JOIN (
                 SELECT 
                     pf1.PRODUCT_NUMBER,

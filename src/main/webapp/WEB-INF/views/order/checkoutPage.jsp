@@ -440,7 +440,10 @@
         const finalPrice = parseInt(document.getElementById('finalPrice').innerText.replace('원', '').replace(',', ''));
         var productNumbers = Array.from(document.querySelectorAll('.productNumber')).map(input => input.value);
         var discount = parseInt(document.getElementById('discountPrice').innerText.replace('원', '').replace(',', ''));
-
+        
+        const IMP = window.IMP; // 생략 가능
+        const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니다
+        IMP.init(userCode);
 
         if (paymentMethod === "card") {
         		const pgProviders = ["uplus.tlgdacomxpay", "danal_tpay.9810030929", "nice_v2.iamport00m", 'kicc.T5102001']; // Add other PG providers as needed
@@ -460,57 +463,40 @@
                 buyer_postcode: zipCode,
                 m_redirect_url:  "{모바일에서 결제 완료 후 리디렉션 될 URL}", // 실제 리디렉션 URL로 변경해야 합니다
                 appCard: true,
-            }, function (rsp) {
-                if (rsp.success) {
-                    alert('결제가 완료되었습니다.');
-                    console.log(rsp);
-                    //window.location.href = '/orderSuccess';
-                    
-                    fetch('/payment/result', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            customerName: customerName,
-                            deliverName: deliverName,
-                            productNumbers: productNumbers,
-                            customerEmail: customerEmail,
-                            customerPhone: customerPhone,
-                            deliverPhone: deliverPhone,
-                            address: address,
-                            detailAddress: detailAddress,
-                            zipCode: zipCode,
-                            paymentMethod: paymentMethod,
-                            finalPrice: finalPrice,
-                            discount: discount,
-                        }),
-                    })
-                    .then(response => {
-                        return response.text().then(text => {
-                            try {
-                                const json = JSON.parse(text);
-                                return json;
-                            } catch (error) {
-                                console.error('서버 응답이 유효한 JSON이 아닙니다:', text);
-                                throw new Error('서버 응답이 유효한 JSON이 아닙니다');
-                            }
-                        });
-                    })
-                    .then(data => {
-                        console.log('주문 저장 성공:', data);
-                    })
-                    .catch(error => {
-                        console.error('주문 저장 오류:', error);
-                        alert('주문 저장 중 오류가 발생했습니다. 에러 메시지: ' + error.message);
-                    });
-                    
-                } else {
-                    alert('결제에 실패하였습니다. 에러 내용: ' + rsp.error_msg);
-                    console.log(rsp);
-                }
+            }, (rsp) => {
+            	fetch('/payment/result', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        customerName: customerName,
+                        deliverName: deliverName,
+                        productNumbers: productNumbers,
+                        customerEmail: customerEmail,
+                        customerPhone: customerPhone,
+                        deliverPhone: deliverPhone,
+                        address: address,
+                        detailAddress: detailAddress,
+                        zipCode: zipCode,
+                        paymentMethod: paymentMethod,
+                        finalPrice: finalPrice,
+                        discount: discount,
+                    }),
+                 })
+                 .then(res => res.ok ? res.text() : Promise.reject(res.statusText))
+                 .then(data => {
+                     console.log('Success:', data);
+                     alert("결제가 완료되었습니다!");
+                     window.location.href = "/best";
+                 })
+                 .catch(error => {
+                     console.error('Error:', error);
+                     alert("결제 실패!");
+                     window.location.href = "/main/mainPage";
+                 });
             });
-        } if (paymentMethod === "vbank") {
+        } else if (paymentMethod === "vbank") {
             var today = new Date();
 
             var year = today.getFullYear();
