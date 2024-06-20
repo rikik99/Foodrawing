@@ -152,7 +152,9 @@
 			</table>
 		</div>
 		<button id="toggleMode" class="primary">Toggle Mode</button>
-		<script src="<c:url value='/js/adminMain.js'/>"></script>
+		<script src="<c:url value='/js/admin/main.js'/>"></script>
+		<script src="<c:url value='/js/admin/toggleMode.js'/>"></script>
+		<script src="<c:url value='/js/admin/starRating.js'/>"></script>
 	</div>
 </body>
 </html>

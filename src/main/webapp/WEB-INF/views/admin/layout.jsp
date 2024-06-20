@@ -51,8 +51,23 @@
                 </li>
             </ul>
             <ul class="dropdown-menu">
-                <li><a href="#" data-target="discountList">할인 목록</a></li>
-                <li><a href="#" data-target="discountManagement">할인 삭제</a></li>
+                <li><a href="#" data-target="discountList">할인 관리</a></li>
+                <li><a href="#" data-target="couponList">쿠폰 관리</a></li>
+            </ul>
+        </li>
+        <li class="dropdown-container">
+            <ul>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">
+                        <img src="/images/admin/shopping-cart-svgrepo-com.svg" alt="Dropdown Icon" class="dropdown-icon">
+                        주문 관리
+                        <i class="fa fa-chevron-right arrow-icon"></i>
+                    </a>
+                </li>
+            </ul>
+            <ul class="dropdown-menu">
+                <li><a href="#" data-target="orderList">주문 관리</a></li>
+                <li><a href="#" data-target="deliveryList">배송 관리</a></li>
             </ul>
         </li>
         

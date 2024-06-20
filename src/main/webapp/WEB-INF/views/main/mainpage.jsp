@@ -154,16 +154,7 @@
 		</div>
 
 
-<<<<<<< HEAD
 
-<div class="section grid" style="border: 1px solid #ccc; padding: 20px; margin-top:20px;">
-  <div class="grid-item">
-    <h3 style="text-align:center; font-weight:bold">할인품목<img src="/images/saleicon.png" class="saleicon"></h3>
-    <div class="now-top item-area" id="discountMainArea">
-      <div class="box">
-        <a href="#" class="item-link">
-          <img src="/images/Na.jpg" style="margin: 10px; min-width: 230px; max-width: 315px; width: 100%;">
-=======
 		<div class="section grid"
 			style="border: 1px solid #ccc; padding: 20px; margin-top: 20px;">
 			<div class="grid-item">
@@ -174,12 +165,6 @@
 					<div class="box">
 						<a href="#" class="item-link"> <img src="/images/Na.jpg"
 							style="margin: 10px; min-width: 230px; max-width: 315px; width: 100%;">
->>>>>>> branch 'develop' of https://github.com/rikik99/Foodrawing.git
-
-<<<<<<< HEAD
-
-=======
->>>>>>> branch 'develop' of https://github.com/rikik99/Foodrawing.git
 
 							<div class="box_list_title" style="text-align: left;">메뉴 제목</div>
 						</a>
@@ -298,15 +283,8 @@ const imageContainer = document.getElementById('image-container');
 const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
 const imageIndex = document.getElementById('image-index');
-<<<<<<< HEAD
-=======
-
->>>>>>> branch 'develop' of https://github.com/rikik99/Foodrawing.git
 const images = ['/images/2.png', '/images/3.png','/images/7.png','/images/8.png','/images/9.png'];
-<<<<<<< HEAD
 
-=======
->>>>>>> branch 'develop' of https://github.com/rikik99/Foodrawing.git
 
 let currentIndex = 0;
 

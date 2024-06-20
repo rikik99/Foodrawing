@@ -122,7 +122,8 @@
 					<tr>
 						<td><input type="checkbox" class="selectProduct secondary"></td>
 						<td><img src="http://example.com/image1.jpg" alt="상품1 이미지"></td>
-						<td><p>ST001</p><p>의정부식 부대볶음 밀키트</p></td>
+						<td><p>ST001</p>
+							<p>의정부식 부대볶음 밀키트</p></td>
 						<td>국,탕,찌개</td>
 						<td>₩12,000</td>
 						<td>100</td>
@@ -145,7 +146,8 @@
 			</table>
 		</div>
 		<button id="toggleMode" class="primary">Toggle Mode</button>
-		<script src="<c:url value='/js/adminMain.js'/>"></script>
+		<script src="<c:url value='/js/admin/main.js'/>"></script>
+		<script src="<c:url value='/js/admin/toggleMode.js'/>"></script>
 	</div>
 </body>
 </html>

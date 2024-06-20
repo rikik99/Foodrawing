@@ -75,7 +75,30 @@ public class AdminController {
     	mv.setViewName("admin/salesReview");
     	return mv;
     }
-    
+    @GetMapping("/discountList")
+    public ModelAndView discountList() {
+    	ModelAndView mv = new ModelAndView();
+    	mv.setViewName("admin/discountList");
+    	return mv;
+    }
+    @GetMapping("/discountManagement")
+    public ModelAndView discountManagement() {
+    	ModelAndView mv = new ModelAndView();
+    	mv.setViewName("admin/discountManagement");
+    	return mv;
+    }
+    @GetMapping("/couponList")
+    public ModelAndView couponList() {
+    	ModelAndView mv = new ModelAndView();
+    	mv.setViewName("admin/couponList");
+    	return mv;
+    }
+    @GetMapping("/couponManagement")
+    public ModelAndView couponManagement() {
+    	ModelAndView mv = new ModelAndView();
+    	mv.setViewName("admin/couponManagement");
+    	return mv;
+    }
 	@GetMapping("/logout")
 	public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) {
 	    HttpSession session = request.getSession();

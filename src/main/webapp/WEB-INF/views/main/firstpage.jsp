@@ -266,7 +266,7 @@ $(".hover").mouseleave(
   <figcaption>
     <p>단백질은 우리 몸을 구성하는 핵심 성분으로, 근육 합성, 면역 기능 강화, 체중 관리 등에 필수적입니다.</p>
   </figcaption>
-  <a href="/main/main"></a>
+  <a href="/main/mainpage"></a>
 </figure>
 
 
@@ -282,7 +282,7 @@ $(".hover").mouseleave(
   <figcaption>
     <p>건강한 체중 관리를 위한 다이어트 식단은 영양 균형을 유지하면서도 에너지 섭취를 줄이는 것이 핵심입니다. 신선한 채소, 과일, 단백질 식품 등을 중심으로 구성된 다이어트 식단은 포만감을 높이고 불필요한 칼로리 섭취를 억제합니다.</p>
   </figcaption>
-  <a href="/main/main"></a>
+  <a href="/main/mainpage"></a>
 </figure>
 
 <figure class="snip1477" style="margin-top:200px;">
@@ -296,7 +296,7 @@ $(".hover").mouseleave(
   <figcaption>
     <p>과도한 나트륨 섭취는 고혈압, 심혈관 질환 등 다양한 건강 문제를 야기할 수 있습니다. 저염식단은 가공식품 대신 신선한 식재료를 사용하고, 소금 대신 다양한 향신료로 맛을 내는 것이 특징입니다.</p>
   </figcaption>
-  <a href="/main/main"></a>
+  <a href="/main/mainpage"></a>
 </figure>
 </body>
 </html>
