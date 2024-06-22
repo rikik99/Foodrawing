@@ -3,55 +3,57 @@
 	display: flex;
 	margin-bottom: 20px; /* 섹션 간격 추가 */
 }
-        .stock-update-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
 
-        .stock-update-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
-            width: 70%; /* Ensure the row takes up the full width */
-        }
+.stock-update-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
 
-        .stock-update-row select,
-        .stock-update-row input[type="number"] {
-            margin-right: 10px;
-            height: 32px;
-            padding: 5px 10px;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            outline: none;
-            box-sizing: border-box;
-        }
+.stock-update-row {
+	display: flex;
+	align-items: center;
+	margin-bottom: 5px;
+	width: 70%; /* Ensure the row takes up the full width */
+}
 
-        .stock-action {
-            width: 100px; /* Specific width for the select */
-        }
+.stock-update-row select, .stock-update-row input[type="number"] {
+	margin-right: 10px;
+	height: 32px;
+	padding: 5px 10px;
+	font-size: 14px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	outline: none;
+	box-sizing: border-box;
+}
 
-        .stock-quantity {
-            width: 80px; /* Specific width for the quantity input */
-        }
+.stock-action {
+	width: 100px; /* Specific width for the select */
+}
 
-        .stock-update-btn {
-            padding: 5px 10px; /* Smaller padding for a more consistent look */
-            font-size: 14px; /* Smaller font size to match input elements */
-            width: 70%; /* Set the button width to match the row width minus the select and input widths */
-            height: 32px; /* Match the height of the select and input elements */
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s, box-shadow 0.3s;
-            background-color: #375a7f; /* Primary color for dark mode */
-            color: white;
-        }
+.stock-quantity {
+	width: 80px; /* Specific width for the quantity input */
+}
 
-        .stock-update-btn:hover {
-            background-color: #2a3e5c; /* Darker shade on hover */
-        }
+.stock-update-btn {
+	padding: 5px 10px; /* Smaller padding for a more consistent look */
+	font-size: 14px; /* Smaller font size to match input elements */
+	width: 70%;
+	/* Set the button width to match the row width minus the select and input widths */
+	height: 32px; /* Match the height of the select and input elements */
+	border-radius: 5px;
+	border: none;
+	cursor: pointer;
+	transition: background-color 0.3s, box-shadow 0.3s;
+	background-color: #375a7f; /* Primary color for dark mode */
+	color: white;
+}
+
+.stock-update-btn:hover {
+	background-color: #2a3e5c; /* Darker shade on hover */
+}
+
 .half-width {
 	display: flex;
 	align-items: center; /* 수직 정렬 */
@@ -257,4 +259,48 @@ button.editButton {
 
 button.editButton:hover {
 	background-color: #e0a800;
+}
+
+.productImg {
+	max-width: 100px;
+	max-height: 100px;
+	object-fit: cover;
+}
+/* Pagination styles */
+.pagination {
+    display: flex;
+    justify-content: center;
+    padding-left: 0;
+    list-style: none;
+    border-radius: 0.25rem;
+}
+
+.page-item {
+    margin: 0 5px; /* Add margin between pagination items */
+}
+
+.page-item .page-link {
+    position: relative;
+    display: block;
+    padding: 0.5rem 0.75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    color: #007bff;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+}
+
+.page-item.active .page-link {
+    z-index: 3;
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.page-item .page-link:hover {
+    z-index: 2;
+    color: #0056b3;
+    text-decoration: none;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
 }

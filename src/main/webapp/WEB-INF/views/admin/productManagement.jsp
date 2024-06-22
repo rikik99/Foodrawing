@@ -25,38 +25,27 @@
 							<label for="category">카테고리</label> <select id="category"
 								name="category" class="secondary">
 								<option value="">전체</option>
-								<option value="001">패션의류/잡화/뷰티</option>
-								<option value="002">식품/생필품</option>
-								<option value="003">출산/유아동</option>
-								<option value="004">생활/건강</option>
-								<option value="005">가구/인테리어</option>
-								<option value="006">가전/디지털/컴퓨터</option>
-								<option value="007">스포츠/레저/자동차/공구</option>
-								<option value="008">도서/여행/e쿠폰/취미</option>
+								<c:forEach items="${categoryList}" var="category">
+									<option value="${category.id}">${category.name}</option>
+								</c:forEach>
 							</select>
 						</div>
 					</div>
-					<div class="full-width dark-mode">
-						<div class="date-group">
-							<label for="fr_date">기간 검색</label> <input type="date"
-								name="fr_date" id="fr_date" placeholder="시작일" class="secondary">
-							<input type="date" name="to_date" id="to_date" placeholder="종료일"
-								class="secondary"> <span class="btn_group"> <input
-								type="button" onclick="setDateRange('today');"
-								class="btn_small white primary" value="오늘"> <input
-								type="button" onclick="setDateRange('yesterday');"
-								class="btn_small white primary" value="어제"> <input
-								type="button" onclick="setDateRange('week');"
-								class="btn_small white primary" value="일주일"> <input
-								type="button" onclick="setDateRange('month');"
-								class="btn_small white primary" value="1개월"> <input
-								type="button" onclick="setDateRange('3months');"
-								class="btn_small white primary" value="3개월"> <input
-								type="button" onclick="setDateRange('all');"
-								class="btn_small white primary" value="전체">
-							</span>
-						</div>
-					</div>
+	                   <div class="full-width">
+                        <div class="date-group">
+                            <label for="searchIssuedDateFrom">발행 날짜</label>
+                            <input type="date" name="searchIssuedDateFrom" id="fr_date" placeholder="시작일" class="secondary">
+                            <input type="date" name="searchIssuedDateTo" id="to_date" placeholder="종료일" class="secondary">
+                            <span class="btn_group">
+                                <input type="button" class="btn_small white primary date-range-btn" data-range="today" data-group="searchIssuedDate" value="오늘">
+                                <input type="button" class="btn_small white primary date-range-btn" data-range="yesterday" data-group="searchIssuedDate" value="어제">
+                                <input type="button" class="btn_small white primary date-range-btn" data-range="week" data-group="searchIssuedDate" value="일주일">
+                                <input type="button" class="btn_small white primary date-range-btn" data-range="month" data-group="searchIssuedDate" value="1개월">
+                                <input type="button" class="btn_small white primary date-range-btn" data-range="3months" data-group="searchIssuedDate" value="3개월">
+                                <input type="button" class="btn_small white primary date-range-btn" data-range="all" data-group="searchIssuedDate" value="전체">
+                            </span>
+                        </div>
+                    </div>
 					<div class="full-width">
 						<div class="half-width number-group">
 							<label for="stock_min">상품 재고</label> <input type="number"
@@ -87,7 +76,7 @@
 
 					</div>
 					<div class="search-buttons full-width">
-						<button type="submit" class="primary">검색</button>
+						<button type="button" class="primary search-btn">검색</button>
 						<button type="reset" class="secondary">초기화</button>
 					</div>
 				</div>
@@ -119,31 +108,37 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<td><input type="checkbox" class="selectProduct secondary"></td>
-						<td><img src="http://example.com/image1.jpg" alt="상품1 이미지"></td>
-						<td><p>ST001</p>
-							<p>의정부식 부대볶음 밀키트</p></td>
-						<td>국,탕,찌개</td>
-						<td>₩12,000</td>
-						<td>100</td>
-						<td>2024-06-13</td>
-						<td>판매중</td>
-						<td><button class="editButton warning">수정</button></td>
-					</tr>
-					<tr>
-						<td><input type="checkbox" class="selectProduct secondary"></td>
-						<td><img src="http://example.com/image1.jpg" alt="상품1 이미지"></td>
-						<td>상품 설명</td>
-						<td>카테고리 1</td>
-						<td>₩10,000</td>
-						<td>50</td>
-						<td>2024-06-17</td>
-						<td>판매중</td>
-						<td><button class="editButton warning">수정</button></td>
-					</tr>
+					<c:forEach items="${product.content}" var="product">
+						<tr>
+							<td><input type="checkbox" class="selectProduct secondary"></td>
+							<td><img class="productImg"
+								src="${product.productFileDTO.filePath}" alt="상품 이미지"></td>
+							<td><p>${product.productNumber}</p>
+								<p>${product.name}</p></td>
+							<td>${product.productCategoryDTO.name}</td>
+							<td>${product.price}</td>
+							<td>${product.quantity}</td>
+							<td>${product.createdDate}</td>
+							<td>판매중</td>
+							<td><button class="editButton warning">수정</button></td>
+						</tr>
+					</c:forEach>
 				</tbody>
 			</table>
+			<div class="full-width">
+			
+			</div>
+			<nav aria-label="Page navigation">
+				<ul class="pagination">
+					<c:forEach begin="1" end="${pageCount}" var="i">
+						<li class="page-item ${currentPage + 1 == i ? 'active' : ''}">
+							<a class="page-link" href="#" data-target="productManagement"
+							onclick="(function(event) { loadPage(event, ${i - 1}, ${size}); })(event)">${i}</a>
+						</li>
+					</c:forEach>
+				</ul>
+			</nav>
+
 		</div>
 		<button id="toggleMode" class="primary">Toggle Mode</button>
 		<script src="<c:url value='/js/admin/main.js'/>"></script>

@@ -6,63 +6,61 @@
 <head>
 <link rel="stylesheet" href="/css/admin/common.css" />
 <link rel="stylesheet" href="/css/admin/discountAdd.css" />
+<script src="<c:url value='/js/admin/couponForm.js'/>"></script>
 </head>
 <body class="dark-mode">
     <div class="discount-form-container">
-        <form id="discountForm" method="post" action="/admin/discountManagement" class="discount-form">
-            <h1>할인 등록</h1>
+        <form id="couponForm" method="post" action="/admin/couponManagement" class="discount-form">
+            <h1>쿠폰 발행</h1>
             <table class="form-table">
                 <tr>
-                    <td><label for="name">할인명</label></td>
-                    <td><input type="text" id="name" name="name" required></td>
+                    <td><label for="couponName">쿠폰명</label></td>
+                    <td>
+                        <select id="couponName" name="couponName" onchange="updateCouponDetails()" required>
+                            <option value="">쿠폰을 선택하세요</option>
+                            <option value="Summer Sale">Summer Sale</option>
+                            <option value="Winter Sale">Winter Sale</option>
+                            <option value="Black Friday">Black Friday</option>
+                            <option value="New Year Coupon">New Year Coupon</option>
+                            <option value="Ongoing Discount">Ongoing Discount</option>
+                        </select>
+                    </td>
                 </tr>
                 <tr>
-                    <td><label for="description">할인 설명</label></td>
-                    <td><textarea id="description" name="description" required></textarea></td>
+                    <td colspan="2">
+                        <div id="couponDetails" class="coupon-details"></div>
+                    </td>
                 </tr>
                 <tr>
-                    <td><label for="type">할인 유형</label></td>
-                    <td><select id="type" name="type" required>
-                            <option value="이벤트">이벤트</option>
-                            <option value="쿠폰">쿠폰</option>
-                    </select></td>
+                    <td><label>발행 대상</label></td>
+                    <td>
+                        <label><input type="radio" name="targetType" value="individual" onclick="showTargetInput()"> 개인</label>
+                        <label><input type="radio" name="targetType" value="membership" onclick="showTargetInput()"> 회원등급</label>
+                        <label><input type="radio" name="targetType" value="all" onclick="showTargetInput()"> 전체</label>
+                    </td>
+                </tr>
+                <tr id="individualInput" style="display: none;">
+                    <td><label for="individualIds">회원 ID</label></td>
+                    <td><input type="text" id="individualIds" name="individualIds" placeholder="쉼표로 구분하여 여러 회원 ID 입력"></td>
+                </tr>
+                <tr id="membershipInput" style="display: none;">
+                    <td><label for="membershipLevels">회원 등급</label></td>
+                    <td>
+                        <label><input type="checkbox" name="membershipLevels" value="normal"> 일반</label>
+                        <label><input type="checkbox" name="membershipLevels" value="premium"> 프리미엄</label>
+                        <label><input type="checkbox" name="membershipLevels" value="vip"> VIP</label>
+                    </td>
                 </tr>
                 <tr>
-                    <td><label for="discountType">할인 종류</label></td>
-                    <td><select id="discountType" name="discountType" required>
-                            <option value="P">퍼센트</option>
-                            <option value="A">금액</option>
-                    </select></td>
+                    <td><label for="couponCode">쿠폰 코드</label></td>
+                    <td><input type="text" id="couponCode" name="couponCode" required></td>
                 </tr>
                 <tr>
-                    <td><label for="discountValue">할인 값</label></td>
-                    <td><input type="number" id="discountValue" name="discountValue" required></td>
+                    <td><label for="issueCount">발행 개수</label></td>
+                    <td><input type="number" id="issueCount" name="issueCount" required></td>
                 </tr>
                 <tr>
-                    <td><label for="minPrice">최소 구매 금액</label></td>
-                    <td><input type="number" id="minPrice" name="minPrice" required></td>
-                </tr>
-                <tr>
-                    <td><label for="maxDiscount">최대 할인 금액</label></td>
-                    <td><input type="number" id="maxDiscount" name="maxDiscount" required></td>
-                </tr>
-                <tr>
-                    <td><label for="startDate">시작 날짜</label></td>
-                    <td><input type="date" id="startDate" name="startDate" required></td>
-                </tr>
-                <tr>
-                    <td><label for="endDate">종료 날짜</label></td>
-                    <td><input type="date" id="endDate" name="endDate" required></td>
-                </tr>
-                <tr>
-                    <td><label for="onsaleYn">진행 상태</label></td>
-                    <td><select id="onsaleYn" name="onsaleYn" required>
-                            <option value="Y">진행중</option>
-                            <option value="N">종료</option>
-                    </select></td>
-                </tr>
-                <tr>
-                    <td colspan="2"><button type="submit" class="primary">등록</button></td>
+                    <td colspan="2"><button type="submit" class="primary">발행</button></td>
                 </tr>
             </table>
         </form>

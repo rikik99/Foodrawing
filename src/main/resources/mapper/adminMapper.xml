@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.food.user.mapper.AdminMapper">
+<mapper namespace="com.food.domain.user.mapper.AdminMapper">
 
+	<select id="findProductList" resultType="com.food.domain.product.dto.ProductDTO">
+		select * from PRODUCT_TB
+	</select>
+
+	<select id="findProductFileByProductNumber"
+		parameterType="String">
+		SELECT * FROM PRODUCT_FILE_TB WHERE PRODUCT_NUMBER = #{productNumber}
+	</select>
+	
+	<select id="findProductCategoryByProductNumber"
+		parameterType="String">
+		SELECT C.ID, C.NAME, C.CATEGORY_CODE
+		FROM PRODUCT_CATEGORY_TB C 
+		JOIN PRODUCT_CATEGORY_MAPPING_TB M ON C.ID = M.CATEGORY_ID 
+		WHERE PRODUCT_NUMBER = #{productNumber}
+	</select>
+	<select id="findCategoryList">
+	SELECT * FROM PRODUCT_CATEGORY_TB
+	</select>
 </mapper>
