@@ -1,11 +1,12 @@
 package com.food.domain.user.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +22,9 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequestMapping("/admin")
 @Controller
 public class AdminController {
@@ -33,7 +36,7 @@ public class AdminController {
 	public ModelAndView login(Authentication authentication) {
 		// 로그인된 사용자가 로그인 페이지로 접근할 경우 메인 페이지로 리다이렉트
 		if (authentication != null && authentication.isAuthenticated()) {
-			return new ModelAndView("redirect:/admin/main");
+			return new ModelAndView("redirect:/admin/mainContent");
 		}
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("admin/login");
@@ -55,19 +58,51 @@ public class AdminController {
 	}
 
 	@GetMapping("/productManagement")
-	public ModelAndView productManagement(@RequestParam(value = "page", defaultValue = "0") int page,
-			@RequestParam(value = "size", defaultValue = "5") int size) {
-		ModelAndView mv = new ModelAndView();
-		Pageable pageable = PageRequest.of(page, size);
-		Page<ProductDTO> ProductList = adminService.findProductList(pageable);
-		List<ProductCategoryDTO> categoryList = adminService.findCategoryList();
-		mv.addObject("product", ProductList);
-		mv.addObject("categoryList", categoryList);
-		mv.addObject("currentPage", ProductList.getNumber());
-		mv.addObject("pageCount", ProductList.getTotalPages());
-		mv.addObject("size", size);
-		mv.setViewName("admin/productManagement");
-		return mv;
+	public ModelAndView productManagement(
+	        @RequestParam Map<String, String> allParams) {
+	    log.info("allparams = {}", allParams);
+	    int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+	    int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+
+	    ModelAndView mv = new ModelAndView();
+
+	    // 페이지 정보와 사이즈 정보를 allParams에 추가
+	    allParams.put("page", String.valueOf(page));
+	    allParams.put("size", String.valueOf(size));
+
+	    // 검색 조건이 있는지 확인
+	    boolean hasSearchParams = allParams.keySet().stream()
+	            .anyMatch(key -> !key.equals("page") && !key.equals("size") && allParams.get(key) != null && !allParams.get(key).isEmpty());
+
+	    Page<ProductDTO> productList;
+	    if (hasSearchParams) {
+	        // 검색 조건이 있을 경우
+	        productList = adminService.findProductListWithSearch(convertEmptyStringsToNull(allParams));
+	    } else {
+	        // 검색 조건이 없을 경우
+	        productList = adminService.findProductList(PageRequest.of(page, size));
+	    }
+	    List<ProductCategoryDTO> categoryList = adminService.findCategoryList();
+	    mv.addObject("product", productList);
+	    mv.addObject("categoryList", categoryList);
+	    mv.addObject("currentPage", productList.getNumber());
+	    mv.addObject("pageCount", productList.getTotalPages());
+	    mv.addObject("totalElements", productList.getTotalElements());
+	    mv.addObject("size", size);
+	    mv.addAllObjects(allParams); // 전달된 검색 조건을 다시 뷰로 전달
+	    mv.setViewName("admin/productManagement");
+	    return mv;
+	}
+
+
+
+
+	private Map<String, String> convertEmptyStringsToNull(Map<String, String> params) {
+		Map<String, String> result = new HashMap<>();
+		params.forEach((key, value) -> {
+			result.put(key, value.isEmpty() ? null : value);
+		});
+		return result;
 	}
 
 	@GetMapping("/stockManagement")

@@ -277,6 +277,7 @@ button.editButton:hover {
 
 .page-item {
     margin: 0 5px; /* Add margin between pagination items */
+    cursor: pointer;
 }
 
 .page-item .page-link {

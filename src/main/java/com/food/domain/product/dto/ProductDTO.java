@@ -1,6 +1,9 @@
 package com.food.domain.product.dto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+import com.food.domain.sales.dto.SalesPostDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,4 +23,15 @@ public class ProductDTO {
     private LocalDateTime createdDate;
     private ProductFileDTO productFileDTO;
     private ProductCategoryDTO productCategoryDTO;
+    private SalesPostDTO salesPostDTO;
+    
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    public String getFormattedCreatedDate() {
+        if (createdDate != null) {
+            return createdDate.format(formatter);
+        }
+        return "";
+    }
+    
 }

@@ -21,5 +21,7 @@ public class SalesPostDTO {
     private Long stock;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
+    private LocalDateTime startPostDate;
     private LocalDateTime lastPostDate;
+    private Long status;
 }

@@ -52,7 +52,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         boolean isAdmin = authorities.stream().anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
 
         if (isAdmin) {
-            response.sendRedirect("/admin/main");
+            response.sendRedirect("/admin/mainContent");
         } else {
             response.sendRedirect("/");
         }

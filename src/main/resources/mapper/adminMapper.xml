@@ -2,23 +2,82 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.food.domain.user.mapper.AdminMapper">
 
-	<select id="findProductList" resultType="com.food.domain.product.dto.ProductDTO">
-		select * from PRODUCT_TB
+	<select id="findProductList"
+		resultType="com.food.domain.product.dto.ProductDTO">
+		select PRODUCT_NUMBER, NAME, DESCRIPTION, PRICE, QUANTITY,
+		CREATED_DATE
+		from PRODUCT_TB
 	</select>
+	
+<select id="findProductListByKeyword" resultType="com.food.domain.product.dto.ProductDTO" parameterType="map">
+    select P.PRODUCT_NUMBER, P.NAME, P.DESCRIPTION, P.PRICE, P.QUANTITY, P.CREATED_DATE
+    from PRODUCT_TB P
+    WHERE 1=1
+    <if test="searchInput != null and searchInput != ''">
+        AND (P.PRODUCT_NUMBER LIKE '%' || #{searchInput} || '%'
+        OR P.NAME LIKE '%' || #{searchInput} || '%')
+    </if>
+    <if test="stock_min != null">
+        AND P.QUANTITY &gt;= #{stock_min}
+    </if>
+    <if test="stock_max != null">
+        AND P.QUANTITY &lt;= #{stock_max}
+    </if>
+    <if test="price_min != null">
+        AND P.PRICE &gt;= #{price_min}
+    </if>
+    <if test="price_max != null">
+        AND P.PRICE &lt;= #{price_max}
+    </if>
+    <if test="fr_date != null and fr_date != ''">
+        AND P.CREATED_DATE &gt;= TO_DATE(#{fr_date}, 'YYYY-MM-DD')
+    </if>
+    <if test="to_date != null and to_date != ''">
+        AND P.CREATED_DATE &lt;= TO_DATE(#{to_date}, 'YYYY-MM-DD')
+    </if>
+    <if test="category != null and category != ''">
+        AND P.PRODUCT_NUMBER IN (
+            SELECT M.PRODUCT_NUMBER
+            FROM PRODUCT_CATEGORY_MAPPING_TB M
+            JOIN PRODUCT_CATEGORY_TB C ON M.CATEGORY_ID = C.ID
+            WHERE C.ID = #{category}
+        )
+    </if>
+    <if test="sale_status != null and sale_status != ''">
+        AND P.PRODUCT_NUMBER IN (
+            SELECT S.PRODUCT_NUMBER
+            FROM SALES_POST_TB S
+            JOIN PRODUCT_TB P ON P.PRODUCT_NUMBER = S.PRODUCT_NUMBER
+            WHERE S.STATUS = #{sale_status}
+        )
+    </if>
+</select>
+
+
 
 	<select id="findProductFileByProductNumber"
 		parameterType="String">
-		SELECT * FROM PRODUCT_FILE_TB WHERE PRODUCT_NUMBER = #{productNumber}
+		SELECT * FROM PRODUCT_FILE_TB WHERE PRODUCT_NUMBER =
+		#{productNumber}
 	</select>
-	
+
 	<select id="findProductCategoryByProductNumber"
 		parameterType="String">
 		SELECT C.ID, C.NAME, C.CATEGORY_CODE
-		FROM PRODUCT_CATEGORY_TB C 
-		JOIN PRODUCT_CATEGORY_MAPPING_TB M ON C.ID = M.CATEGORY_ID 
+		FROM
+		PRODUCT_CATEGORY_TB C
+		JOIN PRODUCT_CATEGORY_MAPPING_TB M ON C.ID =
+		M.CATEGORY_ID
 		WHERE PRODUCT_NUMBER = #{productNumber}
 	</select>
+	
 	<select id="findCategoryList">
-	SELECT * FROM PRODUCT_CATEGORY_TB
+		SELECT * FROM PRODUCT_CATEGORY_TB
+	</select>
+	
+	<select id="findSalesPostByProductNumber" parameterType="String">
+	SELECT ID, ADMIN_ID, PRODUCT_NUMBER, TITLE, DESCRIPTION, CREATED_DATE, LAST_POST_DATE, UPDATED_DATE, START_POST_DATE, STATUS
+	FROM SALES_POST_TB
+	WHERE PRODUCT_NUMBER = #{productNumber}
 	</select>
 </mapper>
