@@ -21,5 +21,9 @@ public class ProductNutritionDTO {
     private Long sodium;
     private Long cholesterol;
     private Long weight;
+    private Integer categoryId;  // categoryId 필드 추가
 
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
+    }
 }

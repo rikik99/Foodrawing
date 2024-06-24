@@ -18,4 +18,6 @@ public class ProductDTO {
     private Long price;
     private Long quantity;
     private LocalDateTime createdDate;
+    
+    private ProductFileDTO productFileDTO;
 }

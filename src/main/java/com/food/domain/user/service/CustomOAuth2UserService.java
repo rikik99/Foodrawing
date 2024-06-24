@@ -2,6 +2,8 @@ package com.food.domain.user.service;
 
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.food.domain.user.dto.CustomerDTO;
 import com.food.domain.user.dto.UserSocialLinksDTO;
 import com.food.domain.user.mapper.CustomerMapper;
+import com.food.global.auth.JwtUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -22,21 +25,27 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final HttpServletRequest request;
     private final CustomerMapper customerMapper;
-    private final PasswordEncoder passwordEncoder;
     private final UserService userService;
-
+    private final CustomUserDetailsService customUserDetailsService;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+    
     public CustomOAuth2UserService(HttpServletRequest request, CustomerMapper customerMapper,
-                                   PasswordEncoder passwordEncoder, UserService userService) {
+                                   UserService userService, CustomUserDetailsService customUserDetailsService, 
+                                   PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.request = request;
         this.customerMapper = customerMapper;
-        this.passwordEncoder = passwordEncoder;
         this.userService = userService;
+        this.customUserDetailsService = customUserDetailsService;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         Map<String, Object> attributes = oAuth2User.getAttributes();
+        System.out.println("attributes = " + attributes);
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         HttpSession session = request.getSession();
         String email = getEmailFromAttributes(attributes, registrationId);
@@ -46,7 +55,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         UserSocialLinksDTO socialLink = userService.findSocialLinkByProviderAndProviderId(registrationId, providerId);
         if (socialLink != null) {
             // 기존 사용자 로직
+        	System.out.println("social check");
             CustomerDTO customer = customerMapper.findCustomerById(socialLink.getUserId());
+            System.out.println("customer = " + customer);
+            session.setAttribute("provider", registrationId);
+            session.setAttribute("providerId", providerId);
+            session.setAttribute("email", email);
+            session.setAttribute("oauth2Attributes", attributes);
             session.setAttribute("user", customer);
             session.setAttribute("oauth2RedirectUrl", "/");
         } else {
@@ -66,6 +81,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 session.setAttribute("oauth2RedirectUrl", "/signup");
             }
         }
+
+        // JWT 토큰 생성 및 세션에 저장
+        Map<String, Object> additionalClaims = new HashMap<>();
+        additionalClaims.put("attributes", attributes); // 필요한 경우 추가 클레임으로 attributes를 저장할 수도 있습니다.
+        String token = jwtUtil.generateToken(email, false, registrationId, additionalClaims);
+        session.setAttribute("jwt", token);
 
         return oAuth2User;
     }

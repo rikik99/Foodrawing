@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class ProductCategoryMappingDTO {
-    private Long id;
+    private int id;
     private String productNumber;
-    private Long categoryId;
+    private int categoryId;
 }

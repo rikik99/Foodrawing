@@ -22,7 +22,7 @@ import com.food.domain.product.service.ProductService;
 @RestController
 public class ProductController {
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
-
+//커스텀페이지
     @Autowired
     private ProductService productService;
 
@@ -66,7 +66,6 @@ public class ProductController {
             String filePath = (i < fileList.size() && fileList.get(i) != null) ? fileList.get(i).getFilePath() : null;
             String fileType = (i < fileList.size() && fileList.get(i) != null) ? fileList.get(i).getFileType() : null;
             LocalDateTime fileUploadDate = (i < fileList.size() && fileList.get(i) != null) ? fileList.get(i).getUploadDate() : null;
-
             customList.add(new CustomPageDTO(
                 results.get(i).getProductNumber(),
                 results.get(i).getCalorie(),
@@ -96,5 +95,7 @@ public class ProductController {
         return customList;
     }
 
+    
+    
     }
 
