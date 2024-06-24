@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
@@ -52,23 +51,22 @@
                         </div>
                     </div>
                     <div class="full-width">
-						<div class="half-width number-group">
-							<label for="stock_min">상품 재고</label> <input type="number"
-								name="stock_min" id="stock_min" placeholder="이상"
-								class="secondary"> <input type="number" name="stock_max"
-								id="stock_max" placeholder="이하" class="secondary"> <span
-								class="btn_group"> <input type="button"
-								onclick="setStockRange('all');" class="btn_small white primary"
-								value="전체"> <input type="button"
-								onclick="setStockRange('soldOut');"
-								class="btn_small white primary" value="품절"> <input
-								type="button" onclick="setStockRange('outOfStock');"
-								class="btn_small white primary" value="부족"> <input
-								type="button" onclick="setStockRange('availability');"
-								class="btn_small white primary" value="여유">
-							</span>
-						</div>
-					</div>
+                        <div class="half-width number-group">
+                            <label for="stock_min">상품 재고</label> 
+                            <input type="number" name="stock_min" id="stock_min" placeholder="이상" class="secondary"> 
+                            <input type="number" name="stock_max" id="stock_max" placeholder="이하" class="secondary"> 
+                            <span class="btn_group"> 
+                                <input type="button" onclick="setStockRange('all');" class="btn_small white primary" value="전체"> 
+                                <input type="button" onclick="setStockRange('soldOut');" class="btn_small white primary" value="품절"> 
+                                <input type="button" onclick="setStockRange('outOfStock');" class="btn_small white primary" value="부족"> 
+                                <input type="button" onclick="setStockRange('availability');" class="btn_small white primary" value="여유">
+                            </span>
+                        </div>
+                    </div>
+                    <div class="search-buttons full-width">
+                        <button type="submit" class="primary">검색</button>
+                        <button type="reset" class="secondary">초기화</button>
+                    </div>
                 </div>
             </form>
 
@@ -78,7 +76,7 @@
                     <span>조회된 상품 개수: <strong>10</strong>개</span>
                 </div>
             </div>
-                         <table class="product-list dark-mode">
+            <table class="product-list dark-mode">
                 <thead>
                     <tr>
                         <th><input type="checkbox" id="selectAll" class="secondary"></th>
@@ -101,12 +99,16 @@
                         <td>10</td>
                         <td>50</td>
                         <td>
-                            <select class="stock-action">
-                                <option value="IN">입고</option>
-                                <option value="OUT">출고</option>
-                            </select>
-                            <input type="number" class="stock-quantity" placeholder="수량">
-                            <button class="stock-update-btn">적용</button>
+                            <div class="stock-update-container">
+                                <div class="stock-update-row">
+                                    <select class="stock-action">
+                                        <option value="IN">입고</option>
+                                        <option value="OUT">출고</option>
+                                    </select>
+                                    <input type="number" class="stock-quantity" placeholder="수량">
+                                </div>
+                                <button class="stock-update-btn">적용</button>
+                            </div>
                         </td>
                         <td>2024-06-17</td>
                         <td>판매중</td>
@@ -119,12 +121,16 @@
                         <td>5</td>
                         <td>30</td>
                         <td>
-                            <select class="stock-action">
-                                <option value="IN">입고</option>
-                                <option value="OUT">출고</option>
-                            </select>
-                            <input type="number" class="stock-quantity" placeholder="수량">
-                            <button class="stock-update-btn">적용</button>
+                            <div class="stock-update-container">
+                                <div class="stock-update-row">
+                                    <select class="stock-action">
+                                        <option value="IN">입고</option>
+                                        <option value="OUT">출고</option>
+                                    </select>
+                                    <input type="number" class="stock-quantity" placeholder="수량">
+                                </div>
+                                <button class="stock-update-btn">적용</button>
+                            </div>
                         </td>
                         <td>2024-06-18</td>
                         <td>판매중</td>
@@ -134,6 +140,36 @@
         </div>
         <button id="toggleMode" class="primary">Toggle Mode</button>
         <script src="<c:url value='/js/adminMain.js'/>"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const stockUpdateButtons = document.querySelectorAll('.stock-update-btn');
+                stockUpdateButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const row = this.closest('tr');
+                        const action = row.querySelector('.stock-action').value;
+                        const quantityInput = row.querySelector('.stock-quantity');
+                        const quantity = parseInt(quantityInput.value, 10);
+                        const stockCell = row.querySelector('td:nth-child(6)');
+                        let currentStock = parseInt(stockCell.textContent, 10);
+
+                        if (action === 'IN') {
+                            currentStock += quantity;
+                        } else if (action === 'OUT') {
+                            currentStock -= quantity;
+                        }
+
+                        stockCell.textContent = currentStock;
+                        quantityInput.value = '';
+
+                        // Update the last updated date
+                        const lastUpdatedCell = row.querySelector('td:nth-child(8)');
+                        lastUpdatedCell.textContent = new Date().toISOString().split('T')[0];
+
+                        // Optionally, make an AJAX call to update the stock in the database
+                    });
+                });
+            });
+        </script>
     </div>
 </body>
 </html>

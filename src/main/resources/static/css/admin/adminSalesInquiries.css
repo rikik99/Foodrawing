@@ -1,0 +1,297 @@
+/* 공통 스타일 */
+.full-width {
+	display: flex;
+	margin-bottom: 20px; /* 섹션 간격 추가 */
+}
+
+.half-width {
+	display: flex;
+	align-items: center; /* 수직 정렬 */
+	flex: 1 1 50%;
+	padding: 0 10px;
+	box-sizing: border-box;
+}
+
+.half-width label {
+	margin-right: 10px; /* 라벨과 div 사이의 간격 */
+}
+
+.second-layer {
+	margin-left: 20px;
+}
+
+.half-width input, .date-group {
+	margin-left: 10px;
+}
+.half-width input, .last-Date-group {
+	margin-left: 10px;
+}
+
+.btn_group {
+	margin-left: 20px;
+}
+
+.search-bar input[type="text"], .search-bar select, .search-bar input[type="date"],
+	.search-bar input[type="number"] {
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	outline: none;
+	box-sizing: border-box;
+}
+
+/* 버튼 스타일 */
+button, input[type="button"] {
+	padding: 10px 20px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: background-color 0.3s, box-shadow 0.3s;
+	font-size: 14px;
+}
+
+body.light-mode button.primary, body.light-mode input[type="button"].primary
+	{
+	background-color: #007bff;
+	color: white;
+}
+
+body.light-mode button.primary:hover, body.light-mode input[type="button"].primary:hover
+	{
+	background-color: #0056b3;
+}
+
+body.light-mode button.secondary, body.light-mode input[type="button"].secondary
+	{
+	background-color: grey;
+	color: white;
+}
+
+body.light-mode button.secondary:hover, body.light-mode input[type="button"].secondary:hover
+	{
+	background-color: darkgrey;
+}
+
+body.light-mode button.danger, body.light-mode input[type="button"].danger
+	{
+	background-color: #dc3545;
+	color: white;
+}
+
+body.light-mode button.danger:hover, body.light-mode input[type="button"].danger:hover
+	{
+	background-color: #c82333;
+}
+
+body.light-mode button.warning, body.light-mode input[type="button"].warning
+	{
+	background-color: #ffc107;
+	color: #212529;
+}
+
+body.light-mode button.warning:hover, body.light-mode input[type="button"].warning:hover
+	{
+	background-color: #e0a800;
+}
+
+body.dark-mode button.primary, body.dark-mode input[type="button"].primary
+	{
+	background-color: #375a7f;
+	color: white;
+}
+
+body.dark-mode button.primary:hover, body.dark-mode input[type="button"].primary:hover
+	{
+	background-color: #2a3e5c;
+}
+
+body.dark-mode button.secondary, body.dark-mode input[type="button"].secondary
+	{
+	background-color: #555555;
+	color: white;
+}
+
+body.dark-mode button.secondary:hover, body.dark-mode input[type="button"].secondary:hover
+	{
+	background-color: #333333;
+}
+
+body.dark-mode button.danger, body.dark-mode input[type="button"].danger
+	{
+	background-color: #c9302c;
+	color: white;
+}
+
+body.dark-mode button.danger:hover, body.dark-mode input[type="button"].danger:hover
+	{
+	background-color: #ac2925;
+}
+
+body.dark-mode button.warning, body.dark-mode input[type="button"].warning
+	{
+	background-color: #f0ad4e;
+	color: #212529;
+}
+
+body.dark-mode button.warning:hover, body.dark-mode input[type="button"].warning:hover
+	{
+	background-color: #ec971f;
+}
+
+.search-buttons {
+	display: flex;
+	justify-content: flex-end;
+	width: 100%;
+	gap: 10px;
+}
+
+.product-list-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+}
+
+.product-list-header div {
+	display: flex;
+	align-items: center;
+}
+
+.product-list-header span {
+	font-size: 18px;
+	margin-right: 20px;
+}
+
+.product-list {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.product-list th, .product-list td {
+	padding: 10px;
+	text-align: center;
+	border-bottom: 1px solid #34495e;
+	color: #ffffff;
+}
+
+.product-list th {
+	background-color: #1c2331;
+	text-align: center;
+}
+
+.product-list tr:nth-child(even) {
+	background-color: #1c2331;
+}
+
+.product-list.light-mode th, .product-list.light-mode td {
+	color: #212529; /* 기본 텍스트 색상 검정으로 설정 */
+	border-bottom: 1px solid #ddd;
+}
+
+.product-list.light-mode th {
+	background-color: #f8f9fa;
+}
+
+.product-list.light-mode tr:nth-child(even) {
+	background-color: #ffffff;
+}
+
+.product-list.light-mode tr td {
+	color: #212529; /* 모든 tr의 기본 텍스트 색상 검정으로 설정 */
+}
+.searchInput {
+	width:30%;
+}
+#fr_date { margin-left: 5px;}
+button.editButton {
+	padding: 5px 10px;
+	border: none;
+	background-color: #ffc107;
+	color: #212529;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+button.editButton:hover {
+	background-color: #e0a800;
+}
+      .product-list .title-column {
+            width: 150px;
+        }
+
+        .product-list .product-name-column {
+            width: 150px;
+        }
+
+        .product-list .customer-id-column {
+            width: 100px;
+        }
+
+        .product-list .inquiry-content-column {
+            width: 300px;
+            word-wrap: break-word;
+            white-space: normal;
+        }
+
+        .product-list .inquiry-date-column {
+            width: 150px;
+        }
+
+        .product-list .status-column {
+            width: 100px;
+        }
+
+        .collapse-content {
+            display: none;
+        }
+
+        .collapse-content.active {
+            display: table-row;
+        }
+
+        .toggle-button {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+        }
+
+        .response-textarea {
+            width: 100%;
+            height: 150px;
+        }
+
+        .response-form {
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #070F25;
+        }
+
+        .response-form label,
+        .response-form textarea,
+        .response-form button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+.star-rating {
+    display: inline-block;
+}
+
+.star {
+    font-size: 24px;
+    cursor: pointer;
+    color: #ccc;
+}
+
+.star.selected,
+.star.hover {
+    color: gold;
+}
+.star:has(~ .star.selected)::after {
+   color: gold;
+}
+
+.star:has(~ .star:hover)::after {
+   color: gold;
+}

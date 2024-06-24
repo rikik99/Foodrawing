@@ -2,37 +2,42 @@ package com.food.domain.order.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import com.food.domain.order.dto.CartDTO;
 import com.food.domain.order.dto.CartInfoDTO;
-import com.food.domain.order.mapper.CartMapper;
-import com.food.domain.user.dto.CustomerDTO;
+import com.food.domain.order.service.OrderService;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Controller
+@RequiredArgsConstructor
 public class OrderController {
-	@Autowired
-	private CartMapper cartMapper;
-	
-	@RequestMapping("/cart")
-	public ModelAndView orderCart() {
-		ModelAndView mv = new ModelAndView();
-		
-		//로그인 한 회원 정보
-		CustomerDTO customer = new CustomerDTO();
-		customer.setId(1L);
-		
-		//장바구니 정보
-		List<CartInfoDTO> cartItems = cartMapper.getCartListByCustomerId(customer.getId());
 
-		
-		mv.addObject("cartItems", cartItems);
-		
-		mv.setViewName("order/order");
-		
-		return mv; 
-	}
+    private final OrderService orderService;
+
+    @RequestMapping("/checkoutPage")
+    public String checkoutPage(@RequestParam(value = "customerId", required = true) Long customerId, @RequestParam List<String> productIds, Model model) {
+    	log.info("Received customerId: {}", customerId);
+        log.info("Received productIds: {}", productIds);
+    	
+        List<CartInfoDTO> selectedItems = orderService.getSelectedItems(productIds, customerId);
+
+        model.addAttribute("cartItems", selectedItems);
+        log.info("selectedItems = {}", selectedItems);
+        // 금액 관련 정보도 model에 추가
+        int totalPrice = selectedItems.stream().mapToInt(item -> item.getPrice() * item.getQuantity()).sum();
+        int discountPrice = 0; // 할인 금액 계산 로직 추가
+        int finalPrice = totalPrice - discountPrice;
+
+        model.addAttribute("totalPrice", totalPrice);
+        model.addAttribute("discountPrice", discountPrice);
+        model.addAttribute("finalPrice", finalPrice);
+
+        return "order/checkoutPage";
+    }
 }

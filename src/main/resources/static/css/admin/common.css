@@ -1,0 +1,262 @@
+/* 공통 스타일 */
+body {
+	font-family: 'Poppins', sans-serif;
+	height: 100vh;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	transition: background-color 0.3s, color 0.3s;
+}
+
+body.light-mode {
+	background: #f8f9fa;
+	color: #212529;
+}
+
+body.dark-mode {
+	background: #070F25;
+	color: #ffffff;
+}
+
+.dashboard-container {
+	display: flex;
+	width: 100%;
+	height: 100vh;
+}
+
+.sidebar {
+	width: 200px;
+	background-color: #081028;
+	color: white;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	transition: background-color 0.3s, color 0.3s;
+	border-right: 1px solid #34495e;
+	flex-shrink: 0; /* 사이드바 너비 고정 */
+}
+
+.sidebar.light-mode {
+	background: #343a40;
+}
+
+.sidebar ul {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+.sidebar ul li {
+	text-align: left;
+	position: relative;
+}
+
+.sidebar ul li>a {
+	padding: 15px 20px;
+	color: #ffffff;
+	text-decoration: none;
+	display: flex;
+	align-items: center;
+	transition: all 0.3s ease;
+}
+
+.sidebar ul li>a:hover, .sidebar ul li.active>a {
+	background: #007bff;
+	color: #ffffff;
+}
+
+.sidebar ul li>a .dropdown-icon {
+	margin-right: 10px;
+	width: 20px;
+	height: 20px;
+	transition: transform 0.3s;
+}
+
+.sidebar ul li>a .arrow-icon {
+	margin-left: auto;
+	transition: transform 0.3s;
+}
+
+.sidebar ul li>a .arrow-icon.rotate {
+	transform: rotate(90deg);
+}
+
+.sidebar .dropdown-menu {
+	display: none;
+	background-color: #081028;
+	list-style: none;
+	padding: 0;
+	transition: all 0.3s ease;
+	overflow: hidden;
+	max-height: 0;
+}
+
+.sidebar .dropdown-menu.visible {
+	display: block;
+	max-height: 500px;
+	opacity: 1;
+}
+
+.sidebar .dropdown-menu li {
+	padding-left: 30px;
+}
+
+.sidebar .dropdown-menu li a {
+	padding: 10px 20px;
+	color: #ffffff;
+	text-decoration: none;
+	display: block;
+	transition: all 0.3s ease;
+}
+
+.sidebar .dropdown-menu li a:hover {
+	background: #007bff;
+}
+
+.main-content {
+	flex-grow: 1;
+	padding: 20px;
+	overflow-y: auto;
+	transition: background-color 0.3s, color 0.3s;
+}
+
+.main-content.light-mode {
+	background: #f8f9fa;
+	color: #212529;
+}
+
+.main-content.dark-mode {
+	background: #070F25;
+	color: #ffffff;
+}
+
+.main-content h1, .main-content h2, .main-content h3, .main-content p {
+	color: inherit;
+}
+
+button#toggleMode {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	padding: 10px 20px;
+	background-color: #007bff;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+button#toggleMode:hover {
+	background-color: #0056b3;
+}
+
+.logout-btn {
+	padding: 15px 20px;
+	text-decoration: none;
+	display: flex;
+	align-items: center;
+	transition: background-color 0.3s ease;
+}
+
+.logout-btn.light-mode {
+	background-color: #343a40;
+	color: #ffffff;
+}
+
+.logout-btn.light-mode:hover {
+	background-color: #007bff;
+	color: #ffffff;
+}
+
+.logout-btn.dark-mode {
+	background-color: #081028;
+	color: white;
+}
+
+.logout-btn.dark-mode:hover {
+	background-color: #007bff;
+	color: #ffffff;
+}
+
+.sidebar .dropdown-icon {
+	width: 20px;
+	height: 20px;
+	fill: #ffffff; /* 아이콘 색상 */
+	transition: transform 0.3s;
+}
+
+.notifications, .recent-orders, .popular-products, .customer-reviews,
+	.summary-box {
+	margin-bottom: 20px;
+	padding: 20px;
+	border-radius: 5px;
+	border: 1px solid #34495e;
+	background: #1c2331;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.notifications.light-mode, .recent-orders.light-mode, .popular-products.light-mode,
+	.customer-reviews.light-mode, .summary-box.light-mode {
+	background: #f8f9fa;
+	color: #212529;
+	border: 1px solid #000;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 원하는 값으로 설정 */
+}
+
+.notifications h2, .recent-orders h2, .popular-products h2,
+	.customer-reviews h2, .summary-box h2 {
+	margin-bottom: 10px;
+	color: #ffffff; /* 기본 텍스트 색을 흰색으로 변경 */
+}
+
+.notifications.light-mode h2, .recent-orders.light-mode h2,
+	.popular-products.light-mode h2, .customer-reviews.light-mode h2,
+	.summary-box.light-mode h2 {
+	color: #212529;
+}
+
+.notification-box {
+	background: #1c2331;
+	padding: 10px;
+	margin-bottom: 10px;
+	border-radius: 5px;
+	color: #ffffff; /* 기본 텍스트 색을 흰색으로 변경 */
+}
+
+.notification-box.light-mode {
+	background: #ffffff;
+	color: #212529;
+	border: 1px solid #ddd;
+}
+
+/* 반응형 스타일 */
+@media ( max-width : 768px) {
+	.sidebar {
+		width: 100%;
+		height: auto;
+		position: relative;
+		border-right: none;
+	}
+	.main-content {
+		padding: 10px;
+	}
+	button#toggleMode {
+		top: 10px;
+		right: 10px;
+		padding: 5px 10px;
+	}
+	.notifications, .recent-orders, .popular-products, .customer-reviews,
+		.summary-box {
+		padding: 10px;
+		margin-bottom: 10px;
+	}
+	.notifications h2, .recent-orders h2, .popular-products h2,
+		.customer-reviews h2, .summary-box h2 {
+		font-size: 1.2em;
+	}
+	.notification-box {
+		padding: 5px;
+	}
+}

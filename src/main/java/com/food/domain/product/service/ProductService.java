@@ -45,4 +45,9 @@ public class ProductService {
     public ProductDTO findById(String productNumber) {
         return productMapper.findById(productNumber);
     }
+
+	public ProductDTO getProductById(String productId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
