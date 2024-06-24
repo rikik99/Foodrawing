@@ -1,271 +1,264 @@
 /* 공통 스타일 */
 .full-width {
-	display: flex;
-	margin-bottom: 20px; /* 섹션 간격 추가 */
+    display: flex;
+    margin-bottom: 20px; /* 섹션 간격 추가 */
 }
 
 .stock-update-container {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%; /* Ensure the container takes up the full width */
 }
 
 .stock-update-row {
-	display: flex;
-	align-items: center;
-	margin-bottom: 5px;
-	width: 70%; /* Ensure the row takes up the full width */
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    width: 80%; /* Ensure the row takes up the full width */
 }
 
-.stock-update-row select, .stock-update-row input[type="number"] {
-	margin-right: 10px;
-	height: 32px;
-	padding: 5px 10px;
-	font-size: 14px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
-	outline: none;
-	box-sizing: border-box;
+.stock-update-row select, 
+.stock-update-row input[type="number"], 
+.stock-update-row input[type="date"] {
+    height: 32px;
+    padding: 5px 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    box-sizing: border-box;
+    flex: 1; /* Flex property to make all elements the same width */
+    width: calc(33.33% - 10px); /* Adjust width to make three items fit in one row */
 }
 
 .stock-action {
-	width: 100px; /* Specific width for the select */
+    width: 100px; /* Specific width for the select */
 }
 
 .stock-quantity {
-	width: 80px; /* Specific width for the quantity input */
+    width: 80px; /* Specific width for the quantity input */
+}
+
+.expiration-date {
+    width: 100%; /* Ensure the date input takes up the full width */
 }
 
 .stock-update-btn {
-	padding: 5px 10px; /* Smaller padding for a more consistent look */
-	font-size: 14px; /* Smaller font size to match input elements */
-	width: 70%;
-	/* Set the button width to match the row width minus the select and input widths */
-	height: 32px; /* Match the height of the select and input elements */
-	border-radius: 5px;
-	border: none;
-	cursor: pointer;
-	transition: background-color 0.3s, box-shadow 0.3s;
-	background-color: #375a7f; /* Primary color for dark mode */
-	color: white;
+    padding: 5px 10px; /* Smaller padding for a more consistent look */
+    font-size: 14px; /* Smaller font size to match input elements */
+    width: 80%;
+    /* Set the button width to match the row width minus the select and input widths */
+    height: 32px; /* Match the height of the select and input elements */
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    background-color: #375a7f; /* Primary color for dark mode */
+    color: white;
 }
 
 .stock-update-btn:hover {
-	background-color: #2a3e5c; /* Darker shade on hover */
+    background-color: #2a3e5c; /* Darker shade on hover */
 }
 
 .half-width {
-	display: flex;
-	align-items: center; /* 수직 정렬 */
-	flex: 1 1 50%;
-	padding: 0 10px;
-	box-sizing: border-box;
+    display: flex;
+    align-items: center; /* 수직 정렬 */
+    flex: 1 1 50%;
+    padding: 0 10px;
+    box-sizing: border-box;
 }
 
 .half-width label {
-	margin-right: 10px; /* 라벨과 div 사이의 간격 */
+    margin-right: 10px; /* 라벨과 div 사이의 간격 */
 }
 
 .second-layer {
-	margin-left: 20px;
+    margin-left: 20px;
 }
 
 .half-width input, .date-group {
-	margin-left: 10px;
+    margin-left: 10px;
 }
 
 .btn_group {
-	margin-left: 20px;
+    margin-left: 20px;
 }
 
 .search-bar input[type="text"], .search-bar select, .search-bar input[type="date"],
-	.search-bar input[type="number"] {
-	padding: 8px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
-	outline: none;
-	box-sizing: border-box;
+    .search-bar input[type="number"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    box-sizing: border-box;
 }
 
 /* 버튼 스타일 */
 button, input[type="button"] {
-	padding: 10px 20px;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
-	transition: background-color 0.3s, box-shadow 0.3s;
-	font-size: 14px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    font-size: 14px;
 }
 
-body.light-mode button.primary, body.light-mode input[type="button"].primary
-	{
-	background-color: #007bff;
-	color: white;
+body.light-mode button.primary, body.light-mode input[type="button"].primary {
+    background-color: #007bff;
+    color: white;
 }
 
-body.light-mode button.primary:hover, body.light-mode input[type="button"].primary:hover
-	{
-	background-color: #0056b3;
+body.light-mode button.primary:hover, body.light-mode input[type="button"].primary:hover {
+    background-color: #0056b3;
 }
 
-body.light-mode button.secondary, body.light-mode input[type="button"].secondary
-	{
-	background-color: grey;
-	color: white;
+body.light-mode button.secondary, body.light-mode input[type="button"].secondary {
+    background-color: grey;
+    color: white;
 }
 
-body.light-mode button.secondary:hover, body.light-mode input[type="button"].secondary:hover
-	{
-	background-color: darkgrey;
+body.light-mode button.secondary:hover, body.light-mode input[type="button"].secondary:hover {
+    background-color: darkgrey;
 }
 
-body.light-mode button.danger, body.light-mode input[type="button"].danger
-	{
-	background-color: #dc3545;
-	color: white;
+body.light-mode button.danger, body.light-mode input[type="button"].danger {
+    background-color: #dc3545;
+    color: white;
 }
 
-body.light-mode button.danger:hover, body.light-mode input[type="button"].danger:hover
-	{
-	background-color: #c82333;
+body.light-mode button.danger:hover, body.light-mode input[type="button"].danger:hover {
+    background-color: #c82333;
 }
 
-body.light-mode button.warning, body.light-mode input[type="button"].warning
-	{
-	background-color: #ffc107;
-	color: #212529;
+body.light-mode button.warning, body.light-mode input[type="button"].warning {
+    background-color: #ffc107;
+    color: #212529;
 }
 
-body.light-mode button.warning:hover, body.light-mode input[type="button"].warning:hover
-	{
-	background-color: #e0a800;
+body.light-mode button.warning:hover, body.light-mode input[type="button"].warning:hover {
+    background-color: #e0a800;
 }
 
-body.dark-mode button.primary, body.dark-mode input[type="button"].primary
-	{
-	background-color: #375a7f;
-	color: white;
+body.dark-mode button.primary, body.dark-mode input[type="button"].primary {
+    background-color: #375a7f;
+    color: white;
 }
 
-body.dark-mode button.primary:hover, body.dark-mode input[type="button"].primary:hover
-	{
-	background-color: #2a3e5c;
+body.dark-mode button.primary:hover, body.dark-mode input[type="button"].primary:hover {
+    background-color: #2a3e5c;
 }
 
-body.dark-mode button.secondary, body.dark-mode input[type="button"].secondary
-	{
-	background-color: #555555;
-	color: white;
+body.dark-mode button.secondary, body.dark-mode input[type="button"].secondary {
+    background-color: #555555;
+    color: white;
 }
 
-body.dark-mode button.secondary:hover, body.dark-mode input[type="button"].secondary:hover
-	{
-	background-color: #333333;
+body.dark-mode button.secondary:hover, body.dark-mode input[type="button"].secondary:hover {
+    background-color: #333333;
 }
 
-body.dark-mode button.danger, body.dark-mode input[type="button"].danger
-	{
-	background-color: #c9302c;
-	color: white;
+body.dark-mode button.danger, body.dark-mode input[type="button"].danger {
+    background-color: #c9302c;
+    color: white;
 }
 
-body.dark-mode button.danger:hover, body.dark-mode input[type="button"].danger:hover
-	{
-	background-color: #ac2925;
+body.dark-mode button.danger:hover, body.dark-mode input[type="button"].danger:hover {
+    background-color: #ac2925;
 }
 
-body.dark-mode button.warning, body.dark-mode input[type="button"].warning
-	{
-	background-color: #f0ad4e;
-	color: #212529;
+body.dark-mode button.warning, body.dark-mode input[type="button"].warning {
+    background-color: #f0ad4e;
+    color: #212529;
 }
 
-body.dark-mode button.warning:hover, body.dark-mode input[type="button"].warning:hover
-	{
-	background-color: #ec971f;
+body.dark-mode button.warning:hover, body.dark-mode input[type="button"].warning:hover {
+    background-color: #ec971f;
 }
 
 .search-buttons {
-	display: flex;
-	justify-content: flex-end;
-	width: 100%;
-	gap: 10px;
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    gap: 10px;
 }
 
 .product-list-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
 .product-list-header div {
-	display: flex;
-	align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 .product-list-header span {
-	font-size: 18px;
-	margin-right: 20px;
+    font-size: 18px;
+    margin-right: 20px;
 }
 
 .product-list {
-	width: 100%;
-	border-collapse: collapse;
+    width: 100%;
+    border-collapse: collapse;
 }
 
 .product-list th, .product-list td {
-	padding: 10px;
-	text-align: center;
-	border-bottom: 1px solid #34495e;
-	color: #ffffff;
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #34495e;
+    color: #ffffff;
 }
 
 .product-list th {
-	background-color: #1c2331;
-	text-align: center;
+    background-color: #1c2331;
+    text-align: center;
 }
 
 .product-list tr:nth-child(even) {
-	background-color: #1c2331;
+    background-color: #1c2331;
 }
 
 .product-list.light-mode th, .product-list.light-mode td {
-	color: #212529; /* 기본 텍스트 색상 검정으로 설정 */
-	border-bottom: 1px solid #ddd;
+    color: #212529; /* 기본 텍스트 색상 검정으로 설정 */
+    border-bottom: 1px solid #ddd;
 }
 
 .product-list.light-mode th {
-	background-color: #f8f9fa;
+    background-color: #f8f9fa;
 }
 
 .product-list.light-mode tr:nth-child(even) {
-	background-color: #ffffff;
+    background-color: #ffffff;
 }
 
 .product-list.light-mode tr td {
-	color: #212529; /* 모든 tr의 기본 텍스트 색상 검정으로 설정 */
+    color: #212529; /* 모든 tr의 기본 텍스트 색상 검정으로 설정 */
 }
 
 button.editButton {
-	padding: 5px 10px;
-	border: none;
-	background-color: #ffc107;
-	color: #212529;
-	border-radius: 5px;
-	cursor: pointer;
-	transition: background-color 0.3s;
+    padding: 5px 10px;
+    border: none;
+    background-color: #ffc107;
+    color: #212529;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 button.editButton:hover {
-	background-color: #e0a800;
+    background-color: #e0a800;
 }
 
 .productImg {
-	max-width: 100px;
-	max-height: 100px;
-	object-fit: cover;
+    max-width: 100px;
+    max-height: 100px;
+    object-fit: cover;
 }
+
 /* Pagination styles */
 .pagination {
     display: flex;

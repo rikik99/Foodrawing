@@ -56,7 +56,7 @@
 		</div>
 
 		<div class="login-footer">
-			<a href="<c:url value='/signup' />" class="signup-btn">회원가입</a> <a
+			<a href="<c:url value='/signupInfo' />" class="signup-btn">회원가입</a> <a
 				href="<c:url value='/guestOrder' />" class="guest-order">비회원
 				주문배송 조회</a>
 			<div class="login-promotion">

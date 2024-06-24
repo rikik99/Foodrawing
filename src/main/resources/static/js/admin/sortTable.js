@@ -1,49 +1,80 @@
-function setupSortTable() {
-	let currentSortColumns = [];
+document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('click', function(e) {
+        const header = e.target.closest('.sortable');
+        if (header) {
+            console.log("Header clicked:", header);
 
-	const sortTable = () => {
-		const tableBody = document.getElementById('stockTableBody');
-		const rows = Array.from(tableBody.rows);
+            const column = header.getAttribute('data-column');
+            const currentSort = header.getAttribute('data-sort');
 
-		rows.sort((rowA, rowB) => {
-			for (let i = 0; i < currentSortColumns.length; i++) {
-				const { column, order, type } = currentSortColumns[i];
-				let cellA = rowA.querySelector(`[data-column="${column}"]`).innerText;
-				let cellB = rowB.querySelector(`[data-column="${column}"]`).innerText;
+            let newSort;
+            switch (currentSort) {
+                case 'asc':
+                    newSort = 'desc';
+                    break;
+                case 'desc':
+                    newSort = '-';
+                    break;
+                default:
+                    newSort = 'asc';
+                    break;
+            }
 
-				if (type === 'number') {
-					cellA = parseInt(cellA);
-					cellB = parseInt(cellB);
-				} else if (type === 'date') {
-					cellA = new Date(cellA);
-					cellB = new Date(cellB);
-				}
+            console.log(`Sorting ${column} by ${newSort}`);
 
-				if (cellA < cellB) return order === 'asc' ? -1 : 1;
-				if (cellA > cellB) return order === 'asc' ? 1 : -1;
-			}
-			return 0;
-		});
+            // 모든 아이콘 초기화
+            const tableHeaders = document.querySelectorAll('.sortable');
+            tableHeaders.forEach(h => {
+                h.setAttribute('data-sort', '-');
+                h.querySelector('.sort-icon.default').style.display = 'inline';
+                h.querySelector('.sort-icon.asc').style.display = 'none';
+                h.querySelector('.sort-icon.desc').style.display = 'none';
+            });
 
-		tableBody.append(...rows);
-	};
+            // 새로운 아이콘 설정
+            header.setAttribute('data-sort', newSort);
+            header.querySelector('.sort-icon.default').style.display = 'none';
+            if (newSort === 'asc') {
+                header.querySelector('.sort-icon.asc').style.display = 'inline';
+            } else if (newSort === 'desc') {
+                header.querySelector('.sort-icon.desc').style.display = 'inline';
+            }
 
-	document.addEventListener('click', function(e) {
-		const header = e.target.closest('.sortable');
-		if (header) {
-			const ascIcon = header.querySelector('.sort-icon.asc');
-			const descIcon = header.querySelector('.sort-icon.desc');
-			if (header.classList.contains('asc')) {
-				header.classList.remove('asc');
-				header.classList.add('desc');
-				if (ascIcon) ascIcon.style.display = 'none';
-				if (descIcon) descIcon.style.display = 'inline';
-			} else {
-				header.classList.remove('desc');
-				header.classList.add('asc');
-				if (ascIcon) ascIcon.style.display = 'inline';
-				if (descIcon) descIcon.style.display = 'none';
-			}
-		}
-	});
+            // URL 업데이트 및 새로운 정렬 매개변수로 콘텐츠를 부분 업데이트
+            const urlParams = new URLSearchParams(window.location.search);
+            const sortParams = [];
+            tableHeaders.forEach(h => {
+                const col = h.getAttribute('data-column');
+                const sort = h.getAttribute('data-sort');
+                if (sort !== '-') {
+                    sortParams.push(`${col},${sort}`);
+                }
+            });
+
+            urlParams.set('sort', sortParams.join(','));
+            const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+            console.log("New URL:", newUrl);
+
+            history.pushState(null, '', newUrl);
+            updateTableContent(newUrl);
+        }
+    });
+});
+
+function updateTableContent(url) {
+    console.log("Updating table content from URL:", url);
+    const tableBody = document.querySelector('.product-list tbody');
+
+    fetch(url)
+        .then(response => response.text())
+        .then(html => {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            const newTableBody = tempDiv.querySelector('.product-list tbody');
+
+            if (newTableBody) {
+                tableBody.innerHTML = newTableBody.innerHTML;
+            }
+        })
+        .catch(error => console.error('Error updating table content:', error));
 }

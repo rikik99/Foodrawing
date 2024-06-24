@@ -145,11 +145,12 @@
 
         </div>
         <button id="toggleMode">Toggle Mode</button>
-        <script src="<c:url value='/js/admin/main.js'/>"></script>
-        <script src="<c:url value='/js/admin/toggleMode.js'/>"></script>
-        <script src="<c:url value='/js/admin/sortTable.js'/>"></script>
-        <script src="<c:url value='/js/admin/starRating.js'/>"></script>
-        <script src="<c:url value='/js/admin/editDiscount.js'/>"></script>
+		<script src="<c:url value='/js/admin/main.js'/>"></script>
+		<script src="<c:url value='/js/admin/editDiscount.js'/>"></script>
+		<script src="<c:url value='/js/admin/starRating.js'/>"></script>
+		<script src="<c:url value='/js/admin/sortTable.js'/>"></script>
+		<script src="<c:url value='/js/admin/toggleMode.js'/>"></script>
+		<script src="<c:url value='/js/admin/openWindow.js'/>"></script>
     </div>
 </body>
 </html>

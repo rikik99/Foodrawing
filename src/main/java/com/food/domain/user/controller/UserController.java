@@ -207,7 +207,7 @@ public class UserController {
 
 	@ResponseBody
 	@GetMapping("/checkDuplicateUsername")
-	public boolean checkDuplicateUsername(@RequestParam("userName") String userName) {
+	public boolean checkDuplicateUsername(@RequestParam("username") String userName) {
 		return userService.isUserIdExists(userName);
 	}
 

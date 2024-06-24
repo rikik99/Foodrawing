@@ -190,7 +190,7 @@
 		<button id="toggleMode" class="primary">Toggle Mode</button>
 		<script src="<c:url value='/js/admin/main.js'/>"></script>
 		<script src="<c:url value='/js/admin/toggleMode.js'/>"></script>
-		<script src="<c:url value='/js/admin/openDiscountAddWindow.js'/>"></script>
+		<script src="<c:url value='/js/admin/openWindow.js'/>"></script>
 		<script src="<c:url value='/js/admin/setDateRange.js'/>"></script>
 	</div>
 </body>

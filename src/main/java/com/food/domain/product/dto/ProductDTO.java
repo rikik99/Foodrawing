@@ -24,6 +24,8 @@ public class ProductDTO {
     private ProductFileDTO productFileDTO;
     private ProductCategoryDTO productCategoryDTO;
     private SalesPostDTO salesPostDTO;
+    private StockDTO stockDTO;
+    private StockTransactionDTO stockTransactionDTO; 
     
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 

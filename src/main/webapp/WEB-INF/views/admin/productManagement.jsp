@@ -87,7 +87,7 @@
 
 				</div>
 				<div class="search-buttons full-width">
-					<button type="button" class="primary search-btn">검색</button>
+					<button type="button" class="primary search-btn" data-url="/admin/productManagement">검색</button>
 					<button type="reset" class="secondary">초기화</button>
 				</div>
 			</div>
@@ -98,8 +98,8 @@
 					</span>
 				</div>
 				<div>
-					<button id="deleteSelectedButton" class="danger">선택삭제</button>
-					<button id="addProductButton" class="primary">상품등록</button>
+					<button id="deleteSelectedButton" class="danger" data-url="/admin/stockManagement">선택삭제</button>
+					<button id="addProduct" class="primary">상품등록</button>
 				</div>
 			</div>
 			<table class="product-list dark-mode">
@@ -152,12 +152,11 @@
 					</c:forEach>
 				</tbody>
 			</table>
-			<div class="full-width"></div>
 			<nav aria-label="Page navigation">
 				<ul class="pagination">
 					<c:forEach begin="1" end="${pageCount}" var="i">
 						<li class="page-item ${currentPage + 1 == i ? 'active' : ''}">
-							<a class="page-link" data-page="${i - 1}"
+							<a class="page-link" data-page="${i - 1}" data-url="/admin/stockManagement"
 							data-size="${size}">${i}</a>
 						</li>
 					</c:forEach>
@@ -170,6 +169,7 @@
 		<button id="toggleMode" class="primary">Toggle Mode</button>
 		<script src="<c:url value='/js/admin/main.js'/>"></script>
 		<script src="<c:url value='/js/admin/toggleMode.js'/>"></script>
+		<script src="<c:url value='/js/admin/openWindow.js'/>"></script>
 	</div>
 </body>
 </html>

@@ -27,13 +27,15 @@
 
 	<select id="isEmailVerified" parameterType="string"
 		resultType="java.lang.Integer">
-		SELECT CASE
+		SELECT COALESCE(
+		(SELECT CASE
 		WHEN verified = 'Y' THEN 1
 		ELSE 0
 		END
 		FROM
 		verification_tokens
-		WHERE email = #{email}
+		WHERE email = #{email}), 0) AS is_verified
+		FROM dual
 	</select>
 
 	<insert id="insertUser"
@@ -73,7 +75,8 @@
 		(SELECT USER_ID FROM CUSTOMER_TB WHERE EMAIL = #{email})
 	</update>
 	<select id="findById" parameterType="Long">
-		select * from user_tb where id = ${userId}
+		select * from user_tb where
+		id = ${userId}
 	</select>
 
 </mapper>

@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof setupEditDiscount === 'function') setupEditDiscount();
     if (typeof setupToggleMode === 'function') setupToggleMode(toggleModeButton, body);
     if (typeof setupStarRating === 'function') setupStarRating();
-    if (typeof setupSortTable === 'function') setupSortTable();
     if (typeof setupOpenDiscountAddWindow === 'function') setupOpenDiscountAddWindow();
     if (typeof setupOpenCounponAddWindow === 'function') setupOpenCounponAddWindow();
 
@@ -39,29 +38,69 @@ document.addEventListener('click', function(e) {
         const group = e.target.getAttribute('data-group');
         setDateRange(range, group);
     }
-});
-
-document.addEventListener('click', function(e) {
     if (e.target.classList.contains('search-btn')) {
-        performSearch();
+        const urlPath = e.target.getAttribute('data-url'); // 추가된 부분
+        performSearch(urlPath); // urlPath를 전달하도록 수정
     }
     if (e.target.classList.contains('page-link')) {
         const page = e.target.getAttribute('data-page');
         const size = e.target.getAttribute('data-size');
-        loadPage(page, size);
+        const urlPath = e.target.getAttribute('data-url'); // 페이지 URL을 동적으로 받음
+        loadPage(page, size, urlPath); // urlPath를 전달하도록 수정
+    }
+    if (e.target.id === 'deleteSelectedButton') {
+        const urlPath = e.target.getAttribute('data-url');
+        deleteSelectedProducts(urlPath);
+    }
+    if (e.target.classList.contains('stock-range-btn')) {
+        const stockType = e.target.getAttribute('data-stock');
+        const stockMinInput = document.getElementById('stock_min');
+        const stockMaxInput = document.getElementById('stock_max');
+        switch (stockType) {
+            case 'all':
+                stockMinInput.value = '';
+                stockMaxInput.value = '';
+                break;
+            case 'out':
+                stockMinInput.value = 0;
+                stockMaxInput.value = 0;
+                break;
+            case 'low':
+                stockMinInput.value = 1;
+                stockMaxInput.value = 80;
+                break;
+            case 'enough':
+                stockMinInput.value = 100;
+                stockMaxInput.value = '';
+                break;
+        }
     }
 });
 
-function performSearch() {
+function performSearch(urlPath) {
     const params = new URLSearchParams();
-    params.append('searchInput', document.getElementById('searchInput').value || '');
-    params.append('category', document.getElementById('category').value || '');
-    params.append('fr_date', document.getElementById('fr_date').value || '');
-    params.append('to_date', document.getElementById('to_date').value || '');
-    params.append('stock_min', document.getElementById('stock_min').value || '');
-    params.append('stock_max', document.getElementById('stock_max').value || '');
-    params.append('price_min', document.getElementById('price_min').value || '');
-    params.append('price_max', document.getElementById('price_max').value || '');
+
+    const fields = [
+        { id: 'searchInput', name: 'searchInput' },
+        { id: 'category', name: 'category' },
+        { id: 'fr_date', name: 'fr_date' },
+        { id: 'to_date', name: 'to_date' },
+        { id: 'stock_min', name: 'stock_min' },
+        { id: 'stock_max', name: 'stock_max' },
+        { id: 'price_min', name: 'price_min' },
+        { id: 'price_max', name: 'price_max' }
+    ];
+
+    fields.forEach(field => {
+        const elem = document.getElementById(field.id);
+        if (elem) {
+            const value = elem.value.trim();
+            if (value) {
+                params.append(field.name, value);
+            }
+        }
+    });
+
     const radioButtons = document.getElementsByName('sale_status');
     let selectedValue = '';
     for (const radioButton of radioButtons) {
@@ -70,11 +109,12 @@ function performSearch() {
             break;
         }
     }
-    params.append('sale_status', selectedValue || '');
+    if (selectedValue) params.append('sale_status', selectedValue);
+
     params.append('page', '0'); // 검색 시 첫 페이지로 이동
     params.append('size', '5'); // 기본 페이지 크기 설정
 
-    const url = `/admin/productManagement?${params.toString()}`;
+    const url = `${urlPath}?${params.toString()}`;
     fetch(url)
         .then(response => response.text())
         .then(html => {
@@ -83,17 +123,18 @@ function performSearch() {
             const newContent = tempDiv.querySelector('.main-content');
             document.querySelector('.main-content').innerHTML = newContent.innerHTML;
             setupPaginationLinks(); // 페이지 링크 초기화
+            setupCheckboxEventListeners(); // 체크박스 이벤트 리스너 초기화
             history.pushState({ url: url, target: 'productManagement' }, '', url);
         })
         .catch(error => console.error('Error:', error));
 }
 
-function loadPage(page, size) {
+function loadPage(page, size, urlPath) { // urlPath 매개변수를 추가
     const params = new URLSearchParams(window.location.search);
     params.set('page', page);
     params.set('size', size);
 
-    const url = `/admin/productManagement?${params.toString()}`;
+    const url = `${urlPath}?${params.toString()}`;
     fetch(url)
         .then(response => response.text())
         .then(html => {
@@ -102,7 +143,8 @@ function loadPage(page, size) {
             const newContent = tempDiv.querySelector('.main-content');
             document.querySelector('.main-content').innerHTML = newContent.innerHTML;
             setupPaginationLinks(); // 페이지 링크 초기화
-            history.pushState({ url: url, target: 'productManagement' }, '', url);
+            setupCheckboxEventListeners(); // 체크박스 이벤트 리스너 초기화
+            history.pushState({ url: url, target: urlPath.split('/').pop() }, '', url);
         })
         .catch(error => console.error('Error:', error));
 }
@@ -113,7 +155,8 @@ function setupPaginationLinks() {
             event.preventDefault();
             const page = this.getAttribute('data-page');
             const size = this.getAttribute('data-size');
-            loadPage(page, size);
+            const urlPath = this.getAttribute('data-url'); // 페이지 URL을 동적으로 받음
+            loadPage(page, size, urlPath); // urlPath를 전달하도록 수정
         });
     });
 }
@@ -210,31 +253,52 @@ function loadContent(url, target, pushState = true) {
 }
 
 function setupCheckboxEventListeners() {
-    document.querySelectorAll('.select-all').forEach(function(selectAllCheckbox) {
-        selectAllCheckbox.addEventListener('change', function() {
-            const group = this.getAttribute('data-group');
-            const checkboxes = document.querySelectorAll(`.checkbox-group[data-group="${group}"] input[type="checkbox"]`);
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const productCheckboxes = document.querySelectorAll('.selectProduct');
 
-            checkboxes.forEach(function(checkbox) {
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            productCheckboxes.forEach(function(checkbox) {
                 checkbox.checked = selectAllCheckbox.checked;
             });
         });
-    });
+    }
 
-    document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(function(checkbox) {
+    productCheckboxes.forEach(function(checkbox) {
         checkbox.addEventListener('change', function() {
-            const group = this.closest('.checkbox-group').getAttribute('data-group');
-            const selectAllCheckbox = document.querySelector(`.select-all[data-group="${group}"]`);
-            const checkboxes = document.querySelectorAll(`.checkbox-group[data-group="${group}"] input[type="checkbox"]:not(.select-all)`);
-
             if (!checkbox.checked) {
                 selectAllCheckbox.checked = false;
             } else {
-                const allChecked = Array.from(checkboxes).every(chk => chk.checked);
+                const allChecked = Array.from(productCheckboxes).every(chk => chk.checked);
                 selectAllCheckbox.checked = allChecked;
             }
         });
     });
+}
+
+function deleteSelectedProducts(urlPath) {
+    const productCheckboxes = document.querySelectorAll('.selectProduct:checked');
+    const selectedProducts = Array.from(productCheckboxes).map(checkbox => {
+        return checkbox.closest('tr').querySelector('td:nth-child(3) p').textContent;
+    });
+
+    if (selectedProducts.length > 0) {
+        fetch('/admin/deleteProducts', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ productNumbers: selectedProducts })
+        })
+            .then(response => response.ok ? response.text() : Promise.reject('Failed to delete products'))
+            .then(message => {
+                alert(message);
+                loadContent(urlPath, urlPath.split('/').pop(), false); // URL과 타겟 페이지를 동적으로 설정
+            })
+            .catch(error => console.error('Error:', error));
+    } else {
+        alert('삭제할 항목을 선택해주세요.');
+    }
 }
 
 function setDateRange(range, dateGroupName) {
