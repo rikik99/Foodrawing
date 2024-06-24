@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-   pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nutrient Graph</title>
 <style>
-
 /* 새로운 애니메이션 속성 및 변수 설정 */
 @property --hue {
   initial-value: 0;
@@ -55,6 +53,7 @@ body {
   gap: 20px;
   width: 100%;
   box-sizing: border-box; /* 요소 크기 계산 시 padding과 border 포함 */
+  position: relative;
 }
 
 .svg-container {
@@ -62,19 +61,20 @@ body {
   justify-content: center;
   align-items: center;
   width: 400px;
-  position: sticky;
-  top: 0px; /* 스크롤 시 상단으로부터의 거리 */
+  position: absolute; /* 위치를 절대값으로 설정 */
+  top: 10px; /* 초기 상단 위치 */
+  right: 10px; /* 초기 오른쪽 위치 */
   box-sizing: border-box;
-  align-items: flex-start;
+  background-color: rgba(255, 255, 255, 0.5); /* 배경색 추가 */
+  border-radius: 10px; /* 테두리 반경 추가 */
+  padding: 10px; /* 패딩 추가 */
 }
 
 svg {
   max-width: 100%;
   height: auto;
   overflow: hidden;
-  background-color: rgba(255, 255, 255, 0.5);
 }
-
 
 /* 육각형 기본 색상 */
 .hexagon {
@@ -148,7 +148,7 @@ svg {
 }
 
 .btn6 {
-	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .btn6:hover {
@@ -186,25 +186,25 @@ h1 {
 }
 
 .buy-div {
-	
+  
 }
 .buy-btn {
-	margin-right: 10px;
-	padding: 5px;
-	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-	border-radius: 5px;
-	background-color: #5766ff;
-	text-decoration-line: none;
-	color: white;
+  margin-right: 10px;
+  padding: 5px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  background-color: #5766ff;
+  text-decoration-line: none;
+  color: white;
 }
 
 .cart-btn {
-	padding: 5px;
-	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-	border-radius: 5px;
-	background-color: #a1a1a1;
-	text-decoration-line: none;
-	color: white;
+  padding: 5px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  background-color: #a1a1a1;
+  text-decoration-line: none;
+  color: white;
 }
 
 .data-container-wrapper h3 {
@@ -224,7 +224,7 @@ h1 {
 /* 데이터아이템 헤더폰트 */
 h2 {
   position: relative;
-  padding: 0;	
+  padding: 0;  
   margin: 0;
   font-family: "Raleway", sans-serif;
   font-weight: 300;
@@ -259,14 +259,7 @@ padding-top:50px;}
   content: "";
   background-color: #DFBFBD; z-index: 4;
 }
-/* .eleven h2:after { */
-/*   position:absolute; */
-/*   width:40px; height:40px; left:50%; margin-left:-20px; bottom:0px; */
-/*   content: '\00a7'; font-size:30px; line-height:40px; color:#c50000; */
-/*   font-weight:400; z-index: 5; */
-/*   display:block; */
-/*   background-color:#f8f8f8; */
- }  
+
 </style>
 </head>
 <body>
@@ -274,11 +267,11 @@ padding-top:50px;}
   <h3 id="preferences-title">선호하는 영양소를 선택하세요 </h3>
   <div class="buttons-container">
     <!-- 각 영양소별로 선호도를 설정하는 버튼들 -->
-    <button class="btn6 protein-btn" onclick="togglePreference('protein', 10, this)">단백질이 많은 음식</button>
+    <button class="btn6 protein-btn" onclick="togglePreference('protein', 20, this)">단백질이 많은 음식</button>
     <button class="btn6 transfat-btn" onclick="togglePreference('transFat', 100, this)">트랜스지방이 적은 음식</button>
     <button class="btn6 saturatedfat-btn" onclick="togglePreference('saturatedFat', 100, this)">포화지방이 적은 음식</button>
     <button class="btn6 sugar-btn" onclick="togglePreference('sugar', 50, this)">당 낮은 함량</button>
-    <button class="btn6 sodium-btn" onclick="togglePreference('sodium', 50, this)">나트륨이 적은 음식</button>
+    <button class="btn6 sodium-btn" onclick="togglePreference('sodium', 100, this)">나트륨이 적은 음식</button>
     <button class="btn6 carbohydrate-btn" onclick="togglePreference('carbohydrate', 20, this)">탄수화물이 많은 음식</button>
   </div>
   <button class="btn6" onclick="fetchData()">데이터 불러오기</button>
@@ -322,20 +315,19 @@ let preferences = {
   carbohydrate: 0
 };
 
-
 function togglePreference(nutrient, value, element) {
-	  if (preferences[nutrient] === value) {
-	    preferences[nutrient] = 0;
-	    element.classList.remove('active');
-	  } else {
-	    preferences[nutrient] = value;
-	    element.classList.add('active');
-	  }
-	}
+  if (preferences[nutrient] === value) {
+    preferences[nutrient] = 0;
+    element.classList.remove('active');
+  } else {
+    preferences[nutrient] = value;
+    element.classList.add('active');
+  }
+}
 
 /* 서버에서 데이터를 가져오는 함수 */
 function fetchData() {
-	const query = Object.entries(preferences)
+  const query = Object.entries(preferences)
     .filter(([key, val]) => val !== 0) // 0이 아닌 값만 필터링
     .map(([key, val]) => `\${key}=\${val}`)
     .join('&');
@@ -445,7 +437,7 @@ function displayData(data) {
 
 /* 그래프를 그리는 함수 */
 function drawGraph(nutrition) {
-  const maxVal = 40;  // 최대값을 40으로 설정
+  const maxVal = 100;  // 최대값을 40으로 설정
   const animationDuration = 800;  // 애니메이션 지속 시간 800밀리초
 
   // 영양소 값들을 올바른 순서로 추출
@@ -454,7 +446,7 @@ function drawGraph(nutrition) {
     nutrition.transFat,
     nutrition.saturatedFat,
     nutrition.sugar,
-    nutrition.sodium,
+    nutrition.sodium / 10,  // 나트륨 값을 10으로 나눔
     nutrition.carbohydrate
   ];
 
@@ -520,6 +512,28 @@ function drawGraph(nutrition) {
 
   requestAnimationFrame(animate);
 }
+
+/* 스크롤 이벤트를 처리하여 svg-container 위치를 조정 */
+document.addEventListener('scroll', () => {
+  const svgContainer = document.getElementById('svg-container');
+  const gridContainer = document.querySelector('.grid-container');
+  
+  const gridRect = gridContainer.getBoundingClientRect();
+
+  const gridTop = gridRect.top + window.scrollY;
+  const gridBottom = gridRect.bottom + window.scrollY;
+
+  if (window.scrollY > gridTop && window.scrollY + 10 < gridBottom - svgContainer.offsetHeight) {
+    svgContainer.style.position = 'fixed';
+    svgContainer.style.top = '10px';
+  } else if (window.scrollY <= gridTop) {
+    svgContainer.style.position = 'absolute';
+    svgContainer.style.top = '10px';
+  } else {
+    svgContainer.style.position = 'absolute';
+    svgContainer.style.top = (gridBottom - svgContainer.offsetHeight - gridTop) + 'px';
+  }
+});
 </script>
 </body>
 </html>

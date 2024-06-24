@@ -8,6 +8,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bibigo 왕교자</title>
+    <meta name="_csrf" content="${_csrf.token}"/>
+    <meta name="_csrf_header" content="${_csrf.headerName}"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/bestpage.css">
@@ -52,7 +54,6 @@
         .right-column {
             flex: 1;
         }
-        
         
         .product-info {
             font-size: 14px;
@@ -461,7 +462,9 @@
             const cartButton = document.querySelector('.cart-button');
             const buyButton = document.querySelector('.buy-button');
             const quantityInput = document.querySelector('.quantity');
-            const productNumberInput = document.getElementById('product_number');           
+            const productNumberInput = document.getElementById('product_number');
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
             
             cartButton.addEventListener('click', function () {
                 const quantity = parseInt(quantityInput.value);
@@ -480,7 +483,8 @@
                 fetch('/cart/checkStock', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
                     },
                     body: JSON.stringify(data),
                 })
@@ -514,6 +518,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
                     },
                     body: JSON.stringify(data),
                 })
@@ -597,10 +602,10 @@
                     </div>
                 </div>
                 <div class="right-column">
-                		<input type="hidden" id="product_number" name="productNumber" value="${productinfo.productNumber}">
+                    <input type="hidden" id="product_number" name="productNumber" value="${productinfo.productNumber}">
                     <h1>${productinfo.name} 1.05kg</h1>
                     <div class="product-info" style="text-align: left;">
-                    		<input type="hidden" id="productprice" name="productprice" class="productprice" value="${productinfo.price}">
+                        <input type="hidden" id="productprice" name="productprice" class="productprice" value="${productinfo.price}">
                         <p class="original-price"><fmt:formatNumber type="number" value="${productinfo.price}" />원</p>
                         <p class="price"><fmt:formatNumber type="number" value="${productinfo.price}" />원</p>
                         <p>원산지 : 하단 상품정보 참고</p>
@@ -622,70 +627,70 @@
                         <button class="cart-button">장바구니담기</button>
                         <button class="buy-button">바로구매</button>
                     </div>
-                    </div>
+                </div>
             </div>
             <div class="sliders-section">
-				        <div class="slider-container">
-				            <div class="slider-header">
-				                <h2>다른 고객이 함께 구매한 상품</h2>
-				                <div class="nav-buttons">
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <h2>다른 고객이 함께 구매한 상품</h2>
+                        <div class="nav-buttons">
                             <button class="nav-button prev" onclick="prevSlide('slider1')">&#10094;</button>
                             <span class="page-indicator" id="page-indicator-slider1">1/1</span>
                             <button class="nav-button next" onclick="nextSlide('slider1')">&#10095;</button>
                         </div>
-				            </div>
-				            <div class="slider" id="slider1">
-				                <div class="slides">
-				                    <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>1</div>
-				                    <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>2</div>
-				                    <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>3</div>
-				                    <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>4</div>
-				                    <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>5</div>
-				                    <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>6</div>
-				                </div>
-				            </div>
-				        </div>
-				        <div class="slider-container">
-				            <div class="slider-header">
-				                <h2>함께 보면 좋은 상품</h2>
-				                <div class="nav-buttons">
+                    </div>
+                    <div class="slider" id="slider1">
+                        <div class="slides">
+                            <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>1</div>
+                            <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>2</div>
+                            <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>3</div>
+                            <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>4</div>
+                            <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>5</div>
+                            <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>6</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <h2>함께 보면 좋은 상품</h2>
+                        <div class="nav-buttons">
                             <button class="nav-button prev" onclick="prevSlide('slider2')">&#10094;</button>
                             <span class="page-indicator" id="page-indicator-slider2">1/1</span>
                             <button class="nav-button next" onclick="nextSlide('slider2')">&#10095;</button>
                         </div>
-				            </div>
-				            <div class="slider" id="slider2">
-				                <div class="slides">
-				                    <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>7</div>
-				                    <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>8</div>
-				                    <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>9</div>
-				                    <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>10</div>
-				                    <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>11</div>
-				                    <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>12</div>
-				                </div>
-				            </div>
-				        </div>
-				    </div>            
+                    </div>
+                    <div class="slider" id="slider2">
+                        <div class="slides">
+                            <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>7</div>
+                            <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>8</div>
+                            <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>9</div>
+                            <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>10</div>
+                            <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>11</div>
+                            <div class="slide"><%@include file="/WEB-INF/include/productCard.jsp"%>12</div>
+                        </div>
+                    </div>
+                </div>
+            </div>            
         </div>
     </div>
     
     <div class="product-detail">
-    <div class="sticky-wrap">
-        <div class="sticky-content">
-            <ul class="nav nav-tabs">
-                <li class="nav-item">
-                    <a class="nav-link active" href="#detail-content">상세정보</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#review">리뷰(9,999+)</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#purchase-info">구매정보</a>
-                </li>
-            </ul>
+        <div class="sticky-wrap">
+            <div class="sticky-content">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#detail-content">상세정보</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#review">리뷰(9,999+)</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#purchase-info">구매정보</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-    <div class="contents-wrapper">
+        <div class="contents-wrapper">
             <div class="contents">
                 <div id="detail-content" class="detail-content">
                     <h2>제품 상세 정보</h2>
@@ -717,127 +722,126 @@
                     
                     <!-- Review Summary Section -->
                     <div class="review-chart-box">
-        <div class="rating-wrap">
-            <div class="average-rating">4.8<span>/5</span></div>
-            <div class="star-rating">★★★★★</div>
-        </div>
-        <div class="review-summary">
-            <div class="total-reviews">총 <span style="color: #FFA500;">47건</span>의 리뷰 중</div>
-            <div class="percentage"><span style="color: #FFA500;">87%</span> 고객님이 <span style="color: #FFA500;">5점</span>을 주었어요</div>
-        </div>
-        <div class="bar-chart-wrap">
-            <div class="score-item">
-                <div>5점</div>
-                <div class="score-bar">
-                    <div class="score" style="width: 87%;"></div>
-                </div>
-                <div class="score-percentage">87%</div>
-            </div>
-            <div class="score-item">
-                <div>4점</div>
-                <div class="score-bar">
-                    <div class="score" style="width: 10%;"></div>
-                </div>
-                <div class="score-percentage">10%</div>
-            </div>
-            <div class="score-item">
-                <div>3점</div>
-                <div class="score-bar">
-                    <div class="score" style="width: 2%;"></div>
-                </div>
-                <div class="score-percentage">2%</div>
-            </div>
-            <div class="score-item">
-                <div>2점</div>
-                <div class="score-bar">
-                    <div class="score" style="width: 1%;"></div>
-                </div>
-                <div class="score-percentage">1%</div>
-            </div>
-            <div class="score-item">
-                <div>1점</div>
-                <div class="score-bar">
-                    <div class="score" style="width: 0%;"></div>
-                </div>
-                <div class="score-percentage">0%</div>
-            </div>
-        </div>
-    </div>
+                        <div class="rating-wrap">
+                            <div class="average-rating">4.8<span>/5</span></div>
+                            <div class="star-rating">★★★★★</div>
+                        </div>
+                        <div class="review-summary">
+                            <div class="total-reviews">총 <span style="color: #FFA500;">47건</span>의 리뷰 중</div>
+                            <div class="percentage"><span style="color: #FFA500;">87%</span> 고객님이 <span style="color: #FFA500;">5점</span>을 주었어요</div>
+                        </div>
+                        <div class="bar-chart-wrap">
+                            <div class="score-item">
+                                <div>5점</div>
+                                <div class="score-bar">
+                                    <div class="score" style="width: 87%;"></div>
+                                </div>
+                                <div class="score-percentage">87%</div>
+                            </div>
+                            <div class="score-item">
+                                <div>4점</div>
+                                <div class="score-bar">
+                                    <div class="score" style="width: 10%;"></div>
+                                </div>
+                                <div class="score-percentage">10%</div>
+                            </div>
+                            <div class="score-item">
+                                <div>3점</div>
+                                <div class="score-bar">
+                                    <div class="score" style="width: 2%;"></div>
+                                </div>
+                                <div class="score-percentage">2%</div>
+                            </div>
+                            <div class="score-item">
+                                <div>2점</div>
+                                <div class="score-bar">
+                                    <div class="score" style="width: 1%;"></div>
+                                </div>
+                                <div class="score-percentage">1%</div>
+                            </div>
+                            <div class="score-item">
+                                <div>1점</div>
+                                <div class="score-bar">
+                                    <div class="score" style="width: 0%;"></div>
+                                </div>
+                                <div class="score-percentage">0%</div>
+                            </div>
+                        </div>
+                    </div>
                     
                     <!-- 리뷰 내용 추가 -->
                     <div class="review-section">
-							        <div class="review-header">
-							            <h2>상품리뷰 59건</h2>
-							            <div class="sort-options">
-							                <select>
-							                    <option>최근 등록순</option>
-							                    <option>높은 평점순</option>
-							                    <option>낮은 평점순</option>
-							                </select>
-							                <button class="btn btn-outline-secondary">포토리뷰 모아보기</button>
-							                <button class="btn btn-primary">상품리뷰 쓰기</button>
-							            </div>
-							        </div>
+                        <div class="review-header">
+                            <h2>상품리뷰 59건</h2>
+                            <div class="sort-options">
+                                <select>
+                                    <option>최근 등록순</option>
+                                    <option>높은 평점순</option>
+                                    <option>낮은 평점순</option>
+                                </select>
+                                <button class="btn btn-outline-secondary">포토리뷰 모아보기</button>
+                                <button class="btn btn-primary">상품리뷰 쓰기</button>
+                            </div>
+                        </div>
         
-							        <!-- Review Item -->
-							        <div class="review-item">
-							            <div class="review-details">
-						                <div class="review-info">
-						                    <span class="review-rating">★★★★★</span>
-						                    <span class="review-author">sang *****</span>
-						                    <span class="review-date">2024.06.10</span>
-						                    <span class="review-badge text-dark" style="margin-left: 10px;">한달사용기</span>
-						                </div>
-						                <div class="review-content">
-						                    <div class="review">
-						                    	<div class="review-comment">
-                                        <p>맛있게 빨리 먹어서 조리하고 사진을 못찍었네요~<br>
-                                           넘 자극적이지하고 담백한 육개장 맛있게 먹었어요~<br>
-                                           좋아요~</p> 
-						                    	</div>
+                        <!-- Review Item -->
+                        <div class="review-item">
+                            <div class="review-details">
+                                <div class="review-info">
+                                    <span class="review-rating">★★★★★</span>
+                                    <span class="review-author">sang *****</span>
+                                    <span class="review-date">2024.06.10</span>
+                                    <span class="review-badge text-dark" style="margin-left: 10px;">한달사용기</span>
+                                </div>
+                                <div class="review-content">
+                                    <div class="review">
+                                        <div class="review-comment">
+                                            <p>맛있게 빨리 먹어서 조리하고 사진을 못찍었네요~<br>
+                                               넘 자극적이지하고 담백한 육개장 맛있게 먹었어요~<br>
+                                               좋아요~</p> 
+                                        </div>
                                         <div class="review-thumbnail">
                                             <img id="thumbnail-1" src="images/20240517_CaTchWorkFavicon.png" alt="Review Image" onclick="toggleMoreContent(1)">
                                         </div>
                                         <div id="more-content-1" class="more-content">
                                             <img src="images/20240517_CaTchWorkFavicon.png" class="full-size-img" alt="Full Review Image">
                                             <div class="review-answer">
-	                                            <p>마이셰프<br>
-	                                               안녕하세요 마이셰프 입니다.<br>
-	                                               마이셰프를 믿고 구매해주셔서 감사합니다.<br>
-	                                               늘 변하지 않는 맛과 서비스를 보답하겠습니다.<br>
-	                                               감사합니다.</p>
+                                                <p>마이셰프<br>
+                                                   안녕하세요 마이셰프 입니다.<br>
+                                                   마이셰프를 믿고 구매해주셔서 감사합니다.<br>
+                                                   늘 변하지 않는 맛과 서비스를 보답하겠습니다.<br>
+                                                   감사합니다.</p>
                                             </div>
                                         </div>
                                         <div id="more-btn-1" class="more-btn" onclick="toggleMoreContent(1)">더보기</div>
                                     </div>
-						                
-						                </div>
-						            </div>
-							        </div>
+                                </div>
+                            </div>
+                        </div>
         
-        <!-- Repeat the Review Item block for more reviews -->
+                        <!-- Repeat the Review Item block for more reviews -->
         
-        <!-- Pagination -->
-        <ul class="pagination">
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="#">4</a></li>
-            <li class="page-item"><a class="page-link" href="#">5</a></li>
-            <li class="page-item"><a class="page-link" href="#">다음</a></li>
-        </ul>
-    </div>
+                        <!-- Pagination -->
+                        <ul class="pagination">
+                            <li class="page-item"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item"><a class="page-link" href="#">4</a></li>
+                            <li class="page-item"><a class="page-link" href="#">5</a></li>
+                            <li class="page-item"><a class="page-link" href="#">다음</a></li>
+                        </ul>
+                    </div>
                 </div>
                 <div id="purchase-info" class="detail-content">
                     <h2>구매 정보</h2>
                     <!-- 구매 정보 추가 -->
                     <div class="inquiry-section">
-        <div class="inquiry-header">
-            <h2>상품문의 1건</h2>
-            <button class="btn btn-primary">상품문의 하기</button>
-        </div>
-        
-       <!-- Inquiry Item -->
+                        <div class="inquiry-header">
+                            <h2>상품문의 1건</h2>
+                            <button class="btn btn-primary">상품문의 하기</button>
+                        </div>
+                        
+                        <!-- Inquiry Item -->
                         <div class="inquiry-item" onclick="toggleInquiryAnswer(1)">
                             <div class="inquiry-info">
                                 <span class="inquiry-badge text-dark">답변완료</span>
@@ -862,13 +866,13 @@
                             </div>
                         </div>
         
-        <!-- Pagination -->
-        <ul class="pagination">
-            <li class="page-item"><a class="page-link" href="#">&#60;</a></li>
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">&#62;</a></li>
-        </ul>
-    </div>
+                        <!-- Pagination -->
+                        <ul class="pagination">
+                            <li class="page-item"><a class="page-link" href="#">&#60;</a></li>
+                            <li class="page-item"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">&#62;</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
             <div class="right-column sticky-cart">
@@ -891,12 +895,9 @@
                   </div>
             </div>
         </div>
-    	
-    
     </div>
     
     <%@include file="/WEB-INF/include/sidebar.jsp"%>
-    
     <%@include file="/WEB-INF/include/footer.jsp"%>
     <script>
         document.querySelectorAll('.mini span').forEach(span => {
@@ -908,125 +909,107 @@
         });
     </script>
     
+    <script>
+    let currentIndex = {};
+
+    function initSliders() {
+        const sliders = document.querySelectorAll('.slider');
+        sliders.forEach(slider => {
+            currentIndex[slider.id] = 0;
+            const slides = slider.querySelector('.slides');
+            const totalSlides = slides.children.length;
+            const slidesToShow = 3; // 한 번에 보여줄 슬라이드 수
+
+            // 슬라이더의 너비를 설정하여 슬라이드가 모두 보이도록 합니다.
+            slides.style.width = '100%';
+            for (let slide of slides.children) {
+                slide.style.width = (100 / slidesToShow) + '%';
+            }
+
+            // 페이지 인디케이터 업데이트
+            updatePageIndicator(slider.id);
+        });
+    }
+
+    function nextSlide(sliderId) {
+        const slider = document.getElementById(sliderId);
+        const slides = slider.querySelector('.slides');
+        const totalSlides = slides.children.length;
+        const slidesToShow = 3;
+        const maxIndex = totalSlides - slidesToShow;
+
+        if (currentIndex[sliderId] < maxIndex) {
+            currentIndex[sliderId] += slidesToShow;
+            updateSlider(slides, currentIndex[sliderId]);
+            updatePageIndicator(sliderId);
+        }
+    }
+
+    function prevSlide(sliderId) {
+        const slider = document.getElementById(sliderId);
+        const slides = slider.querySelector('.slides');
+        const totalSlides = slides.children.length;
+        const slidesToShow = 3;
+
+        if (currentIndex[sliderId] > 0) {
+            currentIndex[sliderId] -= slidesToShow;
+            updateSlider(slides, currentIndex[sliderId]);
+            updatePageIndicator(sliderId);
+        }
+    }
+
+    function updateSlider(slides, index) {
+        const slideWidth = slides.children[0].getBoundingClientRect().width;
+        const newTransformValue = -(index * slideWidth);
+        slides.style.transform = 'translateX(' + newTransformValue + 'px)';
+    }
+
+    function updatePageIndicator(sliderId) {
+        const slider = document.getElementById(sliderId);
+        const slides = slider.querySelector('.slides');
+        const totalSlides = slides.children.length;
+        const slidesToShow = 3;
+        const currentPage = Math.ceil((currentIndex[sliderId] + 1) / slidesToShow);
+        const totalPages = Math.ceil(totalSlides / slidesToShow);
+
+        const pageIndicator = document.getElementById('page-indicator-' + sliderId);
+        pageIndicator.textContent = currentPage + '/' + totalPages;
+    }
+
+    document.addEventListener('DOMContentLoaded', initSliders);
     
-    
-  <!-- <script type="text/javascript">
-    window.addEventListener('scroll', function() {
-    	  var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    	  var sidebarLeft = document.querySelector('.sidebar-left');
-    	  var sidebarRight = document.querySelector('.sidebar-right');
+    document.addEventListener('DOMContentLoaded', function () {
+        var navLinks = document.querySelectorAll('.nav-tabs .nav-link');
+        navLinks.forEach(function (link) {
+            link.addEventListener('click', function (event) {
+                event.preventDefault(); // Prevent default anchor behavior
+                navLinks.forEach(function (navLink) {
+                    navLink.classList.remove('active'); // Remove active class from all tabs
+                });
+                link.classList.add('active'); // Add active class to clicked tab
+                var targetId = link.getAttribute('href').substring(1); // Get the target content ID
+                var targetElement = document.getElementById(targetId);
+                var offset = document.querySelector('.sticky-wrap').offsetHeight; // Adjust scroll position by sticky-wrap height
+                window.scrollTo({
+                    top: targetElement.offsetTop - offset,
+                    behavior: 'smooth'
+                });
+            });
+        });
 
-    	  sidebarLeft.style.top = scrollTop + 'px';
-    	  sidebarRight.style.top = scrollTop + 'px';
-    	});
-  
-  </script> -->
-  
-  <script>
-  let currentIndex = {};
+        // Scroll to top on page load and replace URL without hash
+        if (window.location.hash) {
+            history.replaceState(null, null, 'http://localhost:9086/ProductDetail');
+            window.scrollTo(0, 0);
+        } else {
+            window.scrollTo(0, 0);
+        }
+    });
 
-  function initSliders() {
-      const sliders = document.querySelectorAll('.slider');
-      sliders.forEach(slider => {
-          currentIndex[slider.id] = 0;
-          const slides = slider.querySelector('.slides');
-          const totalSlides = slides.children.length;
-          const slidesToShow = 3; // 한 번에 보여줄 슬라이드 수
-
-          // 슬라이더의 너비를 설정하여 슬라이드가 모두 보이도록 합니다.
-          slides.style.width = '100%';
-          for (let slide of slides.children) {
-              slide.style.width = (100 / slidesToShow) + '%';
-          }
-
-          // 페이지 인디케이터 업데이트
-          updatePageIndicator(slider.id);
-      });
-  }
-
-  function nextSlide(sliderId) {
-      const slider = document.getElementById(sliderId);
-      const slides = slider.querySelector('.slides');
-      const totalSlides = slides.children.length;
-      const slidesToShow = 3;
-      const maxIndex = totalSlides - slidesToShow;
-
-      if (currentIndex[sliderId] < maxIndex) {
-          currentIndex[sliderId] += slidesToShow;
-          updateSlider(slides, currentIndex[sliderId]);
-          updatePageIndicator(sliderId);
-      }
-  }
-
-  function prevSlide(sliderId) {
-      const slider = document.getElementById(sliderId);
-      const slides = slider.querySelector('.slides');
-      const totalSlides = slides.children.length;
-      const slidesToShow = 3;
-
-      if (currentIndex[sliderId] > 0) {
-          currentIndex[sliderId] -= slidesToShow;
-          updateSlider(slides, currentIndex[sliderId]);
-          updatePageIndicator(sliderId);
-      }
-  }
-
-  function updateSlider(slides, index) {
-      const slideWidth = slides.children[0].getBoundingClientRect().width;
-      const newTransformValue = -(index * slideWidth);
-      slides.style.transform = 'translateX(' + newTransformValue + 'px)';
-  }
-
-  function updatePageIndicator(sliderId) {
-      const slider = document.getElementById(sliderId);
-      const slides = slider.querySelector('.slides');
-      const totalSlides = slides.children.length;
-      const slidesToShow = 3;
-      const currentPage = Math.ceil((currentIndex[sliderId] + 1) / slidesToShow);
-      const totalPages = Math.ceil(totalSlides / slidesToShow);
-
-      const pageIndicator = document.getElementById('page-indicator-' + sliderId);
-      pageIndicator.textContent = currentPage + '/' + totalPages;
-  }
-
-  document.addEventListener('DOMContentLoaded', initSliders);
-  
-  
-  document.addEventListener('DOMContentLoaded', function () {
-      var navLinks = document.querySelectorAll('.nav-tabs .nav-link');
-      navLinks.forEach(function (link) {
-          link.addEventListener('click', function (event) {
-              event.preventDefault(); // Prevent default anchor behavior
-              navLinks.forEach(function (navLink) {
-                  navLink.classList.remove('active'); // Remove active class from all tabs
-              });
-              link.classList.add('active'); // Add active class to clicked tab
-              var targetId = link.getAttribute('href').substring(1); // Get the target content ID
-              var targetElement = document.getElementById(targetId);
-              var offset = document.querySelector('.sticky-wrap').offsetHeight; // Adjust scroll position by sticky-wrap height
-              window.scrollTo({
-                  top: targetElement.offsetTop - offset,
-                  behavior: 'smooth'
-              });
-          });
-      });
-
-      // Scroll to top on page load and replace URL without hash
-      if (window.location.hash) {
-          history.replaceState(null, null, 'http://localhost:9086/ProductDetail');
-          window.scrollTo(0, 0);
-      } else {
-          window.scrollTo(0, 0);
-      }
-  });
-
-  // Ensure page scrolls to top on refresh
-  window.addEventListener('beforeunload', function () {
-      history.replaceState(null, null, 'http://localhost:9086/ProductDetail');
-  });
-
+    // Ensure page scrolls to top on refresh
+    window.addEventListener('beforeunload', function () {
+        history.replaceState(null, null, 'http://localhost:9086/ProductDetail');
+    });
     </script>
-  
-  
 </body>
 </html>

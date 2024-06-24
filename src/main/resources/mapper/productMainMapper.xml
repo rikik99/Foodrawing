@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.food.domain.product.mapper.ProductMainMapper">
+
+    <select id="selectAllProducts" resultType="com.food.domain.product.dto.ProductDTO">
+        SELECT PRODUCT_NUMBER, NAME, DESCRIPTION, PRICE, QUANTITY, CREATED_DATE
+        FROM PRODUCT_TB
+    </select>
+
+    <select id="selectAllProductFiles" resultType="com.food.domain.product.dto.ProductFileDTO">
+        SELECT ID, PRODUCT_NUMBER, ORIGINAL_NAME, FILE_PATH, FILE_TYPE, UPLOAD_DATE
+        FROM PRODUCT_FILE_TB
+    </select>
+
+    <select id="fileByResults" parameterType="String" resultType="com.food.domain.product.dto.ProductFileDTO">
+        SELECT ID, PRODUCT_NUMBER, ORIGINAL_NAME, FILE_PATH, FILE_TYPE, UPLOAD_DATE
+        FROM PRODUCT_FILE_TB
+        WHERE PRODUCT_NUMBER = #{productNumber}
+    </select>
+
+    <select id="findProductsByCategory" resultType="com.food.domain.product.dto.ProductDTO">
+        SELECT PRODUCT_TB.PRODUCT_NUMBER, PRODUCT_TB.NAME, PRODUCT_TB.DESCRIPTION, PRODUCT_TB.PRICE, PRODUCT_TB.QUANTITY, PRODUCT_TB.CREATED_DATE
+        FROM PRODUCT_TB
+        JOIN PRODUCT_CATEGORY_MAPPING_TB ON PRODUCT_TB.PRODUCT_NUMBER = PRODUCT_CATEGORY_MAPPING_TB.PRODUCT_NUMBER
+        WHERE PRODUCT_CATEGORY_MAPPING_TB.CATEGORY_ID = #{categoryId}
+    </select>
+</mapper>

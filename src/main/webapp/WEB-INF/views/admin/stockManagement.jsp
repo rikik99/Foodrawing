@@ -51,27 +51,22 @@
                         </div>
                     </div>
                     <div class="full-width">
-						<div class="half-width number-group">
-							<label for="stock_min">상품 재고</label> <input type="number"
-								name="stock_min" id="stock_min" placeholder="이상"
-								class="secondary"> <input type="number" name="stock_max"
-								id="stock_max" placeholder="이하" class="secondary"> <span
-								class="btn_group"> <input type="button"
-								onclick="setStockRange('all');" class="btn_small white primary"
-								value="전체"> <input type="button"
-								onclick="setStockRange('soldOut');"
-								class="btn_small white primary" value="품절"> <input
-								type="button" onclick="setStockRange('outOfStock');"
-								class="btn_small white primary" value="부족"> <input
-								type="button" onclick="setStockRange('availability');"
-								class="btn_small white primary" value="여유">
-							</span>
-						</div>
-					</div>
-										<div class="search-buttons full-width">
-						<button type="submit" class="primary">검색</button>
-						<button type="reset" class="secondary">초기화</button>
-					</div>
+                        <div class="half-width number-group">
+                            <label for="stock_min">상품 재고</label> 
+                            <input type="number" name="stock_min" id="stock_min" placeholder="이상" class="secondary"> 
+                            <input type="number" name="stock_max" id="stock_max" placeholder="이하" class="secondary"> 
+                            <span class="btn_group"> 
+                                <input type="button" onclick="setStockRange('all');" class="btn_small white primary" value="전체"> 
+                                <input type="button" onclick="setStockRange('soldOut');" class="btn_small white primary" value="품절"> 
+                                <input type="button" onclick="setStockRange('outOfStock');" class="btn_small white primary" value="부족"> 
+                                <input type="button" onclick="setStockRange('availability');" class="btn_small white primary" value="여유">
+                            </span>
+                        </div>
+                    </div>
+                    <div class="search-buttons full-width">
+                        <button type="submit" class="primary">검색</button>
+                        <button type="reset" class="secondary">초기화</button>
+                    </div>
                 </div>
             </form>
 

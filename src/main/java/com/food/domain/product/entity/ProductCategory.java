@@ -24,6 +24,6 @@ public class ProductCategory {
     @Column(name = "NAME", length = 100, nullable = false)
     private String name;
 
-    @Column(name = "DETAIL_NAME", length = 100)
-    private String detailName;
+    @Column(name = "CATEGORY_CODE", length = 100, nullable = false)
+    private String categoryCode;
 }
