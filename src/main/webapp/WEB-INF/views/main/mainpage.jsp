@@ -188,25 +188,25 @@
 
         <section style="margin-top:100px;">
             <c:choose>
-                <c:when test="${category == 21}">
+                <c:when test="${category == 11}">
                 <div style="text-align:center;">
                 <h2>회원님의 추천상품</h2>
                     <small>균형잡힌 식단</small>
                 </div>
                 </c:when>
-                <c:when test="${category == 22}">
+                <c:when test="${category == 12}">
                 <div style="text-align:center;">
                  <h2>회원님의 추천상품</h2>
                     <small>단백질 위주 식단</small>
                     </div>
                 </c:when>
-                <c:when test="${category == 23}">
+                <c:when test="${category == 13}">
                 <div style="text-align:center;">
                  <h2>회원님의 추천상품</h2>
                     <small>다이어트 식단</small>
                     </div>
                 </c:when>
-                <c:when test="${category == 24}">
+                <c:when test="${category == 22}">
                 <div style="text-align:center;">
                  <h2>회원님의 추천상품</h2>
                     <small>저염 식단</small>
