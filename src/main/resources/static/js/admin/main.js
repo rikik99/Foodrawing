@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupNavigation();
     setupCheckboxEventListeners();
     setupPaginationLinks();
+    initializeCKEditor();
 
     // 초기 로드 설정
     const pathSegments = window.location.pathname.split('/');
@@ -36,17 +37,19 @@ document.addEventListener('click', function(e) {
     if (e.target.classList.contains('date-range-btn')) {
         const range = e.target.getAttribute('data-range');
         const group = e.target.getAttribute('data-group');
+        console.log(range);
+        console.log(group);
         setDateRange(range, group);
     }
     if (e.target.classList.contains('search-btn')) {
-        const urlPath = e.target.getAttribute('data-url'); // 추가된 부분
-        performSearch(urlPath); // urlPath를 전달하도록 수정
+        const urlPath = e.target.getAttribute('data-url');
+        performSearch(urlPath);
     }
     if (e.target.classList.contains('page-link')) {
         const page = e.target.getAttribute('data-page');
         const size = e.target.getAttribute('data-size');
-        const urlPath = e.target.getAttribute('data-url'); // 페이지 URL을 동적으로 받음
-        loadPage(page, size, urlPath); // urlPath를 전달하도록 수정
+        const urlPath = e.target.getAttribute('data-url');
+        loadPage(page, size, urlPath);
     }
     if (e.target.id === 'deleteSelectedButton') {
         const urlPath = e.target.getAttribute('data-url');
@@ -77,6 +80,13 @@ document.addEventListener('click', function(e) {
     }
 });
 
+document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'productList') {
+        console.log("상품명 선택했어요");
+        updateProductDetails('productList');
+    }
+});
+
 function performSearch(urlPath) {
     const params = new URLSearchParams();
 
@@ -88,7 +98,12 @@ function performSearch(urlPath) {
         { id: 'stock_min', name: 'stock_min' },
         { id: 'stock_max', name: 'stock_max' },
         { id: 'price_min', name: 'price_min' },
-        { id: 'price_max', name: 'price_max' }
+        { id: 'price_max', name: 'price_max' },
+        { id: 'last_fr_date', name:'last_fr_date'},
+        { id: 'last_to_date', name:'last_to_date'},
+        { id: 'register_fr_date', name:'register_fr_date'},
+        { id: 'register_to_date', name:'register_to_date'},
+        { id: 'sale_status', name:'sale_status'}
     ];
 
     fields.forEach(field => {
@@ -122,14 +137,15 @@ function performSearch(urlPath) {
             tempDiv.innerHTML = html;
             const newContent = tempDiv.querySelector('.main-content');
             document.querySelector('.main-content').innerHTML = newContent.innerHTML;
-            setupPaginationLinks(); // 페이지 링크 초기화
-            setupCheckboxEventListeners(); // 체크박스 이벤트 리스너 초기화
+            setupPaginationLinks();
+            setupCheckboxEventListeners();
+            initializeCKEditor();
             history.pushState({ url: url, target: 'productManagement' }, '', url);
         })
         .catch(error => console.error('Error:', error));
 }
 
-function loadPage(page, size, urlPath) { // urlPath 매개변수를 추가
+function loadPage(page, size, urlPath) {
     const params = new URLSearchParams(window.location.search);
     params.set('page', page);
     params.set('size', size);
@@ -142,8 +158,9 @@ function loadPage(page, size, urlPath) { // urlPath 매개변수를 추가
             tempDiv.innerHTML = html;
             const newContent = tempDiv.querySelector('.main-content');
             document.querySelector('.main-content').innerHTML = newContent.innerHTML;
-            setupPaginationLinks(); // 페이지 링크 초기화
-            setupCheckboxEventListeners(); // 체크박스 이벤트 리스너 초기화
+            setupPaginationLinks();
+            setupCheckboxEventListeners();
+            initializeCKEditor();
             history.pushState({ url: url, target: urlPath.split('/').pop() }, '', url);
         })
         .catch(error => console.error('Error:', error));
@@ -155,8 +172,8 @@ function setupPaginationLinks() {
             event.preventDefault();
             const page = this.getAttribute('data-page');
             const size = this.getAttribute('data-size');
-            const urlPath = this.getAttribute('data-url'); // 페이지 URL을 동적으로 받음
-            loadPage(page, size, urlPath); // urlPath를 전달하도록 수정
+            const urlPath = this.getAttribute('data-url');
+            loadPage(page, size, urlPath);
         });
     });
 }
@@ -207,7 +224,6 @@ function highlightMenu(target) {
         activeLink.parentElement.classList.add('active');
     }
 }
-
 function loadContent(url, target, pushState = true) {
     const mainContent = document.querySelector('.main-content');
 
@@ -220,24 +236,28 @@ function loadContent(url, target, pushState = true) {
             const newStyles = tempDiv.querySelectorAll('link[rel="stylesheet"]');
 
             if (newMainContent) {
+                // 기존의 모든 CSS 링크 태그 임시 저장
+                const existingStyles = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
+
+                // 새로운 CSS 링크 태그 추가
                 newStyles.forEach(style => {
-                    const existingLink = Array.from(document.head.querySelectorAll('link[rel="stylesheet"]')).find(link => link.href === style.href);
-                    if (!existingLink) {
-                        document.head.appendChild(style.cloneNode(true));
-                    }
+                    document.head.appendChild(style.cloneNode(true));
                 });
 
                 mainContent.style.opacity = '0';
                 setTimeout(() => {
+                    // 컨텐츠 업데이트
                     mainContent.innerHTML = newMainContent.innerHTML;
                     mainContent.className = newMainContent.className;
+
+                    // 기존의 CSS 링크 태그 제거
+                    existingStyles.forEach(link => link.remove());
+
                     mainContent.style.opacity = '1';
                     setupNavigation();
                     highlightMenu(target);
                     setupCheckboxEventListeners();
-
-                    // 각 페이지별 추가 초기화 함수 호출
-                    if (typeof setupPageSpecificFunction === 'function') setupPageSpecificFunction();
+                    initializeCKEditor();
                 }, 100);
 
                 if (pushState) {
@@ -246,11 +266,12 @@ function loadContent(url, target, pushState = true) {
                     history.replaceState({ url: url, target: target }, '', url);
                 }
             } else if (url === '/admin/mainContent') {
-                mainContent.innerHTML = '<p>메인 콘텐츠</p>'; // 메인 콘텐츠를 설정합니다. 실제 콘텐츠로 교체하세요.
+                mainContent.innerHTML = '<p>메인 콘텐츠</p>';
             }
         })
         .catch(error => console.error('Error loading content:', error));
 }
+
 
 function setupCheckboxEventListeners() {
     const selectAllCheckbox = document.getElementById('selectAll');
@@ -293,7 +314,7 @@ function deleteSelectedProducts(urlPath) {
             .then(response => response.ok ? response.text() : Promise.reject('Failed to delete products'))
             .then(message => {
                 alert(message);
-                loadContent(urlPath, urlPath.split('/').pop(), false); // URL과 타겟 페이지를 동적으로 설정
+                loadContent(urlPath, urlPath.split('/').pop(), false);
             })
             .catch(error => console.error('Error:', error));
     } else {
@@ -301,7 +322,7 @@ function deleteSelectedProducts(urlPath) {
     }
 }
 
-function setDateRange(range, dateGroupName) {
+function setDateRange(range, group) {
     const today = new Date();
     let startDate, endDate;
 
@@ -333,8 +354,8 @@ function setDateRange(range, dateGroupName) {
             break;
     }
 
-    const startDateInput = document.querySelector(`input[name="${dateGroupName}From"]`);
-    const endDateInput = document.querySelector(`input[name="${dateGroupName}To"]`);
+    const startDateInput = document.querySelector(`input[name="${group}_fr_date"]`);
+    const endDateInput = document.querySelector(`input[name="${group}_to_date"]`);
 
     if (startDateInput && endDateInput) {
         startDateInput.value = startDate;
@@ -343,3 +364,25 @@ function setDateRange(range, dateGroupName) {
 }
 
 window.setDateRange = setDateRange;
+
+function MyCustomUploadAdapterPlugin(editor) {
+    editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+        return new UploadAdapter(loader);
+    }
+}
+
+function initializeCKEditor() {
+    const descriptionElement = document.querySelector('#description');
+    if (descriptionElement) {
+        ClassicEditor.create(descriptionElement, {
+            language: 'ko',
+            extraPlugins: [MyCustomUploadAdapterPlugin]
+        }).then(editor => {
+            window.editor = editor;
+        }).catch(error => {
+            console.error(error);
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', initializeCKEditor);

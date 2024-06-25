@@ -21,15 +21,35 @@
                 <thead>
                     <tr>
                         <th>이미지</th>
-                        <th class="sortable" data-column="product" data-type="string" data-sort="${sort eq 'product,asc' ? 'asc' : (sort eq 'product,desc' ? 'desc' : '-')}">상품명(상품 코드, 상품명)<span class="sort-icon default">-</span><span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
-                        <th class="sortable" data-column="transactionType" data-type="string" data-sort="${sort eq 'transactionType,asc' ? 'asc' : (sort eq 'transactionType,desc' ? 'desc' : '-')}">입/출고<span class="sort-icon default">-</span><span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
-                        <th class="sortable" data-column="quantity" data-type="number" data-sort="${sort eq 'quantity,asc' ? 'asc' : (sort eq 'quantity,desc' ? 'desc' : '-')}">수량<span class="sort-icon default">-</span><span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
-                        <th class="sortable" data-column="transactionDate" data-type="date" data-sort="${sort eq 'transactionDate,asc' ? 'asc' : (sort eq 'transactionDate,desc' ? 'desc' : '-')}">입출고 날짜<span class="sort-icon default">-</span><span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
-                        <th class="sortable" data-column="expirationDate" data-type="date" data-sort="${sort eq 'expirationDate,asc' ? 'asc' : (sort eq 'expirationDate,desc' ? 'desc' : '-')}">유통 기한<span class="sort-icon default">-</span><span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
+                        <th class="sortable" data-column="PRODUCT_NUMBER" data-sort="${sort.startsWith('product,') ? sort.split(',')[1] : '-'}">상품명(상품 코드, 상품명)
+                            <span class="sort-icon default">-</span>
+                            <span class="sort-icon asc">▲</span>
+                            <span class="sort-icon desc">▼</span>
+                        </th>
+                        <th class="sortable" data-column="TRANSACTION_TYPE" data-sort="${sort.startsWith('transactionType,') ? sort.split(',')[1] : '-'}">입/출고
+                            <span class="sort-icon default">-</span>
+                            <span class="sort-icon asc">▲</span>
+                            <span class="sort-icon desc">▼</span>
+                        </th>
+                        <th class="sortable" data-column="QUANTITY" data-sort="${sort.startsWith('quantity,') ? sort.split(',')[1] : '-'}">수량
+                            <span class="sort-icon default">-</span>
+                            <span class="sort-icon asc">▲</span>
+                            <span class="sort-icon desc">▼</span>
+                        </th>
+                        <th class="sortable" data-column="TRANSACTION_DATE" data-sort="${sort.startsWith('TRANSACTION_DATE,') ? sort.split(',')[1] : '-'}">입출고 날짜
+                            <span class="sort-icon default">-</span>
+                            <span class="sort-icon asc">▲</span>
+                            <span class="sort-icon desc">▼</span>
+                        </th>
+                        <th class="sortable" data-column="EXPIRATION_DATE" data-sort="${sort.startsWith('expirationDate,') ? sort.split(',')[1] : '-'}">유통 기한
+                            <span class="sort-icon default">-</span>
+                            <span class="sort-icon asc">▲</span>
+                            <span class="sort-icon desc">▼</span>
+                        </th>
                     </tr>
                 </thead>
                 <tbody id="stockTableBody">
-                    <c:forEach items="${transaction.content}" var="transaction">
+                    <c:forEach items="${transaction}" var="transaction">
                         <tr>
                             <td><img class="productImg" src="${transaction.productFileDTO.filePath}" alt="상품 이미지"></td>
                             <td><p>${transaction.productNumber}</p><p>${transaction.productDTO.name}</p></td>

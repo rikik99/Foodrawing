@@ -232,17 +232,144 @@
 	</update>
 	<insert id="insertTransaction">
 		INSERT INTO STOCK_TRANSACTION_TB
-		(PRODUCT_NUMBER, TRANSACTION_TYPE, QUANTITY, TRANSACTION_DATE, EXPIRATION_DATE)
+		(PRODUCT_NUMBER,
+		TRANSACTION_TYPE, QUANTITY, TRANSACTION_DATE, EXPIRATION_DATE)
 		VALUES
-		(#{productNumber}, #{type}, #{quantity}, CURRENT_TIMESTAMP, #{expirationDate})
+		(#{productNumber}, #{type}, #{quantity}, CURRENT_TIMESTAMP,
+		#{expirationDate})
 	</insert>
 	<select id="findTransaction">
-	SELECT ID, PRODUCT_NUMBER, TRANSACTION_TYPE, QUANTITY, TRANSACTION_DATE, EXPIRATION_DATE
-	FROM STOCK_TRANSACTION_TB
+		SELECT ID, PRODUCT_NUMBER, TRANSACTION_TYPE,
+		QUANTITY, TRANSACTION_DATE,
+		EXPIRATION_DATE
+		FROM STOCK_TRANSACTION_TB
 	</select>
 	<select id="findProductByProductNumber" parameterType="String">
-	SELECT PRODUCT_NUMBER, NAME, DESCRIPTION, PRICE, QUANTITY, CREATED_DATE
-	FROM PRODUCT_TB
-	WHERE PRODUCT_NUMBER = #{productNumber}
+		SELECT
+		PRODUCT_NUMBER, NAME, DESCRIPTION, PRICE, QUANTITY, CREATED_DATE
+		FROM
+		PRODUCT_TB
+		WHERE PRODUCT_NUMBER = #{productNumber}
+	</select>
+	<select id="findTransactionList"
+		resultType="com.food.domain.product.dto.StockTransactionDTO">
+		SELECT *
+		FROM (
+		SELECT
+		a.*,
+		ROW_NUMBER() OVER (ORDER BY
+		<if test="orderByClause != null and orderByClause != ''">
+			${orderByClause}
+		</if>
+		<if test="orderByClause == null or orderByClause == ''">
+			TRANSACTION_DATE DESC
+		</if>
+		) AS row_num
+		FROM
+		STOCK_TRANSACTION_TB a
+		)
+		WHERE row_num BETWEEN #{offset}
+		AND #{offset} + #{pageSize} - 1
+	</select>
+
+	<!-- 전체 레코드 수 계산 쿼리 -->
+	<select id="countTransactionList" resultType="int">
+		SELECT COUNT(*)
+		FROM STOCK_TRANSACTION_TB
+	</select>
+
+	<select id="findPostList"
+		resultType="com.food.domain.sales.dto.SalesPostDTO">
+		select ID, ADMIN_ID, PRODUCT_NUMBER, TITLE, DESCRIPTION,
+		CREATED_DATE, LAST_POST_DATE, UPDATED_DATE, START_POST_DATE, STATUS
+		from SALES_POST_TB
+	</select>
+
+	<select id="findPostListWithSearch"
+		resultType="com.food.domain.sales.dto.SalesPostDTO"
+		parameterType="map">
+		select S.ID, S.ADMIN_ID, S.PRODUCT_NUMBER, S.TITLE, S.DESCRIPTION,
+		S.CREATED_DATE,
+		S.LAST_POST_DATE, S.UPDATED_DATE, S.START_POST_DATE,
+		S.STATUS
+		from
+		SALES_POST_TB S
+		WHERE 1=1
+		<if test="searchInput != null and searchInput != ''">
+			AND (S.PRODUCT_NUMBER LIKE '%' || #{searchInput} || '%'
+			OR
+			S.TITLE LIKE '%' || #{searchInput} || '%')
+		</if>
+		<if test="stock_min != null">
+			AND S.PRODUCT_NUMBER IN (
+			SELECT S.PRODUCT_NUMBER
+			FROM
+			SALES_POST_TB S
+			JOIN
+			PRODUCT_TB P ON
+			S.PRODUCT_NUMBER = P.PRODUCT_NUMBER
+			WHERE P.QUANTITY
+			&gt;= #{stock_min}
+			)
+		</if>
+		<if test="stock_max != null">
+			AND S.PRODUCT_NUMBER IN (
+			SELECT S.PRODUCT_NUMBER
+			FROM
+			SALES_POST_TB S
+			JOIN
+			PRODUCT_TB P ON
+			S.PRODUCT_NUMBER = P.PRODUCT_NUMBER
+			WHERE P.QUANTITY
+			&lt;= #{stock_max}
+			)
+		</if>
+		<if test="price_min != null">
+			AND S.PRODUCT_NUMBER IN (
+			SELECT S.PRODUCT_NUMBER
+			FROM
+			SALES_POST_TB S
+			JOIN
+			PRODUCT_TB P ON
+			S.PRODUCT_NUMBER = P.PRODUCT_NUMBER
+			WHERE P.PRICE &gt;=#{price_min}
+			)
+		</if>
+		<if test="price_max != null">
+			AND S.PRODUCT_NUMBER IN (
+			SELECT S.PRODUCT_NUMBER
+			FROM
+			SALES_POST_TB S
+			JOIN
+			PRODUCT_TB P ON
+			S.PRODUCT_NUMBER = P.PRODUCT_NUMBER
+			WHERE P.PRICE &lt;=#{price_max}
+			)
+		</if>
+		<if test="last_fr_date != null and last_fr_date != ''">
+			AND S.LAST_POST_DATE &gt;= TO_DATE(#{last_fr_date},
+			'YYYY-MM-DD')
+		</if>
+		<if test="last_to_date != null and last_to_date != ''">
+			AND S.LAST_POST_DATE &lt;= TO_DATE(#{last_to_date},
+			'YYYY-MM-DD')
+		</if>
+		<if test="register_fr_date != null and register_fr_date != ''">
+			AND S.CREATED_DATE &gt;= TO_DATE(#{register_fr_date},
+			'YYYY-MM-DD')
+		</if>
+		<if test="register_to_date != null and register_to_date != ''">
+			AND S.CREATED_DATE &lt;= TO_DATE(#{register_to_date},
+			'YYYY-MM-DD')
+		</if>
+		<if test="sale_status != null and sale_status != ''">
+			AND S.STATUS = #{sale_status}
+		</if>
+	</select>
+	<select id="findAdminByAdminId" parameterType="Long">
+		SELECT * FROM ADMIN_TB WHERE ID = #{adminId}
+	</select>
+	<select id="findProductByName" parameterType="String">
+	select * from PRODUCT_TB where name= #{name}
 	</select>
 </mapper>

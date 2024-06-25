@@ -2,6 +2,9 @@ package com.food.domain.sales.dto;
 
 import java.time.LocalDateTime;
 
+import com.food.domain.product.dto.ProductDTO;
+import com.food.domain.user.dto.AdminDTO;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,4 +27,6 @@ public class SalesPostDTO {
     private LocalDateTime startPostDate;
     private LocalDateTime lastPostDate;
     private Long status;
+    private ProductDTO productDTO;
+    private AdminDTO adminDTO;
 }

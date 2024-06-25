@@ -31,16 +31,16 @@
                 </div>
                 <div class="full-width">
                     <div class="date-group">
-                        <label for="searchIssuedDateFrom">최종 수정일</label>
-                        <input type="date" name="searchIssuedDateFrom" id="fr_date" placeholder="시작일" class="secondary">
-                        <input type="date" name="searchIssuedDateTo" id="to_date" placeholder="종료일" class="secondary">
+                        <label for="last_fr_date">최종 수정일</label>
+                        <input type="date" name="last_fr_date" id="last_fr_date" placeholder="시작일" class="secondary">
+                        <input type="date" name="last_to_date" id="last_to_date" placeholder="종료일" class="secondary">
                         <span class="btn_group">
-                            <input type="button" class="btn_small white primary date-range-btn" data-range="today" data-group="searchIssuedDate" value="오늘">
-                            <input type="button" class="btn_small white primary date-range-btn" data-range="yesterday" data-group="searchIssuedDate" value="어제">
-                            <input type="button" class="btn_small white primary date-range-btn" data-range="week" data-group="searchIssuedDate" value="일주일">
-                            <input type="button" class="btn_small white primary date-range-btn" data-range="month" data-group="searchIssuedDate" value="1개월">
-                            <input type="button" class="btn_small white primary date-range-btn" data-range="3months" data-group="searchIssuedDate" value="3개월">
-                            <input type="button" class="btn_small white primary date-range-btn" data-range="all" data-group="searchIssuedDate" value="전체">
+                            <input type="button" class="btn_small white primary date-range-btn" data-range="today" data-group="last" value="오늘">
+                            <input type="button" class="btn_small white primary date-range-btn" data-range="yesterday" data-group="last" value="어제">
+                            <input type="button" class="btn_small white primary date-range-btn" data-range="week" data-group="last" value="일주일">
+                            <input type="button" class="btn_small white primary date-range-btn" data-range="month" data-group="last" value="1개월">
+                            <input type="button" class="btn_small white primary date-range-btn" data-range="3months" data-group="last" value="3개월">
+                            <input type="button" class="btn_small white primary date-range-btn" data-range="all" data-group="last" value="전체">
                         </span>
                     </div>
                 </div>

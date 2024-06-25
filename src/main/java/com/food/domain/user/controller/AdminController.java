@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -24,10 +25,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.food.domain.product.dto.ProductCategoryDTO;
 import com.food.domain.product.dto.ProductDTO;
 import com.food.domain.product.dto.StockTransactionDTO;
+import com.food.domain.sales.dto.SalesPostDTO;
+import com.food.domain.sales.dto.SalesPostFileDTO;
 import com.food.domain.user.service.AdminService;
+import com.food.global.util.SalesPostFile;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,6 +48,9 @@ public class AdminController {
 
 	@Autowired
 	AdminService adminService;
+
+	@Autowired
+	private SalesPostFile salesPostFile;
 
 	@GetMapping("/login")
 	public ModelAndView login(Authentication authentication) {
@@ -115,9 +124,11 @@ public class AdminController {
 
 	@ResponseBody
 	@GetMapping("/nextProductNumber")
-	public ResponseEntity<String> getNextProductNumber(@RequestParam Long id) {
+	public ResponseEntity<Map<String, String>> getNextProductNumber(@RequestParam Long id) {
 		String nextProductNumber = adminService.getNextProductNumber(id);
-		return ResponseEntity.ok(nextProductNumber);
+		Map<String, String> response = new HashMap<>();
+		response.put("productCode", nextProductNumber);
+		return ResponseEntity.ok(response);
 	}
 
 	@PostMapping("/insertProduct")
@@ -190,43 +201,63 @@ public class AdminController {
 
 	@GetMapping("/stockTransaction")
 	public ModelAndView stockTransaction(@RequestParam Map<String, String> allParams) {
-	    int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
-	    int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
-	    String sortParam = allParams.getOrDefault("sort", "transactionDate,desc");
-	    String[] sortParams = sortParam.split(",");
+		log.info("Transaction allParams = {}", allParams);
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+		String sortParam = allParams.getOrDefault("sort", "TRANSACTION_DATE,desc");
+		String[] sortParams = sortParam.split(",");
 
-	    Sort sort = Sort.by(parseSortParams(sortParams));
-	    Pageable pageable = PageRequest.of(page, size, sort);
+		List<Sort.Order> orders = new ArrayList<>();
+		for (int i = 0; i < sortParams.length; i += 2) {
+			orders.add(new Sort.Order(Sort.Direction.fromString(sortParams[i + 1]), sortParams[i]));
+		}
 
-	    Page<StockTransactionDTO> transactionList = adminService.findTransactionList(pageable);
-	    ModelAndView mv = new ModelAndView();
-	    mv.addObject("transaction", transactionList);
-	    mv.addObject("totalElements", transactionList.getTotalElements());
-	    mv.addObject("currentPage", transactionList.getNumber());
-	    mv.addObject("pageCount", transactionList.getTotalPages());
-	    mv.addObject("size", size);
-	    mv.addObject("sort", sortParam);
-	    mv.setViewName("admin/stockTransaction");
-	    return mv;
+		Pageable pageable = PageRequest.of(page, size, Sort.by(orders));
+		Page<StockTransactionDTO> transactionList = adminService.findTransactionList(pageable);
+
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("transaction", transactionList.getContent());
+		mv.addObject("totalElements", transactionList.getTotalElements()); // 전체 레코드 수
+		mv.addObject("currentPage", page);
+		mv.addObject("pageCount", transactionList.getTotalPages()); // 전체 페이지 수 계산
+		mv.addObject("size", size);
+		mv.addObject("sort", sortParam);
+		mv.setViewName("admin/stockTransaction");
+		return mv;
 	}
-
-	private List<Sort.Order> parseSortParams(String[] sortParams) {
-	    List<Sort.Order> orders = new ArrayList<>();
-	    for (int i = 0; i < sortParams.length; i += 2) {
-	        String property = sortParams[i];
-	        String direction = (i + 1 < sortParams.length) ? sortParams[i + 1] : "asc";
-	        if (!direction.equals("-")) {
-	            orders.add(new Sort.Order(Sort.Direction.fromString(direction), property));
-	        }
-	    }
-	    return orders;
-	}
-
-
 
 	@GetMapping("/salesPost")
-	public ModelAndView salesPost() {
+	public ModelAndView salesPost(@RequestParam Map<String, String> allParams) {
+		log.info("allparams = {}", allParams);
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+
 		ModelAndView mv = new ModelAndView();
+
+		// 페이지 정보와 사이즈 정보를 allParams에 추가
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+
+		// 검색 조건이 있는지 확인
+		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
+				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
+
+		Page<SalesPostDTO> postList;
+		Pageable pageable = PageRequest.of(page, size);
+		if (hasSearchParams) {
+			// 검색 조건이 있을 경우
+			postList = adminService.findPostListWithSearch(convertEmptyStringsToNull(allParams));
+		} else {
+			// 검색 조건이 없을 경우
+			postList = adminService.findPostList(pageable);
+		}
+		List<ProductCategoryDTO> categoryList = adminService.findCategoryList();
+		mv.addObject("post", postList);
+		mv.addObject("currentPage", postList.getNumber());
+		mv.addObject("pageCount", postList.getTotalPages());
+		mv.addObject("totalElements", postList.getTotalElements());
+		mv.addObject("size", size);
+		mv.addAllObjects(allParams); // 전달된 검색 조건을 다시 뷰로 전달
 		mv.setViewName("admin/salesPost");
 		return mv;
 	}
@@ -312,4 +343,52 @@ public class AdminController {
 		});
 		return result;
 	}
+
+	@GetMapping("/insertSalesPost")
+	public ModelAndView salesPostInsert() {
+		ModelAndView mv = new ModelAndView();
+		List<ProductDTO> productList = adminService.findProducts();
+		mv.addObject("productList", productList);
+		mv.setViewName("admin/insertSalesPost");
+		return mv;
+	}
+
+	@ResponseBody
+	@GetMapping("/getProductDetails")
+	public ResponseEntity<Map<String, String>> getProductDetails(@RequestParam String name) {
+		Map<String, String> productDetails = adminService.getProductDetails(name);
+		return ResponseEntity.ok(productDetails);
+	}
+
+	  @PostMapping("/uploadImage")
+	    public ResponseEntity<SalesPostFileDTO> uploadImage(@RequestParam("upload") MultipartFile file) {
+	        try {
+	            SalesPostFileDTO fileDTO = adminService.uploadImage(file);
+
+	            // 로그 추가
+	            System.out.println("Uploaded file URL: " + fileDTO.getFilePath());
+
+	            return ResponseEntity.ok(fileDTO);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+	        }
+	    }
+
+	    @PostMapping("/insertSalesPost")
+	    @ResponseBody
+	    public ResponseEntity<?> registerSalesPost(@RequestParam Map<String, String> allParams,
+	                                               @RequestParam("fileDTOList") String fileDTOListJson) {
+	        try {
+	            // JSON 문자열을 List<SalesPostFileDTO>로 변환
+	            ObjectMapper objectMapper = new ObjectMapper();
+	            List<SalesPostFileDTO> fileDTOList = objectMapper.readValue(fileDTOListJson, new TypeReference<List<SalesPostFileDTO>>() {});
+
+	            adminService.insertSalesPost(allParams, fileDTOList);
+	            return ResponseEntity.ok("판매글이 성공적으로 등록되었습니다.");
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+	        }
+	    }
 }

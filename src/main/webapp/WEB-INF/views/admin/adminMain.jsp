@@ -146,13 +146,16 @@
 
 		</div>
 		<button id="toggleMode">Toggle Mode</button>
-		<script src="<c:url value='/js/admin/main.js'/>"></script>
+		<script src="<c:url value='/js/admin/productNumber.js'/>"></script>
 		<script src="<c:url value='/js/admin/editDiscount.js'/>"></script>
 		<script src="<c:url value='/js/admin/starRating.js'/>"></script>
 		<script src="<c:url value='/js/admin/sortTable.js'/>"></script>
 		<script src="<c:url value='/js/admin/toggleMode.js'/>"></script>
 		<script src="<c:url value='/js/admin/openDiscountAddWindow.js'/>"></script>
 		<script src="<c:url value='/js/admin/openCouponAddWindow.js'/>"></script>
+		<script src="<c:url value='/js/admin/main.js'/>"></script>
+		<script src="<c:url value='/js/admin/ckeditor5/ckeditor.js'/>"></script>
+		<script src="<c:url value='/js/admin/ckeditor5/translations/ko.js'/>"></script>
 	</div>
 </body>
 </html>

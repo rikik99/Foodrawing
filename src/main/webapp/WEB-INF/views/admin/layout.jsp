@@ -30,6 +30,7 @@
 			</ul>
 			<ul class="dropdown-menu">
 				<li><a data-target="salesPost">판매글 관리</a></li>
+				<li><a data-target="insertSalesPost">판매글 등록</a></li>
 				<li><a data-target="salesInquiry">판매글 문의 관리</a></li>
 				<li><a data-target="salesReview">판매글 후기 관리</a></li>
 			</ul>

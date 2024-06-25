@@ -4,6 +4,8 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,6 +13,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.food.domain.product.dto.ProductFileDTO;
+import com.food.domain.sales.dto.SalesPostFileDTO;
 
 @Component
 public class ProductFile {
@@ -78,4 +81,5 @@ public class ProductFile {
 
         return null;
     }
+    
 }

@@ -11,6 +11,8 @@ import com.food.domain.product.dto.ProductFileDTO;
 import com.food.domain.product.dto.StockDTO;
 import com.food.domain.product.dto.StockTransactionDTO;
 import com.food.domain.sales.dto.SalesPostDTO;
+import com.food.domain.sales.dto.SalesPostFileDTO;
+import com.food.domain.user.dto.AdminDTO;
 
 @Mapper
 public interface AdminMapper {
@@ -54,4 +56,20 @@ public interface AdminMapper {
 	List<StockTransactionDTO> findTransaction();
 
 	ProductDTO findProductByProductNumber(String productNumber);
+
+	List<StockTransactionDTO> findTransactionList(String orderByClause, int pageSize, int offset);
+
+	int countTransactionList();
+
+	List<SalesPostDTO> findPostList();
+
+	List<SalesPostDTO> findPostListWithSearch(Map<String, String> allParams);
+
+	AdminDTO findAdminByAdminId(Long adminId);
+
+	String findProductByName(String name);
+
+	void insertSalesPost(SalesPostDTO salesPost);
+
+	void insertSalesPostFile(SalesPostFileDTO fileDTO);
 }

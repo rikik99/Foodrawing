@@ -1,6 +1,5 @@
 package com.food.global.configuration;
 
-import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -22,9 +21,6 @@ import com.food.global.auth.CustomOAuth2SuccessHandler;
 import com.food.global.auth.JwtAuthenticationFilter;
 import com.food.global.auth.JwtUtil;
 
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.SessionCookieConfig;
 import jakarta.servlet.http.Cookie;
 
 @Configuration
@@ -61,9 +57,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
-    	 http.csrf(csrf -> csrf.disable()).securityMatcher("/admin/**")
+        http.csrf(csrf -> csrf.disable()).securityMatcher("/admin/**")
             .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                .requestMatchers("/admin/login", "/admin/loginFail").permitAll()
+                .requestMatchers("/admin/login", "/admin/loginFail, /js/**").permitAll()
                 .anyRequest().hasAuthority("ROLE_ADMIN"))
             .formLogin(formLogin -> formLogin
                 .loginPage("/admin/login")
@@ -87,6 +83,9 @@ public class SecurityConfig {
                 .permitAll())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // 세션을 필요할 때만 생성하도록 설정
             .userDetailsService(customUserDetailsService);
+
+        // X-Frame-Options SAMEORIGIN 설정 추가
+        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
         return http.build();
     }
@@ -133,6 +132,9 @@ public class SecurityConfig {
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
+        // X-Frame-Options SAMEORIGIN 설정 추가
+        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
+
         return http.build();
     }
 
@@ -144,19 +146,5 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public ServletContextInitializer initializer() {
-        return new ServletContextInitializer() {
-            @Override
-            public void onStartup(ServletContext servletContext) throws ServletException {
-                SessionCookieConfig sessionCookieConfig = servletContext.getSessionCookieConfig();
-                sessionCookieConfig.setMaxAge(-1); // 브라우저 닫을 때 세션 쿠키 삭제
-                sessionCookieConfig.setHttpOnly(true);
-                sessionCookieConfig.setSecure(false);
-                System.out.println("Session Cookie Config MaxAge set to: " + sessionCookieConfig.getMaxAge());
-            }
-        };
     }
 }
