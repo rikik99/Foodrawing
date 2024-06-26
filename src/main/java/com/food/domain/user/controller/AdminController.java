@@ -1,5 +1,6 @@
 package com.food.domain.user.controller;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.food.domain.product.dto.ProductCategoryDTO;
@@ -360,35 +362,45 @@ public class AdminController {
 		return ResponseEntity.ok(productDetails);
 	}
 
-	  @PostMapping("/uploadImage")
-	    public ResponseEntity<SalesPostFileDTO> uploadImage(@RequestParam("upload") MultipartFile file) {
-	        try {
-	            SalesPostFileDTO fileDTO = adminService.uploadImage(file);
+	@PostMapping("/uploadImage")
+	public ResponseEntity<SalesPostFileDTO> uploadImage(@RequestParam("upload") MultipartFile file) {
+		try {
+			SalesPostFileDTO fileDTO = adminService.uploadImage(file);
 
-	            // 로그 추가
-	            System.out.println("Uploaded file URL: " + fileDTO.getFilePath());
+			// 로그 추가
+			System.out.println("Uploaded fileDTO : " + fileDTO);
 
-	            return ResponseEntity.ok(fileDTO);
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+			return ResponseEntity.ok(fileDTO);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+	@PostMapping("/insertSalesPost")
+	@ResponseBody
+	public ResponseEntity<?> registerSalesPost(@RequestBody Map<String, Object> allParams) {
+	    try {
+	        List<Map<String, Object>> fileDTOListRaw = (List<Map<String, Object>>) allParams.get("fileDTOList");
+	        if (fileDTOListRaw == null) {
+	            throw new IllegalArgumentException("fileDTOList is missing in request");
 	        }
-	    }
 
-	    @PostMapping("/insertSalesPost")
-	    @ResponseBody
-	    public ResponseEntity<?> registerSalesPost(@RequestParam Map<String, String> allParams,
-	                                               @RequestParam("fileDTOList") String fileDTOListJson) {
-	        try {
-	            // JSON 문자열을 List<SalesPostFileDTO>로 변환
-	            ObjectMapper objectMapper = new ObjectMapper();
-	            List<SalesPostFileDTO> fileDTOList = objectMapper.readValue(fileDTOListJson, new TypeReference<List<SalesPostFileDTO>>() {});
-
-	            adminService.insertSalesPost(allParams, fileDTOList);
-	            return ResponseEntity.ok("판매글이 성공적으로 등록되었습니다.");
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+	        List<SalesPostFileDTO> fileDTOList = new ArrayList<>();
+	        for (Map<String, Object> fileDTOMap : fileDTOListRaw) {
+	            SalesPostFileDTO fileDTO = new SalesPostFileDTO();
+	            fileDTO.setOriginalName(String.valueOf(fileDTOMap.get("originalName")));
+	            fileDTO.setFilePath(String.valueOf(fileDTOMap.get("filePath")));
+	            fileDTO.setFileType(String.valueOf(fileDTOMap.get("fileType")));
+	            fileDTO.setUploadDate(LocalDateTime.parse(String.valueOf(fileDTOMap.get("uploadDate"))));
+	            fileDTOList.add(fileDTO);
 	        }
+
+	        adminService.insertSalesPost(allParams, fileDTOList);
+	        return ResponseEntity.ok("판매글이 성공적으로 등록되었습니다.");
+	    } catch (Exception e) {
+	        e.printStackTrace(); // Print the stack trace to see the error
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("판매글 등록에 실패했습니다.");
 	    }
+	}
+
 }

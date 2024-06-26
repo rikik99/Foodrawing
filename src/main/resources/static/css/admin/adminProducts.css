@@ -258,7 +258,9 @@ button.editButton:hover {
     max-height: 100px;
     object-fit: cover;
 }
-
+.deleteAndAdd {
+	gap:10px;
+}
 /* Pagination styles */
 .pagination {
     display: flex;

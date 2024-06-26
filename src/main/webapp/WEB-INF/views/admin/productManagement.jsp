@@ -86,7 +86,7 @@
 					<span>조회된 상품 개수: <strong>${totalElements}</strong>개
 					</span>
 				</div>
-				<div>
+				<div class="deleteAndAdd">
 					<button id="deleteSelectedButton" class="danger" data-url="/admin/stockManagement">선택삭제</button>
 					<button id="addProduct" class="primary">상품등록</button>
 				</div>
@@ -145,7 +145,7 @@
 				<ul class="pagination">
 					<c:forEach begin="1" end="${pageCount}" var="i">
 						<li class="page-item ${currentPage + 1 == i ? 'active' : ''}">
-							<a class="page-link" data-page="${i - 1}" data-url="/admin/stockManagement"
+							<a class="page-link" data-page="${i - 1}" data-url="/admin/productManagement"
 							data-size="${size}">${i}</a>
 						</li>
 					</c:forEach>

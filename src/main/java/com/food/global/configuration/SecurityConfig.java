@@ -59,7 +59,7 @@ public class SecurityConfig {
     public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable()).securityMatcher("/admin/**")
             .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                .requestMatchers("/admin/login", "/admin/loginFail, /js/**").permitAll()
+                .requestMatchers("/admin/login", "/admin/loginFail").permitAll()
                 .anyRequest().hasAuthority("ROLE_ADMIN"))
             .formLogin(formLogin -> formLogin
                 .loginPage("/admin/login")

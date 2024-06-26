@@ -13,7 +13,7 @@ class UploadAdapter {
 
     _initRequest() {
         const xhr = this.xhr = new XMLHttpRequest();
-        xhr.open('POST', '/admin/uploadImage', true);
+        xhr.open('POST', 'http://localhost:9093/admin/uploadImage', true);
         xhr.responseType = 'json';
     }
 
@@ -31,10 +31,10 @@ class UploadAdapter {
             }
 
             const fileDTO = {
-                originalName: file.name,
-                filePath: response.url,
-                fileType: file.type,
-                uploadDate: new Date().toISOString()
+                originalName: response.originalName,
+                filePath: response.filePath,
+                fileType: response.fileType,
+                uploadDate: response.uploadDate
             };
 
             let fileDTOList = JSON.parse(localStorage.getItem('fileDTOList')) || [];
@@ -42,7 +42,7 @@ class UploadAdapter {
             localStorage.setItem('fileDTOList', JSON.stringify(fileDTOList));
 
             resolve({
-                default: response.url // 업로드된 파일 주소
+                default: response.filePath // 업로드된 파일 주소
             });
         });
     }

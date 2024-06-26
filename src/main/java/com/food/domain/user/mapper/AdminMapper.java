@@ -72,4 +72,8 @@ public interface AdminMapper {
 	void insertSalesPost(SalesPostDTO salesPost);
 
 	void insertSalesPostFile(SalesPostFileDTO fileDTO);
+
+	Long findAdminByUserId(Long userId);
+
+	void updateQuantity(Map<String, Object> allParams);
 }

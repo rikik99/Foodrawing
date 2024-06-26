@@ -1,10 +1,8 @@
 package com.food.domain.user.service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,6 +29,7 @@ import com.food.domain.sales.dto.SalesPostDTO;
 import com.food.domain.sales.dto.SalesPostFileDTO;
 import com.food.domain.user.dto.AdminDTO;
 import com.food.domain.user.mapper.AdminMapper;
+import com.food.global.auth.CustomUserDetails;
 import com.food.global.util.ProductFile;
 import com.food.global.util.SalesPostFile;
 
@@ -78,8 +79,8 @@ public class AdminService {
 	}
 
 	public Page<ProductDTO> findProductListWithSearch(Map<String, String> allParams) {
-		int page = Integer.parseInt((String) allParams.get("page"));
-		int size = Integer.parseInt((String) allParams.get("size"));
+		int page = Integer.parseInt(String.valueOf(allParams.get("page")));
+		int size = Integer.parseInt(String.valueOf(allParams.get("size")));
 		Pageable pageable = PageRequest.of(page, size);
 
 		List<ProductDTO> products = adminMapper.findProductListByKeyword(allParams);
@@ -207,10 +208,17 @@ public class AdminService {
 	            updatedQuantity = 0L;
 	        }
 	    }
-
+	    System.out.println("type = ?"+type);
 	    // 재고 업데이트
 	    allParams.put("updatedQuantity", updatedQuantity);
 	    adminMapper.updateStock(allParams);
+	    ProductDTO productDTO = adminMapper.findProductByProductNumber(productNumber);
+	    Long productQuantity = productDTO.getQuantity();
+	    if("OUT".equals(type)) {
+	    	productQuantity += quantity;
+	    	allParams.put("productQuantity", productQuantity);
+	    	adminMapper.updateQuantity(allParams);	    	
+	    }
 	    adminMapper.insertTransaction(allParams);
 	}
 
@@ -313,36 +321,43 @@ public class AdminService {
 	    }
 
 	    public SalesPostFileDTO uploadImage(MultipartFile file) throws Exception {
-	        List<SalesPostFileDTO> fileDTOList = salesPostFileUtil.parseFileInfos(null, new MultipartFile[]{file});
-	        System.out.println(fileDTOList.get(0));
-	        return fileDTOList.get(0);
+	        return salesPostFileUtil.parseFileInfos(null, new MultipartFile[]{file}).stream()
+	                .findFirst()
+	                .orElseThrow(() -> new Exception("File upload failed"));
 	    }
-
-	    public void insertSalesPost(Map<String, String> allParams, List<SalesPostFileDTO> fileDTOList) throws Exception {
-	        SalesPostDTO salesPost = new SalesPostDTO();
-	        String statusString = allParams.get("status");
-	        try {
-	            Long status = Long.parseLong(statusString);
-	            salesPost.setStatus(status);
-	        } catch (NumberFormatException e) {
-	            // 변환 실패 시의 처리 로직 (예: 기본값 설정 또는 예외 처리)
-	        	salesPost.setStatus(null); // 또는 적절한 기본값 설정
+	    @Transactional
+	    public void insertSalesPost(Map<String, Object> allParams, List<SalesPostFileDTO> fileDTOList) throws Exception {
+	        Long userId = null;
+	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+	            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+	            userId = userDetails.getId();
 	        }
-	        salesPost.setAdminId(Long.parseLong(allParams.get("adminId")));
-	        salesPost.setProductNumber(allParams.get("productNumber"));
-	        salesPost.setTitle(allParams.get("title"));
-	        salesPost.setDescription(allParams.get("description"));
-	        salesPost.setCreatedDate(LocalDateTime.now());
-	        salesPost.setLastPostDate(LocalDateTime.parse(allParams.get("lastPostDate")));
-	        salesPost.setUpdatedDate(LocalDateTime.now());
-	        salesPost.setStartPostDate(LocalDateTime.parse(allParams.get("startPostDate")));
+	        Long adminId = adminMapper.findAdminByUserId(userId);
 
-	        // 판매글 등록
+	        SalesPostDTO salesPost = new SalesPostDTO();
+	        salesPost.setAdminId(adminId);
+	        salesPost.setProductNumber((String) allParams.get("productNumber"));
+	        salesPost.setTitle((String) allParams.get("title"));
+	        salesPost.setDescription((String) allParams.get("description"));
+	        salesPost.setCreatedDate(LocalDateTime.now());
+	        salesPost.setLastPostDate(LocalDate.parse((String) allParams.get("lastPostDate"), DateTimeFormatter.ISO_DATE).atStartOfDay());
+	        salesPost.setUpdatedDate(LocalDateTime.now());
+	        salesPost.setStartPostDate(LocalDate.parse((String) allParams.get("startPostDate"), DateTimeFormatter.ISO_DATE).atStartOfDay());
+	        salesPost.setStatus(Long.parseLong((String) allParams.get("status")));
+
+	        // 판매글 저장
 	        adminMapper.insertSalesPost(salesPost);
 
-	        // 판매글 파일 정보 등록
+	        // 저장된 판매글의 ID 가져오기
+	        Long salesPostId = salesPost.getId();
+	        if (salesPostId == null) {
+	            throw new RuntimeException("Failed to retrieve generated sales post ID");
+	        }
+
+	        // 파일 정보 업데이트 및 저장
 	        for (SalesPostFileDTO fileDTO : fileDTOList) {
-	            fileDTO.setSalesPostId(salesPost.getId());
+	            fileDTO.setSalesPostId(salesPostId);
 	            adminMapper.insertSalesPostFile(fileDTO);
 	        }
 	    }

@@ -230,6 +230,13 @@
 		WHERE
 		PRODUCT_NUMBER = #{productNumber}
 	</update>
+	<update id="updateQuantity" parameterType="map">
+		UPDATE PRODUCT_TB
+		SET
+		QUANTITY = #{productQuantity}
+		WHERE
+		PRODUCT_NUMBER = #{productNumber}
+	</update>
 	<insert id="insertTransaction">
 		INSERT INTO STOCK_TRANSACTION_TB
 		(PRODUCT_NUMBER,
@@ -372,4 +379,21 @@
 	<select id="findProductByName" parameterType="String">
 	select * from PRODUCT_TB where name= #{name}
 	</select>
+	<select id="findAdminByUserId" parameterType="Long">
+	select ID
+	FROM ADMIN_TB
+	WHERE USER_ID = #{userId}
+	</select>
+
+<insert id="insertSalesPost" parameterType="com.food.domain.sales.dto.SalesPostDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
+    INSERT INTO SALES_POST_TB (ADMIN_ID, PRODUCT_NUMBER, TITLE, DESCRIPTION, CREATED_DATE, LAST_POST_DATE, UPDATED_DATE, START_POST_DATE, STATUS)
+    VALUES (#{adminId}, #{productNumber}, #{title}, #{description}, #{createdDate}, #{lastPostDate}, #{updatedDate}, #{startPostDate}, #{status})
+</insert>
+
+<insert id="insertSalesPostFile" parameterType="com.food.domain.sales.dto.SalesPostFileDTO">
+    INSERT INTO SALES_POST_FILE_TB (SALES_POST_ID, ORIGINAL_NAME, FILE_PATH, FILE_TYPE, UPLOAD_DATE)
+    VALUES (#{salesPostId}, #{originalName}, #{filePath}, #{fileType}, #{uploadDate})
+</insert>
+
+	
 </mapper>

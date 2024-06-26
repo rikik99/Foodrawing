@@ -8,7 +8,15 @@
 .sidebar {
     flex-shrink: 0;
 }
-
+/* 버튼 스타일 */
+button, input[type="button"] {
+	padding: 10px 20px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: background-color 0.3s, box-shadow 0.3s;
+	font-size: 14px;
+}
 .main-content {
     flex-grow: 1;
     padding: 20px;
@@ -84,9 +92,8 @@
 }
 
 /* 버튼 스타일 */
-button.addBtn {
-    display: block;
-    width: 100%;
+button.salesAddBtn {
+	width: 15%;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -97,9 +104,42 @@ button.addBtn {
     transition: background-color 0.3s, box-shadow 0.3s;
     margin-top: 20px;
 }
-
+.submitTd {
+	text-align: center;
+}
 button.primary:hover {
     background-color: #0056b3;
+}
+/* 라디오 버튼 가로 정렬 */
+#radio-group {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+}
+
+#radio-group label {
+    margin-right: 15px;
+}
+
+body.light-mode button.primary, body.light-mode input[type="button"].primary
+	{
+	background-color: #007bff;
+	color: white;
+}
+
+body.light-mode button.primary:hover, body.light-mode input[type="button"].primary:hover
+	{
+	background-color: #0056b3;
+}
+body.dark-mode button.primary, body.dark-mode input[type="button"].primary
+	{
+	background-color: #375a7f;
+	color: white;
+}
+
+body.dark-mode button.primary:hover, body.dark-mode input[type="button"].primary:hover
+	{
+	background-color: #2a3e5c;
 }
 
 /* 반응형 스타일 */
