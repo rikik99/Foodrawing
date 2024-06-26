@@ -2,6 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.food.domain.product.mapper.ProductMapper">
 
+<!-- 영양소테이블 , 상품정보 테이블 , 상품 파일 테이블 -->
+
   <select id="selectByCriteria" resultType="com.food.domain.product.dto.ProductNutritionDTO">
     SELECT *
     FROM PRODUCT_NUTRITION_TB

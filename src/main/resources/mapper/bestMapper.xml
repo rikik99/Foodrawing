@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.food.domain.product.mapper.BestMapper">
+
+  <select id="selectBestSellingProducts" resultType="com.food.domain.product.dto.BestDTO">
+    SELECT 
+        OD.ORDER_ID,
+        OD.SALES_POST_ID,
+        OD.UNIT_PRICE,
+        OD.DISCOUNT_PRICE,
+        OD.QUANTITY AS ORDER_QUANTITY,
+        SP.TITLE AS SALES_POST_TITLE,
+        SP.DESCRIPTION AS SALES_POST_DESCRIPTION,
+        SP.PRICE AS SALES_POST_PRICE,
+        SP.QUANTITY AS SALES_POST_QUANTITY,
+        P.PRODUCT_NUMBER,
+        P.NAME AS PRODUCT_NAME,
+        P.DESCRIPTION AS PRODUCT_DESCRIPTION,
+        P.PRICE AS PRODUCT_PRICE,
+        P.QUANTITY AS PRODUCT_QUANTITY,
+        PF.FILE_PATH,
+        PF.FILE_TYPE
+    FROM 
+        ORDER_DETAIL_TB OD
+    JOIN 
+        SALES_POST_TB SP ON OD.SALES_POST_ID = SP.ID
+    JOIN 
+        PRODUCT_TB P ON SP.PRODUCT_NUMBER = P.PRODUCT_NUMBER
+    JOIN
+        PRODUCT_FILE_TB PF ON P.PRODUCT_NUMBER = PF.PRODUCT_NUMBER
+    ORDER BY 
+        OD.QUANTITY DESC
+  </select>
+
+</mapper>

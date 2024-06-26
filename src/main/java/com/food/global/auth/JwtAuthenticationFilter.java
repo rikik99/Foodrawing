@@ -52,57 +52,67 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             token = (String) request.getSession().getAttribute("jwt");
         }
 
-        if (token != null) {
-            try {
-                if (jwtUtil.validateToken(token)) {
-                    String email = jwtUtil.extractUsername(token); // email을 추출
-                    
-                    String provider = (String) request.getSession().getAttribute("provider");
-                    UserDetails userDetails;
-                    if (provider == null) {
-                        userDetails = ((CustomUserDetailsService) userDetailsService).loadUserByUsername(email);
-                    } else {
-                        userDetails = ((CustomUserDetailsService) userDetailsService).loadUserByEmail(email);
-                    }
+        boolean newTokenIssued = false;
 
-                    if (jwtUtil.validateToken(token, userDetails)) {
-                        UsernamePasswordAuthenticationToken authentication = 
-                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                    }
+        try {
+            if (token != null && jwtUtil.validateToken(token)) {
+                String email = jwtUtil.extractUsername(token);
+                String provider = (String) request.getSession().getAttribute("provider");
+
+                UserDetails userDetails;
+                if (provider == null) {
+                    userDetails = ((CustomUserDetailsService) userDetailsService).loadUserByUsername(email);
+                } else {
+                    userDetails = ((CustomUserDetailsService) userDetailsService).loadUserByEmail(email);
                 }
-            } catch (ExpiredJwtException e) {
-                // JWT가 만료된 경우 리프레시 토큰을 검증하고, 유효한 경우 새로운 JWT 발급
-                if (refreshToken != null && jwtUtil.validateRefreshToken(refreshToken)) {
-                    String email = jwtUtil.extractUsername(refreshToken); // email을 추출
-                    String provider = (String) request.getSession().getAttribute("provider");
 
-                    UserDetails userDetails;
-                    if (provider == null) {
-                        userDetails = ((CustomUserDetailsService) userDetailsService).loadUserByUsername(email);
-                    } else {
-                        userDetails = ((CustomUserDetailsService) userDetailsService).loadUserByEmail(email);
-                    }
-
-                    if (jwtUtil.validateToken(refreshToken, userDetails)) {
-                        String newToken = jwtUtil.generateToken(email, false, provider, null); // provider 전달
-
-                        // 새로운 JWT를 쿠키에 추가
-                        Cookie newJwtCookie = new Cookie("jwt", newToken);
-                        newJwtCookie.setHttpOnly(true);
-                        newJwtCookie.setPath("/");
-                        response.addCookie(newJwtCookie);
-
-                        // 새로운 JWT를 세션에 추가
-                        request.getSession().setAttribute("jwt", newToken);
-
-                        // 새로운 JWT로 인증
-                        UsernamePasswordAuthenticationToken authentication = 
-                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                    }
+                if (jwtUtil.validateToken(token, userDetails)) {
+                    UsernamePasswordAuthenticationToken authentication = 
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
+        } catch (ExpiredJwtException e) {
+            // JWT가 만료된 경우 리프레시 토큰을 검증하고, 유효한 경우 새로운 JWT 발급
+            if (refreshToken != null && jwtUtil.validateRefreshToken(refreshToken)) {
+                String email = jwtUtil.extractUsername(refreshToken);
+                String provider = (String) request.getSession().getAttribute("provider");
+
+                UserDetails userDetails;
+                if (provider == null) {
+                    userDetails = ((CustomUserDetailsService) userDetailsService).loadUserByUsername(email);
+                } else {
+                    userDetails = ((CustomUserDetailsService) userDetailsService).loadUserByEmail(email);
+                }
+
+                if (jwtUtil.validateToken(refreshToken, userDetails)) {
+                    String newToken = jwtUtil.generateToken(email, false, provider, null);
+
+                    // 새로운 JWT를 쿠키에 추가
+                    Cookie newJwtCookie = new Cookie("jwt", newToken);
+                    newJwtCookie.setHttpOnly(true);
+                    newJwtCookie.setPath("/");
+                    newJwtCookie.setMaxAge(7 * 24 * 60 * 60); // 쿠키 유효 기간을 7일로 설정
+                    response.addCookie(newJwtCookie);
+
+                    // 새로운 JWT를 세션에 추가
+                    request.getSession().setAttribute("jwt", newToken);
+
+                    // 새로운 JWT로 인증
+                    UsernamePasswordAuthenticationToken authentication = 
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                    // 리다이렉트 루프 방지를 위해 플래그 설정
+                    newTokenIssued = true;
+                }
+            }
+        }
+
+        // 새로운 토큰이 발행된 경우 다시 원래 요청을 처리
+        if (newTokenIssued) {
+            response.sendRedirect(request.getRequestURI());
+            return;
         }
 
         chain.doFilter(request, response);
