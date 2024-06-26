@@ -8,15 +8,8 @@ public class BestDTO {
     private int orderQuantity;
     private String salesPostTitle;
     private String salesPostDescription;
-    private int salesPostPrice;
-    private int salesPostQuantity;
-    private String productNumber;
-    private String productName;
-    private String productDescription;
-    private int productPrice;
-    private int productQuantity;
     private String filePath;
-    private String fileType; 
+    private String fileType;
 
     // Getters and setters
     public int getOrderId() {
@@ -73,62 +66,6 @@ public class BestDTO {
 
     public void setSalesPostDescription(String salesPostDescription) {
         this.salesPostDescription = salesPostDescription;
-    }
-
-    public int getSalesPostPrice() {
-        return salesPostPrice;
-    }
-
-    public void setSalesPostPrice(int salesPostPrice) {
-        this.salesPostPrice = salesPostPrice;
-    }
-
-    public int getSalesPostQuantity() {
-        return salesPostQuantity;
-    }
-
-    public void setSalesPostQuantity(int salesPostQuantity) {
-        this.salesPostQuantity = salesPostQuantity;
-    }
-
-    public String getProductNumber() {
-        return productNumber;
-    }
-
-    public void setProductNumber(String productNumber) {
-        this.productNumber = productNumber;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
-
-    public String getProductDescription() {
-        return productDescription;
-    }
-
-    public void setProductDescription(String productDescription) {
-        this.productDescription = productDescription;
-    }
-
-    public int getProductPrice() {
-        return productPrice;
-    }
-
-    public void setProductPrice(int productPrice) {
-        this.productPrice = productPrice;
-    }
-
-    public int getProductQuantity() {
-        return productQuantity;
-    }
-
-    public void setProductQuantity(int productQuantity) {
-        this.productQuantity = productQuantity;
     }
 
     public String getFilePath() {
