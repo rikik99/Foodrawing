@@ -34,4 +34,6 @@ public interface UserMapper {
 
 	UserDTO findById(Long userId);
 
+	Long getIdByAdminName();
+
 }

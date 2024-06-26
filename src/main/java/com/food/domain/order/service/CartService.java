@@ -61,7 +61,7 @@ public class CartService {
         } else {
             CartDTO cart = CartDTO.builder()
                 .customerId(customer.getId())
-                .productNumber(product.getProductNumber())
+                .productNumber(cartRequest.getProductNumber())
                 .quantity((long) cartRequest.getQuantity())
                 .lastDate(LocalDateTime.now())
                 .build();
@@ -72,7 +72,7 @@ public class CartService {
     }
 
     public CartResponseDTO updateCartItem(CartRequestDTO cartRequest) {
-    	System.out.println("cartRequest = "+cartRequest);
+        System.out.println("cartRequest = " + cartRequest);
         Optional<CartDTO> cartOptional = cartMapper.findByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductNumber());
         if (cartOptional.isPresent()) {
             CartDTO cart = cartOptional.get();
@@ -86,13 +86,19 @@ public class CartService {
     }
 
     public void deleteCartItem(CartRequestDTO cartRequest) {
-        cartMapper.deleteByCustomerIdAndProductId(cartRequest.getCustomerId(), cartRequest.getProductNumber());
+        cartMapper.deleteByCustomerIdAndProductNumber(cartRequest.getCustomerId(), cartRequest.getProductNumber());
+    }
+
+    public void deleteSelectedItems(CartRequestDTO cartRequest) {
+        for (String productNumber : cartRequest.getProductNumbers()) {
+            cartMapper.deleteByCustomerIdAndProductNumber(cartRequest.getCustomerId(), productNumber);
+        }
     }
 
     public void checkoutSelectedItems(CartRequestDTO cartRequest) {
         // 선택된 아이템을 주문 처리하는 로직 구현
-        for (Long productId : cartRequest.getProductIds()) {
-            cartMapper.deleteByCustomerIdAndProductId(cartRequest.getCustomerId(), productId);
+        for (String productNumber : cartRequest.getProductNumbers()) {
+            cartMapper.deleteByCustomerIdAndProductNumber(cartRequest.getCustomerId(), productNumber);
         }
     }
 }

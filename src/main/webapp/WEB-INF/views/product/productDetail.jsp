@@ -591,7 +591,7 @@
             <div class="product-section">
                 <div class="left-column">
                     <div class="big" id="bigImageContainer">
-                        <img id="bigImage" src="images/20240517_CaTchWorkFavicon.png" alt="bigimage">
+                        <img id="bigImage" src="${productFileInfo.filePath}" alt="bigimage">
                     </div>
                     <div class="mini">
                         <span data-image="images/20240517_CaTchWorkFavicon.png"><img src="images/20240517_CaTchWorkFavicon.png" alt="1"></span>
@@ -602,12 +602,12 @@
                     </div>
                 </div>
                 <div class="right-column">
-                    <input type="hidden" id="product_number" name="productNumber" value="${productinfo.productNumber}">
-                    <h1>${productinfo.name} 1.05kg</h1>
+                		<input type="hidden" id="product_number" name="productNumber" value="${productInfo.productNumber}">
+                    <h1>${productInfo.name} 1.05kg</h1>
                     <div class="product-info" style="text-align: left;">
-                        <input type="hidden" id="productprice" name="productprice" class="productprice" value="${productinfo.price}">
-                        <p class="original-price"><fmt:formatNumber type="number" value="${productinfo.price}" />원</p>
-                        <p class="price"><fmt:formatNumber type="number" value="${productinfo.price}" />원</p>
+                    		<input type="hidden" id="productprice" name="productprice" class="productprice" value="${productInfo.price}">
+                        <p class="original-price"><fmt:formatNumber type="number" value="${productInfo.price}" />원</p>
+                        <p class="price"><fmt:formatNumber type="number" value="${productInfo.price}" />원</p>
                         <p>원산지 : 하단 상품정보 참고</p>
                         <div class="rating">⭐ 4.9 (9,999)</div>
                     </div>
@@ -619,9 +619,9 @@
                                 <input type="text" class="quantity" value="1" readonly>
                                 <button class="increment">+</button>
                             </div>
-                            <div class="item-price"><fmt:formatNumber type="number" value="${productinfo.price}" />원</div>
+                            <div class="item-price"><fmt:formatNumber type="number" value="${productInfo.price}" />원</div>
                         </div>
-                        <div class="cart-total">합계 <span class="total-price"><fmt:formatNumber type="number" value="${productinfo.price}" />원</span></div>
+                        <div class="cart-total">합계 <span class="total-price"><fmt:formatNumber type="number" value="${productInfo.price}" />원</span></div>
                     </div>
                     <div class="purchase-buttons">
                         <button class="cart-button">장바구니담기</button>
@@ -879,14 +879,14 @@
                 <div class="detail-cart-wrap sticky-sidebar">
                     <div class="cart-item">
                         <div class="item-info">비비고 왕교자 1.05kg</div>
-                        <div class="item-price"><fmt:formatNumber type="number" value="${productinfo.price}" />원</div>
+                        <div class="item-price"><fmt:formatNumber type="number" value="${productInfo.price}" />원</div>
                         <div class="item-quantity">
                             <button class="decrement">-</button>
                             <input type="text" class="quantity" value="1" readonly>
                             <button class="increment">+</button>
                         </div>
                     </div>
-                    <div class="cart-total">합계 <span class="total-price"><fmt:formatNumber type="number" value="${productinfo.price}" />원</span></div>
+                    <div class="cart-total">합계 <span class="total-price"><fmt:formatNumber type="number" value="${productInfo.price}" />원</span></div>
                     <div class="purchase-buttons">
                         <button class="cart-button">장바구니담기</button>
                         <button class="buy-button">바로구매</button>
