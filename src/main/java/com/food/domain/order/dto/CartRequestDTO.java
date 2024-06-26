@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class CartRequestDTO {
     private Long customerId;
-    private String productNumber;
+    private String productNumber; // 단일 제품의 경우 사용
     private int quantity;
-    private List<Long> productIds; // 선택된 항목 결제 시 필요한 필드
+    private List<String> productNumbers; // 선택된 여러 항목의 경우 사용
 }

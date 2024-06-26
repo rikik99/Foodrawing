@@ -75,5 +75,9 @@
 	<select id="findById" parameterType="Long">
 		select * from user_tb where id = ${userId}
 	</select>
+	
+	<select id="getIdByAdminName">
+		SELECT ID FROM USER_TB WHERE USERNAME = 'admin'
+	</select>
 
 </mapper>
