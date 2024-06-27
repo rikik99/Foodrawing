@@ -18,4 +18,6 @@ public class StockTransactionDTO {
     private Long quantity;
     private LocalDateTime transactionDate;
     private LocalDateTime expirationDate;
+    private ProductFileDTO productFileDTO;
+    private ProductDTO productDTO;
 }
