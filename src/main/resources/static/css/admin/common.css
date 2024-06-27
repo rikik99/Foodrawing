@@ -25,6 +25,14 @@ body.dark-mode {
 	height: 100vh;
 }
 
+.dropdown {
+	cursor: pointer;
+}
+
+.dropdown-menu li {
+	cursor: pointer;
+}
+
 .sidebar {
 	width: 200px;
 	background-color: #081028;
@@ -173,6 +181,11 @@ button#toggleMode:hover {
 .logout-btn.dark-mode {
 	background-color: #081028;
 	color: white;
+}
+
+.insertSalsePostForm.light-mode {
+	background-color: #ffffff;
+	color: #212529;
 }
 
 .logout-btn.dark-mode:hover {

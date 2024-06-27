@@ -41,7 +41,6 @@
                 </div>
             </div>
         </form>
-
         <div class="login-social">
             <a href="<c:url value='/oauth2/authorization/kakao' />" class="social-btn kakao">
                 <img src="<c:url value='/images/kakao_login_large_narrow.png' />" alt="카카오 로그인">
@@ -50,7 +49,6 @@
                 <img src="<c:url value='/images/btnG_완성형.png' />" alt="네이버 로그인">
             </a>
         </div>
-
         <div class="login-footer">
             <a href="<c:url value='/signupInfo' />" class="signup-btn">회원가입</a>
             <a href="<c:url value='/guestOrder' />" class="guest-order">비회원 주문배송 조회</a>

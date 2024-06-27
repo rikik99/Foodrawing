@@ -239,7 +239,7 @@ figure.snip1477.hover figcaption {
         <span class="letter">Custom Nutrient<br><small style="font-size:17px;">원하는 영양소를 직접 골라보세요</small></span>
     </h2>
 
-    <figure class="snip1477 food-button" data-category="21">
+    <figure class="snip1477 food-button" data-category="11">
         <img src="/images/balance.jpg" alt="sample38" />
         <div class="title">
             <div>
@@ -253,7 +253,7 @@ figure.snip1477.hover figcaption {
         <a href="javascript:void(0);"></a>
     </figure>
 
-     <figure class="snip1477 food-button" data-category="22" style="margin-top:200px;">
+     <figure class="snip1477 food-button" data-category="12" style="margin-top:200px;">
         <img src="/images/protien.jpg" alt="img" />
         <div class="title">
             <div>
@@ -267,7 +267,7 @@ figure.snip1477.hover figcaption {
         <a href="javascript:void(0);"></a>
     </figure>
 
-    <figure class="snip1477 food-button" data-category="23">
+    <figure class="snip1477 food-button" data-category="13">
         <img src="/images/diet.jpeg" alt="sample38" />
         <div class="title">
             <div>
@@ -281,7 +281,7 @@ figure.snip1477.hover figcaption {
         <a href="javascript:void(0);"></a>
     </figure>
 
-    <figure class="snip1477 food-button" data-category="24" style="margin-top:200px;">
+    <figure class="snip1477 food-button" data-category="22" style="margin-top:200px;">
         <img src="/images/Na.jpg" alt="sample38" />
         <div class="title">
             <div>
