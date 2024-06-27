@@ -117,5 +117,56 @@
             sp.ID
         ORDER BY p.PRODUCT_NUMBER
     </select>
+    
+    <select id="findItem">
+    	SELECT 
+			    p.PRODUCT_NUMBER AS productNumber,
+			    p.NAME AS name,
+			    p.DESCRIPTION AS description,
+			    p.PRICE,
+			    pf.ORIGINAL_NAME AS originalName,
+			    pf.FILE_PATH AS filePath,
+			    pf.FILE_TYPE AS fileType,
+			    d.NAME AS discountName,
+			    d.TYPE AS discountType,
+			    d.DISCOUNT_VALUE AS discountValue,
+			    d.MAX_DISCOUNT AS maxDiscount,
+			    sp.ID AS salesPostId
+			FROM 
+			    PRODUCT_TB p
+			    LEFT JOIN (
+			        SELECT 
+			            pf1.PRODUCT_NUMBER,
+			            pf1.ORIGINAL_NAME,
+			            pf1.FILE_PATH,
+			            pf1.FILE_TYPE
+			        FROM PRODUCT_FILE_TB pf1
+			        INNER JOIN (
+			            SELECT 
+			                PRODUCT_NUMBER,
+			                MIN(UPLOAD_DATE) AS earliest_date
+			            FROM PRODUCT_FILE_TB
+			            GROUP BY PRODUCT_NUMBER
+			        ) pf2 ON pf1.PRODUCT_NUMBER = pf2.PRODUCT_NUMBER AND pf1.UPLOAD_DATE = pf2.earliest_date
+			    ) pf ON p.PRODUCT_NUMBER = pf.PRODUCT_NUMBER
+			    LEFT JOIN DISCOUNT_TARGET_TB dt ON p.PRODUCT_NUMBER = dt.TARGET_ID AND dt.TARGET_TYPE = 'product'
+			    LEFT JOIN DISCOUNT_TB d ON dt.DISCOUNT_ID = d.ID
+			    LEFT JOIN SALES_POST_TB sp ON p.PRODUCT_NUMBER = sp.PRODUCT_NUMBER
+			WHERE 
+			    p.PRODUCT_NUMBER = #{productNumber}
+			GROUP BY 
+			    p.PRODUCT_NUMBER,
+			    p.NAME,
+			    p.DESCRIPTION,
+			    p.PRICE,
+			    pf.ORIGINAL_NAME,
+			    pf.FILE_PATH,
+			    pf.FILE_TYPE,
+			    d.NAME,
+			    d.TYPE,
+			    d.DISCOUNT_VALUE,
+			    d.MAX_DISCOUNT,
+			    sp.ID
+    </select>
 
 </mapper>

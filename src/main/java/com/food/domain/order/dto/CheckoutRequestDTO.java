@@ -7,5 +7,5 @@ import lombok.Data;
 @Data
 public class CheckoutRequestDTO {
     private Long customerId;
-    private List<String> productIds;
+    private List<String> productNumbers;
 }

@@ -28,4 +28,8 @@ public class OrderService {
     public List<CartInfoDTO> getAllItems(Long customerId) {
         return orderMapper.findAllItemsByCustomerId(customerId);
     }
+
+	public List<CartInfoDTO> getProduct(String productNumber, int quantity) {
+		return orderMapper.findItem(productNumber);
+	}
 }

@@ -105,7 +105,7 @@ public class SecurityConfig {
 						"/findPassword", "/sendPasswordResetCode", "/verify-password-code", "/passwordReset", "/best",
 						"/ProductDetail", "/cart/checkStock", "/cart/addToCart", "/cart", "/cart/deleteCartItem",
 						"/order/prepareCheckout", "/checkoutPage", "/order/prepareCheckoutAll", "/cart/updateCartItem",
-						"/cart/deleteSelectedItems", "/payment/result", "/payment/restoreStock").permitAll()
+						"/cart/deleteSelectedItems", "/payment/result", "/payment/restoreStock", "/buy/checkoutPage").permitAll()
 						.anyRequest().authenticated())
 				.formLogin(formLogin -> formLogin.loginPage("/login").defaultSuccessUrl("/", true)
 						.successHandler(customAuthenticationSuccessHandler)
