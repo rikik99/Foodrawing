@@ -10,10 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDetailRequest {
-    private Long id;
+    private Long productNumber;
     private Long orderId;
     private String salesPostId;
     private BigDecimal unitPrice;
     private BigDecimal discountPrice;
+    private BigDecimal finalPrice;
     private int quantity;
 }

@@ -2,32 +2,85 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.food.domain.order.mapper.PaymentMapper">
-
-    <insert id="insertOrder">
-        INSERT INTO ORDER_TB (ID, IDENTIFIER_ID, IDENTIFIER_TYPE, ORDER_DATE, TOTAL_AMOUNT, ORDER_NUMBER) 
-        VALUES (#{id}, #{identifierId}, #{identifierType}, #{orderDate}, #{totalAmount}, #{orderNumber})
-    </insert>
+		<!-- 수정하기 -->
+		<!-- INSERT INTO ORDER_TB (IDENTIFIER_ID, IDENTIFIER_TYPE, ORDER_DATE, TOTAL_AMOUNT, ORDER_NUMBER) 
+        VALUES (#{order.identifierId}, #{order.identifierType}, #{order.orderDate}, #{order.totalAmount}, #{order.orderNumber}) -->
+    <update id="updateOrder">
+        UPDATE ORDER_TB
+				SET 
+				    IDENTIFIER_ID = #{identifierId}, 
+				    IDENTIFIER_TYPE = #{identifierType}, 
+				    ORDER_DATE = #{orderDate}, 
+				    TOTAL_AMOUNT = #{totalAmount}, 
+				    ORDER_NUMBER = #{orderNumber},
+				    PAYMENT_ID = #{paymentId}, 
+				    PAYMENT_TYPE = #{paymentType}
+				WHERE 
+				    ORDER_NUMBER = #{orderNumber}
+    </update>
 
     <insert id="insertOrderDetail">
-        INSERT INTO ORDER_DETAIL_TB (ID, ORDER_ID, SALES_POST_ID, UNIT_PRICE, DISCOUNT_PRICE, QUANTITY) 
-        VALUES (#{id}, #{orderId}, #{salesPostId}, #{unitPrice}, #{discountPrice}, #{quantity})
+        INSERT INTO ORDER_DETAIL_TB (ORDER_ID, SALES_POST_ID, UNIT_PRICE, DISCOUNT_PRICE, QUANTITY) 
+        VALUES (#{orderId}, #{salesPostId}, #{unitPrice}, #{discountPrice}, #{quantity})
+    </insert>
+    
+    <insert id="insertNoDiscountOrderDetail">
+        INSERT INTO ORDER_DETAIL_TB (ORDER_ID, SALES_POST_ID, UNIT_PRICE, QUANTITY) 
+        VALUES (#{orderId}, #{salesPostId}, #{unitPrice}, #{quantity})
     </insert>
 
     <insert id="insertOrderStatus">
-        INSERT INTO ORDER_STATUS_TB (ID, ORDER_ID, ORDER_STATUS, DESCRIPTION, CREATED_DATE, UPDATED_DATE) 
-        VALUES (#{id}, #{orderId}, #{orderStatus}, #{description}, #{createdDate}, #{updatedDate})
+        INSERT INTO ORDER_STATUS_TB (ORDER_ID, ORDER_STATUS) 
+        VALUES (#{orderId}, #{orderStatus})
     </insert>
 
     <update id="updateProductQuantity">
         UPDATE PRODUCT_TB 
         SET QUANTITY = QUANTITY - #{quantity} 
-        WHERE PRODUCT_NUMBER = #{salesPostId}
+        WHERE PRODUCT_NUMBER = #{productNumber}
     </update>
+    
+    <delete id="deleteCartItem">
+        DELETE FROM CART_TB 
+        WHERE CUSTOMER_ID = #{identifierId} 
+          AND PRODUCT_NUMBER = #{productNumber}
+    </delete>
 
     <select id="existsOrderNumber" resultType="boolean">
-        SELECT COUNT(*) > 0 
+        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
         FROM ORDER_TB 
         WHERE ORDER_NUMBER = #{orderNumber}
     </select>
+    
+    <select id="getOrderId">
+        SELECT ID FROM ORDER_TB WHERE ORDER_NUMBER = #{orderNumber}
+    </select>
+    
+    <insert id="insertDelivery">
+    	INSERT INTO DELIVERY_TB (ORDER_ID, DELIVERY_STATUS, RECIPIENT_NAME, RECIPIENT_PHONE, RECIPIENT_ADDRESS, 
+    													 RECIPIENT_ADDRESS_DETAIL, RECIPIENT_ZIPCODE, DELIVERY_COMMENT)
+    	VALUES (#{orderId}, #{deliveryStatus}, #{recipientName}, #{recipientPhone}, #{recipientAddress}, 
+    				  #{recipientAddressDetail}, #{recipientZipcode}, #{deliveryComment})
+    </insert>
+    
+    
+    <select id="getProductNumberBySalesPostId">
+    	SELECT PRODUCT_NUMBER FROM sales_post_tb WHERE ID = #{arg0}
+    </select>
+    
+    <insert id="insertOrder">
+    	INSERT INTO ORDER_TB (IDENTIFIER_ID, IDENTIFIER_TYPE, ORDER_DATE, TOTAL_AMOUNT, ORDER_NUMBER) 
+        VALUES (#{adminId}, 'admin', sysdate, 0, #{orderNumber})
+    </insert>
+    
+    <update id="increaseStock">
+        UPDATE PRODUCT_TB
+        SET QUANTITY = QUANTITY + #{quantity}
+        WHERE PRODUCT_NUMBER = #{productNumber}
+    </update>
+    
+    <delete id="deleteOrder">
+    	DELETE FROM ORDER_TB WHERE ORDER_NUMBER = #{orderNumber}
+    </delete>
 
 </mapper>

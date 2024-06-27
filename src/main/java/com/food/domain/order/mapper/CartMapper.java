@@ -19,13 +19,11 @@ public interface CartMapper {
 
 	List<CartInfoDTO> getCartListByCustomerId(Long id);
 
-	void deleteByCustomerIdAndProductId(Long customerId, String productId);
-
-	void deleteByCustomerIdAndProductId(Long customerId, Long productId);
+	void deleteByCustomerIdAndProductNumber(Long customerId, String productNumber);
 
 	void deleteAllByCustomerId(Long customerId);
 
-	List<CartDTO> findItemsByIds(List<String> productIds);
+	List<CartDTO> findItemsByIds(List<String> productNumber);
 
 	List<CartDTO> findAllItemsByCustomerId(Long customerId);
 }
