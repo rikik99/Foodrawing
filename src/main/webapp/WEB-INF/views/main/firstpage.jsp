@@ -1,11 +1,8 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-   pageEncoding="UTF-8"%>
-   <!DOCTYPE html>
-
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
 <html>
 <head>
- <title>Foodrawing</title>
-</head>
+    <title>Foodrawing</title>
 <style>
 /* 배경 스타일 */
 @property --hue {
@@ -226,78 +223,76 @@ figure.snip1477.hover figcaption {
 }
 
 </style>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-// --버튼효과
-$(".hover").mouseleave(
-  function () {
-    $(this).removeClass("hover");
-  }
-);
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $(".food-button").click(function() {
+                const category = $(this).data("category");
+                console.log(category);
+                window.location.href = "/mainpage?category=" + category;
+            });
+        });
+    </script>
+</head>
+<body>
+    <h2 class="title content" style="position:absolute; bottom:650px; left:100px;">
+        <span class="letter">Custom Nutrient<br><small style="font-size:17px;">원하는 영양소를 직접 골라보세요</small></span>
+    </h2>
 
+    <figure class="snip1477 food-button" data-category="11">
+        <img src="/images/balance.jpg" alt="sample38" />
+        <div class="title">
+            <div>
+                <h2>균형잡힌 식단</h2>
+                <h4 style="border-radius:15px;">Balanced</h4>
+            </div>
+        </div>
+        <figcaption>
+            <p>다양한 영양소가 조화롭게 구성된 균형잡힌 식단은 건강한 삶을 위한 필수적인 요소입니다.</p>
+        </figcaption>
+        <a href="javascript:void(0);"></a>
+    </figure>
 
-</script>
-<!-- <h1 style="position:absolute; bottom:650px;">어떤 식단을 찾으시나요?</h1> -->
+     <figure class="snip1477 food-button" data-category="12" style="margin-top:200px;">
+        <img src="/images/protien.jpg" alt="img" />
+        <div class="title">
+            <div>
+                <h2>단백질 위주 식단</h2>
+                <h4 style="border-radius:15px;">Protein-based</h4>
+            </div>
+        </div>
+        <figcaption>
+            <p>단백질은 우리 몸을 구성하는 핵심 성분으로, 근육 합성, 면역 기능 강화, 체중 관리 등에 필수적입니다.</p>
+        </figcaption>
+        <a href="javascript:void(0);"></a>
+    </figure>
 
-<h2 class="title content" style="position:absolute; bottom:650px; left:100px; "><span class="letter">Custom Nutrient<br><small style="font-size:17px;">원하는 영양소를 직접 골라보세요</small></span></h2>
- 
-<figure class="snip1477" >
-  <img src="/images/balance.jpg" alt="이미지" />
-  <div class="title">
-    <div>
-      <h2>균형잡힌 식단</h2>
-      <h4 style="border-radius:15px;">Balanced</h4>
-    </div>
-  </div>
-  <figcaption>
-    <p>다양한 영양소가 조화롭게 구성된 균형잡힌 식단은 건강한 삶을 위한 필수적인 요소입니다. 단백질, 탄수화물, 지방, 비타민, 무기질 등 각 영양소가 적절히 포함된 식단은 우리 몸의 원활한 기능 유지와 질병 예방에 도움을 줍니다. 균형잡힌 식단을 통해 에너지 공급, 면역력 강화, 체중 관리 등의 혜택을 누릴 수 있습니다.</p>
-  </figcaption>
-  <a href="/main/mainpage"></a>
-</figure>
+    <figure class="snip1477 food-button" data-category="13">
+        <img src="/images/diet.jpeg" alt="sample38" />
+        <div class="title">
+            <div>
+                <h2>다이어트 식단</h2>
+                <h4 style="border-radius:15px;">Diet menu</h4>
+            </div>
+        </div>
+        <figcaption>
+            <p>건강한 체중 관리를 위한 다이어트 식단은 영양 균형을 유지하면서도 에너지 섭취를 줄이는 것이 핵심입니다.</p>
+        </figcaption>
+        <a href="javascript:void(0);"></a>
+    </figure>
 
-<figure class="snip1477" style="margin-top:200px;">
-  <img src="/images/protien.jpg" alt="sample38" />
-  <div class="title">
-    <div>
-      <h2>단백질 위주 식단</h2>
-      <h4 style="border-radius:15px;">Protein-based</h4>
-    </div>
-  </div>
-  <figcaption>
-    <p>단백질은 우리 몸을 구성하는 핵심 성분으로, 근육 합성, 면역 기능 강화, 체중 관리 등에 필수적입니다.</p>
-  </figcaption>
-  <a href="/main/mainpage"></a>
-</figure>
-
-
-
-<figure class="snip1477">
-  <img src="/images/diet.jpeg" alt="sample38" />
-  <div class="title">
-    <div>
-      <h2>다이어트 식단</h2>
-      <h4 style="border-radius:15px;">Diet menu</h4>
-    </div>
-  </div>
-  <figcaption>
-    <p>건강한 체중 관리를 위한 다이어트 식단은 영양 균형을 유지하면서도 에너지 섭취를 줄이는 것이 핵심입니다. 신선한 채소, 과일, 단백질 식품 등을 중심으로 구성된 다이어트 식단은 포만감을 높이고 불필요한 칼로리 섭취를 억제합니다.</p>
-  </figcaption>
-  <a href="/main/mainpage"></a>
-</figure>
-
-<figure class="snip1477" style="margin-top:200px;">
-  <img src="/images/Na.jpg" alt="sample38" />
-  <div class="title">
-    <div>
-      <h2>저염 식단</h2>
-      <h4 style="border-radius:15px;">Low salt</h4>
-    </div>
-  </div>
-  <figcaption>
-    <p>과도한 나트륨 섭취는 고혈압, 심혈관 질환 등 다양한 건강 문제를 야기할 수 있습니다. 저염식단은 가공식품 대신 신선한 식재료를 사용하고, 소금 대신 다양한 향신료로 맛을 내는 것이 특징입니다.</p>
-  </figcaption>
-  <a href="/main/mainpage"></a>
-</figure>
+    <figure class="snip1477 food-button" data-category="22" style="margin-top:200px;">
+        <img src="/images/Na.jpg" alt="sample38" />
+        <div class="title">
+            <div>
+                <h2>저염 식단</h4>
+                <h4 style="border-radius:15px;">Low salt</h4>
+            </div>
+        </div>
+        <figcaption>
+            <p>과도한 나트륨 섭취는 고혈압, 심혈관 질환 등 다양한 건강 문제를 야기할 수 있습니다.</p>
+        </figcaption>
+        <a href="javascript:void(0);"></a>
+    </figure>
 </body>
 </html>
-

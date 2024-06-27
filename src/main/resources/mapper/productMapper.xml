@@ -2,6 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.food.domain.product.mapper.ProductMapper">
 
+<!-- 영양소테이블 , 상품정보 테이블 , 상품 파일 테이블 -->
+
   <select id="selectByCriteria" resultType="com.food.domain.product.dto.ProductNutritionDTO">
     SELECT *
     FROM PRODUCT_NUTRITION_TB
@@ -47,6 +49,12 @@
 	
 	<select id="findById" resultType="com.food.domain.product.dto.ProductDTO">
         SELECT * FROM PRODUCT_TB WHERE PRODUCT_NUMBER = #{productNumber}
+    </select>
+    
+    <select id="getProductFileByProductNumber">
+    	SELECT ID, PRODUCT_NUMBER, ORIGINAL_NAME, FILE_PATH, FILE_TYPE, UPLOAD_DATE
+    	FROM PRODUCT_FILE_TB
+    	WHERE PRODUCT_NUMBER = #{productNumber}
     </select>
 
 </mapper>

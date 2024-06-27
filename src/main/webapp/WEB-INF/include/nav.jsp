@@ -23,7 +23,7 @@
                 </div>
                 <ul class="navbar-nav menuitems justify-content-center">
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="#">베스트</a>
+                        <a class="nav-link" aria-current="page" href="/bestpage">베스트</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">할인</a>

@@ -13,6 +13,7 @@ import com.food.domain.product.mapper.ProductMapper;
 
 @Service
 public class ProductService {
+
     @Autowired
     private ProductMapper productMapper;
 
@@ -20,29 +21,26 @@ public class ProductService {
         return productMapper.selectByCriteria(productNutrition);
     }
 
-	public List<ProductDTO> getProductName(List<ProductNutritionDTO> results) {
-		List<ProductDTO> products = new ArrayList<>();
-		
-		for(int i = 0; i < results.size(); i++) {
-			ProductDTO product = productMapper.selectByResults(results.get(i));
-			products.add(product);
-		}
-		
-		return products;
-	}
+    public List<ProductDTO> getProductName(List<ProductNutritionDTO> results) {
+        List<ProductDTO> products = new ArrayList<>();
+        for (ProductNutritionDTO result : results) {
+            ProductDTO product = productMapper.selectByResults(result);
+            products.add(product);
+        }
+        return products;
+    }
 
-	public List<ProductFileDTO> getProductFile(List<ProductNutritionDTO> results) {
-		List<ProductFileDTO> files = new ArrayList<>();
-		for(int i = 0; i < results.size(); i++) {
-			String productNumber = results.get(i).getProductNumber();
-			ProductFileDTO file = productMapper.fileByResults(productNumber);
-			 if (file != null) {
-		            files.add(file);
-		        }
-		}
-		
-		return files;
-	}
+    public List<ProductFileDTO> getProductFile(List<ProductNutritionDTO> results) {
+        List<ProductFileDTO> files = new ArrayList<>();
+        for (ProductNutritionDTO result : results) {
+            String productNumber = result.getProductNumber();
+            ProductFileDTO file = productMapper.fileByResults(productNumber);
+            if (file != null) {
+                files.add(file);
+            }
+        }
+        return files;
+    }
 
     public ProductDTO findById(String productNumber) {
         return productMapper.findById(productNumber);

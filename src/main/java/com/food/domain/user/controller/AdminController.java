@@ -33,7 +33,6 @@ import com.food.domain.sales.dto.SalesPostDTO;
 import com.food.domain.sales.dto.SalesPostFileDTO;
 import com.food.domain.support.dto.InquiriesDTO;
 import com.food.domain.user.service.AdminService;
-import com.food.global.util.SalesPostFile;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -264,7 +263,7 @@ public class AdminController {
 		ModelAndView mv = new ModelAndView();
 		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
 		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
-		
+
 		// 페이지 정보와 사이즈 정보를 allParams에 추가
 		allParams.put("page", String.valueOf(page));
 		allParams.put("size", String.valueOf(size));
@@ -273,7 +272,7 @@ public class AdminController {
 		// 검색 조건이 있는지 확인
 		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
 				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
-		
+
 		if (hasSearchParams) {
 			// 검색 조건이 있을 경우
 			inquiries = adminService.findInquiriesWithSearch(pageable, allParams);
@@ -395,31 +394,32 @@ public class AdminController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 		}
 	}
+
 	@PostMapping("/insertSalesPost")
 	@ResponseBody
 	public ResponseEntity<?> registerSalesPost(@RequestBody Map<String, Object> allParams) {
-	    try {
-	        List<Map<String, Object>> fileDTOListRaw = (List<Map<String, Object>>) allParams.get("fileDTOList");
-	        if (fileDTOListRaw == null) {
-	            throw new IllegalArgumentException("fileDTOList is missing in request");
-	        }
+		try {
+			List<Map<String, Object>> fileDTOListRaw = (List<Map<String, Object>>) allParams.get("fileDTOList");
+			if (fileDTOListRaw == null) {
+				throw new IllegalArgumentException("fileDTOList is missing in request");
+			}
 
-	        List<SalesPostFileDTO> fileDTOList = new ArrayList<>();
-	        for (Map<String, Object> fileDTOMap : fileDTOListRaw) {
-	            SalesPostFileDTO fileDTO = new SalesPostFileDTO();
-	            fileDTO.setOriginalName(String.valueOf(fileDTOMap.get("originalName")));
-	            fileDTO.setFilePath(String.valueOf(fileDTOMap.get("filePath")));
-	            fileDTO.setFileType(String.valueOf(fileDTOMap.get("fileType")));
-	            fileDTO.setUploadDate(LocalDateTime.parse(String.valueOf(fileDTOMap.get("uploadDate"))));
-	            fileDTOList.add(fileDTO);
-	        }
+			List<SalesPostFileDTO> fileDTOList = new ArrayList<>();
+			for (Map<String, Object> fileDTOMap : fileDTOListRaw) {
+				SalesPostFileDTO fileDTO = new SalesPostFileDTO();
+				fileDTO.setOriginalName(String.valueOf(fileDTOMap.get("originalName")));
+				fileDTO.setFilePath(String.valueOf(fileDTOMap.get("filePath")));
+				fileDTO.setFileType(String.valueOf(fileDTOMap.get("fileType")));
+				fileDTO.setUploadDate(LocalDateTime.parse(String.valueOf(fileDTOMap.get("uploadDate"))));
+				fileDTOList.add(fileDTO);
+			}
 
-	        adminService.insertSalesPost(allParams, fileDTOList);
-	        return ResponseEntity.ok("판매글이 성공적으로 등록되었습니다.");
-	    } catch (Exception e) {
-	        e.printStackTrace(); // Print the stack trace to see the error
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("판매글 등록에 실패했습니다.");
-	    }
+			adminService.insertSalesPost(allParams, fileDTOList);
+			return ResponseEntity.ok("판매글이 성공적으로 등록되었습니다.");
+		} catch (Exception e) {
+			e.printStackTrace(); // Print the stack trace to see the error
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("판매글 등록에 실패했습니다.");
+		}
 	}
 
 }

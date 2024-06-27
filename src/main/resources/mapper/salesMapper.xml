@@ -1,5 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.food.user.mapper.SalesMapper">
+<mapper namespace="com.food.domain.sales.mapper.SalesMapper">
+	<select id="getIdBySalesPostId">
+		SELECT ID FROM SALES_POST_TB WHERE PRODUCT_NUMBER = #{productNumber}
+	</select>
+	
+	<select id="getIdByProductNumber">
+		SELECT PRODUCT_NUMBER FROM SALES_POST_TB WHERE ID = #{id}
+	</select>
 
+	<select id="getSalesById">
+		SELECT 
+		    sp.ID AS SALES_POST_ID,
+		    sp.ADMIN_ID,
+		    sp.PRODUCT_NUMBER,
+		    sp.TITLE,
+		    sp.DESCRIPTION,
+		    sp.CREATED_DATE,
+		    sp.LAST_POST_DATE,
+		    sp.UPDATED_DATE,
+		    sp.START_POST_DATE,
+		    sp.STATUS,
+		    spf.ID AS FILE_ID,
+		    spf.ORIGINAL_NAME,
+		    spf.FILE_PATH,
+		    spf.FILE_TYPE,
+		    spf.UPLOAD_DATE
+		FROM 
+		    SALES_POST_TB sp
+		LEFT JOIN 
+		    SALES_POST_FILE_TB spf
+		ON 
+		    sp.ID = spf.SALES_POST_ID
+		WHERE
+		    sp.ID = #{id}
+	</select>
 </mapper>

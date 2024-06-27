@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.food.domain.order.mapper.OrderMapper">
-	<select id="findItemsByIds" parameterType="map" resultType="com.food.domain.order.dto.CartInfoDTO">
+    
+    <select id="findItemsByIds" parameterType="map" resultType="com.food.domain.order.dto.CartInfoDTO">
         SELECT 
             c.CUSTOMER_ID AS id,
             SUM(c.QUANTITY) AS quantity,
@@ -15,7 +16,8 @@
             d.NAME AS discountName,
             d.TYPE AS discountType,
             d.DISCOUNT_VALUE AS discountValue,
-            d.MAX_DISCOUNT AS maxDiscount
+            d.MAX_DISCOUNT AS maxDiscount,
+            sp.ID AS salesPostId
         FROM 
             CART_TB c
             JOIN PRODUCT_TB p ON c.PRODUCT_NUMBER = p.PRODUCT_NUMBER
@@ -36,6 +38,7 @@
             ) pf ON p.PRODUCT_NUMBER = pf.PRODUCT_NUMBER
             LEFT JOIN DISCOUNT_TARGET_TB dt ON p.PRODUCT_NUMBER = dt.TARGET_ID AND dt.TARGET_TYPE = 'product'
             LEFT JOIN DISCOUNT_TB d ON dt.DISCOUNT_ID = d.ID
+            LEFT JOIN SALES_POST_TB sp ON p.PRODUCT_NUMBER = sp.PRODUCT_NUMBER
         WHERE 
             c.CUSTOMER_ID = #{customerId}
             AND p.PRODUCT_NUMBER IN
@@ -54,7 +57,9 @@
             d.NAME,
             d.TYPE,
             d.DISCOUNT_VALUE,
-            d.MAX_DISCOUNT
+            d.MAX_DISCOUNT,
+            sp.ID
+        ORDER BY p.PRODUCT_NUMBER
     </select>
 
     <select id="findAllItemsByCustomerId" resultType="com.food.domain.order.dto.CartInfoDTO">
@@ -71,10 +76,11 @@
             d.NAME AS discountName,
             d.TYPE AS discountType,
             d.DISCOUNT_VALUE AS discountValue,
-            d.MAX_DISCOUNT AS maxDiscount
+            d.MAX_DISCOUNT AS maxDiscount,
+            sp.ID AS salesPostId
         FROM 
             CART_TB c
-            JOIN PRODUCT_TB p ON c.PRODUCT_ID = p.PRODUCT_NUMBER
+            JOIN PRODUCT_TB p ON c.PRODUCT_NUMBER = p.PRODUCT_NUMBER
             LEFT JOIN (
                 SELECT 
                     pf1.PRODUCT_NUMBER,
@@ -92,6 +98,7 @@
             ) pf ON p.PRODUCT_NUMBER = pf.PRODUCT_NUMBER
             LEFT JOIN DISCOUNT_TARGET_TB dt ON p.PRODUCT_NUMBER = dt.TARGET_ID AND dt.TARGET_TYPE = 'product'
             LEFT JOIN DISCOUNT_TB d ON dt.DISCOUNT_ID = d.ID
+            LEFT JOIN SALES_POST_TB sp ON p.PRODUCT_NUMBER = sp.PRODUCT_NUMBER
         WHERE 
             c.CUSTOMER_ID = #{customerId}
         GROUP BY 
@@ -106,6 +113,9 @@
             d.NAME,
             d.TYPE,
             d.DISCOUNT_VALUE,
-            d.MAX_DISCOUNT
+            d.MAX_DISCOUNT,
+            sp.ID
+        ORDER BY p.PRODUCT_NUMBER
     </select>
+
 </mapper>

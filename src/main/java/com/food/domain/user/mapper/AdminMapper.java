@@ -15,7 +15,6 @@ import com.food.domain.sales.dto.SalesPostFileDTO;
 import com.food.domain.support.dto.InquiriesDTO;
 import com.food.domain.user.dto.AdminDTO;
 import com.food.domain.user.dto.CustomerDTO;
-
 @Mapper
 public interface AdminMapper {
 
@@ -42,6 +41,7 @@ public interface AdminMapper {
 	void insertProductCategoryMapping(String productNumber, Long categoryId);
 
 	void deleteProductByProductNumber(String productNumber);
+
 
 	StockDTO findStockListByProductNumber(String productNumber);
 

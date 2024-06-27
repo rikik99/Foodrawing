@@ -12,11 +12,13 @@ import com.food.domain.product.dto.ProductNutritionDTO;
 public interface ProductMapper {
     List<ProductNutritionDTO> selectByCriteria(ProductNutritionDTO productNutrition);
 
-	ProductDTO selectByResults(ProductNutritionDTO productNutritionDTO);
+    ProductDTO selectByResults(ProductNutritionDTO productNutritionDTO);
 
-	ProductFileDTO fileByResults(String productNumber);
-	
+    ProductFileDTO fileByResults(String productNumber);
+    
+    ProductDTO findById(String productNumber);
+
 	ProductDTO getProductById(String productNumber);
 
-	ProductDTO findById(String productNumber);
+	ProductFileDTO getProductFileByProductNumber(String productNumber);
 }
