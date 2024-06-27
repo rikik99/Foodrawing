@@ -1,5 +1,7 @@
 package com.food.domain.product.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -7,18 +9,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.food.domain.product.dto.ProductCategoryDTO;
 import com.food.domain.product.dto.ProductDTO;
 import com.food.domain.product.dto.ProductFileDTO;
-import com.food.domain.product.mapper.ProductMapper;
+import com.food.domain.product.mapper.ProductDetailMapper;
+import com.food.domain.sales.dto.DiscountDTO;
+import com.food.domain.sales.dto.DiscountInfoDTO;
 import com.food.domain.sales.dto.SalesPostDTO;
-import com.food.domain.sales.dto.SalesPostFileDTO;
 import com.food.domain.sales.mapper.SalesMapper;
 
 @Controller
 public class ProductBController {
 	
 	@Autowired
-	ProductMapper productMapper;
+	ProductDetailMapper productDetailMapper;
 
 	@Autowired
 	SalesMapper salesMapper;
@@ -58,14 +62,48 @@ public class ProductBController {
 	   //SalesPostFileDTO salesFileInfo = salesMapper.getSalesFileById(salesPost);
 	   
 	   //상품 정보, 현재 하나로 고정
-	   ProductDTO productInfo = productMapper.getProductById(salesPost.getProductNumber());
+	   ProductDTO productInfo = productDetailMapper.getProductById(salesPost.getProductNumber());
 	   //System.out.println("product = " + productinfo);
 	   mv.addObject("productInfo", productInfo);
 	   
 	   //상품 파일 정보
-	   ProductFileDTO productFileInfo = productMapper.getProductFileByProductNumber(salesPost.getProductNumber());
+	   ProductFileDTO productFileInfo = productDetailMapper.getProductFileByProductNumber(salesPost.getProductNumber());
 	   //System.out.println("productFileInfo = " + productFileInfo);
 	   mv.addObject("productFileInfo", productFileInfo);
+	   
+	   //상품 카테고리 정보
+	   String categoryCode = productInfo.getProductNumber().substring(0, 2);
+	   ProductCategoryDTO productCategoryInfo = productDetailMapper.getCategoryByCategryCode(categoryCode);
+	   
+	   //상품 할인 정보(카테고리 or 상품 할인)
+	   List<DiscountInfoDTO> discountInfo = productDetailMapper.getDiscount(productCategoryInfo, salesPost.getProductNumber());
+	   int discountPrice = 0;
+	   
+	   //할인가 계산
+	   if (discountInfo.size() == 1) {
+		   mv.addObject("discountInfo", discountInfo);
+		   
+		   if(discountInfo.get(0).getDiscountDTO().getDiscountType().equals("P")) {
+			   discountPrice = (int) (productInfo.getPrice() * (1 - (discountInfo.get(0).getDiscountDTO().getDiscountValue() * 0.01)));
+		   } else if (discountInfo.get(0).getDiscountDTO().getDiscountType().equals("A")) {
+			   discountPrice = (int) (productInfo.getPrice() - discountInfo.get(0).getDiscountDTO().getDiscountValue());
+		   }
+	   } else if (discountInfo.size() > 1) {
+		   mv.addObject("discountInfo", discountInfo);
+		   int a = 0;
+		   int b = 0;
+		   
+		   for(DiscountInfoDTO discount : discountInfo) {
+			   if(discountInfo.get(0).getDiscountDTO().getDiscountType().equals("P")) {
+				   a = (int) (productInfo.getPrice() * (1 - (discountInfo.get(0).getDiscountDTO().getDiscountValue() * 0.01)));
+			   } else if (discountInfo.get(0).getDiscountDTO().getDiscountType().equals("A")) {
+				   b = (int) (productInfo.getPrice() - discountInfo.get(0).getDiscountDTO().getDiscountValue());
+			   }
+		   }
+		   
+		   discountPrice = (a > b) ? a : b;
+	   }
+	   mv.addObject("discountPrice", discountPrice);
 	   
 	   Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
        boolean isLoggedIn = authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal());
