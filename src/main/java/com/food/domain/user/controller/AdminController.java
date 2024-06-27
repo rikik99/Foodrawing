@@ -26,14 +26,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.food.domain.product.dto.ProductCategoryDTO;
 import com.food.domain.product.dto.ProductDTO;
 import com.food.domain.product.dto.StockTransactionDTO;
 import com.food.domain.sales.dto.SalesPostDTO;
 import com.food.domain.sales.dto.SalesPostFileDTO;
+import com.food.domain.support.dto.InquiriesDTO;
 import com.food.domain.user.service.AdminService;
 import com.food.global.util.SalesPostFile;
 
@@ -50,9 +48,6 @@ public class AdminController {
 
 	@Autowired
 	AdminService adminService;
-
-	@Autowired
-	private SalesPostFile salesPostFile;
 
 	@GetMapping("/login")
 	public ModelAndView login(Authentication authentication) {
@@ -265,9 +260,33 @@ public class AdminController {
 	}
 
 	@GetMapping("/salesInquiry")
-	public ModelAndView salesInquiry() {
+	public ModelAndView salesInquiry(@RequestParam Map<String, String> allParams) {
 		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+		
+		// 페이지 정보와 사이즈 정보를 allParams에 추가
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		Page<InquiriesDTO> inquiries;
+		// 검색 조건이 있는지 확인
+		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
+				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
+		
+		if (hasSearchParams) {
+			// 검색 조건이 있을 경우
+			inquiries = adminService.findInquiriesWithSearch(pageable, allParams);
+		} else {
+			// 검색 조건이 없을 경우
+			inquiries = adminService.findInquiries(pageable, allParams);
+		}
 		mv.setViewName("admin/salesInquiry");
+		mv.addObject("inquiries", inquiries);
+		mv.addObject("currentPage", inquiries.getNumber());
+		mv.addObject("pageCount", inquiries.getTotalPages());
+		mv.addObject("totalElements", inquiries.getTotalElements());
+		mv.addObject("size", size);
 		return mv;
 	}
 

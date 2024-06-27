@@ -27,7 +27,9 @@ import com.food.domain.product.dto.StockDTO;
 import com.food.domain.product.dto.StockTransactionDTO;
 import com.food.domain.sales.dto.SalesPostDTO;
 import com.food.domain.sales.dto.SalesPostFileDTO;
+import com.food.domain.support.dto.InquiriesDTO;
 import com.food.domain.user.dto.AdminDTO;
+import com.food.domain.user.dto.CustomerDTO;
 import com.food.domain.user.mapper.AdminMapper;
 import com.food.global.auth.CustomUserDetails;
 import com.food.global.util.ProductFile;
@@ -361,4 +363,42 @@ public class AdminService {
 	            adminMapper.insertSalesPostFile(fileDTO);
 	        }
 	    }
+
+		public Page<InquiriesDTO> findInquiries(Pageable pageable, Map<String, String> allParams) {
+			List<InquiriesDTO> inquiries = adminMapper.findSalesInquiries();
+			List<InquiriesDTO> inquirieList = new ArrayList<>();
+			for(InquiriesDTO Inquiry : inquiries) {
+				Long salesPostId = Inquiry.getSalesPostId();
+				SalesPostDTO salesPotDTO = adminMapper.findSalesPostById(salesPostId);
+				String productNumber = salesPotDTO.getProductNumber();
+				ProductDTO productDTO = adminMapper.findProductByProductNumber(productNumber);
+				Long customerId = Inquiry.getCustomerId();
+				CustomerDTO customerDTO = adminMapper.findCustomerByCustomerId(customerId);
+				Inquiry.setSalesPotDTO(salesPotDTO);
+				Inquiry.setProductDTO(productDTO);
+				Inquiry.setCustomerDTO(customerDTO);
+				inquirieList.add(Inquiry);
+			}
+						
+			int start = (int) pageable.getOffset();
+			int end = Math.min((start + pageable.getPageSize()), inquirieList.size());
+			Page<InquiriesDTO> page = new PageImpl<>(inquirieList.subList(start, end), pageable, inquirieList.size());
+			return page;
+		}
+
+		public Page<InquiriesDTO> findInquiriesWithSearch(Pageable pageable, Map<String, String> allParams) {
+			List<InquiriesDTO> inquiries = adminMapper.findSalesInquiriesWithSearch(allParams);
+			List<InquiriesDTO> inquirieList = new ArrayList<>();
+			for(InquiriesDTO Inquiry : inquiries) {
+				Long salesPostId = Inquiry.getSalesPostId();
+				SalesPostDTO salesPotDTO = adminMapper.findSalesPostById(salesPostId);
+				Inquiry.setSalesPotDTO(salesPotDTO);
+				inquirieList.add(Inquiry);
+			}
+						
+			int start = (int) pageable.getOffset();
+			int end = Math.min((start + pageable.getPageSize()), inquirieList.size());
+			Page<InquiriesDTO> page = new PageImpl<>(inquirieList.subList(start, end), pageable, inquirieList.size());
+			return page;
+		}
 }

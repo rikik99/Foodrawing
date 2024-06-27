@@ -95,7 +95,7 @@
 						</div>
 					</div>
 				</div>
-		<div class="search-buttons full-width">
+				<div class="search-buttons full-width">
 					<button type="button" class="primary search-btn" data-url="/admin/salesPost">검색</button>
 					<button type="reset" class="secondary">초기화</button>
 				</div>

@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	setupCheckboxEventListeners();
 	setupPaginationLinks();
 	initializeCKEditor();
-
+	inquiryToggleFunction();
 	// 초기 로드 설정
 	const pathSegments = window.location.pathname.split('/');
 	const initialPage = pathSegments[pathSegments.length - 1];
@@ -269,7 +269,6 @@ function setupPaginationLinks() {
 
 function setupNavigation() {
 	const dropdownToggles = document.querySelectorAll('.sidebar .dropdown-toggle');
-
 	dropdownToggles.forEach(toggle => {
 		toggle.removeEventListener('click', handleDropdownClick);
 		toggle.addEventListener('click', handleDropdownClick);
@@ -282,7 +281,20 @@ function setupNavigation() {
 		link.addEventListener('click', handleLinkClick);
 	});
 }
-
+function inquiryToggleFunction() {
+	const inquiryToggles = document.querySelectorAll('.inquiryToggle');
+	inquiryToggles.forEach(inquiryToggle => {
+		inquiryToggle.removeEventListener('click', handleInquiryToggleClick);
+		inquiryToggle.addEventListener('click', handleInquiryToggleClick);
+	});
+}
+function handleInquiryToggleClick(event) {
+	event.preventDefault();
+	const inquiryToggleNenu = this.parentElement.parentElement.nextElementSibling;
+	if(inquiryToggleNenu) {
+		inquiryToggleNenu.classList.toggle('visible');
+	}
+}
 function handleDropdownClick(event) {
 	event.preventDefault();
 	const dropdownMenu = this.parentElement.parentElement.nextElementSibling;

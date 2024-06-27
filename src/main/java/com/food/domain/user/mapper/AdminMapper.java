@@ -12,7 +12,9 @@ import com.food.domain.product.dto.StockDTO;
 import com.food.domain.product.dto.StockTransactionDTO;
 import com.food.domain.sales.dto.SalesPostDTO;
 import com.food.domain.sales.dto.SalesPostFileDTO;
+import com.food.domain.support.dto.InquiriesDTO;
 import com.food.domain.user.dto.AdminDTO;
+import com.food.domain.user.dto.CustomerDTO;
 
 @Mapper
 public interface AdminMapper {
@@ -76,4 +78,12 @@ public interface AdminMapper {
 	Long findAdminByUserId(Long userId);
 
 	void updateQuantity(Map<String, Object> allParams);
+
+	List<InquiriesDTO> findSalesInquiries();
+
+	SalesPostDTO findSalesPostById(Long salesPostId);
+
+	List<InquiriesDTO> findSalesInquiriesWithSearch(Map<String, String> allParams);
+
+	CustomerDTO findCustomerByCustomerId(Long customerId);
 }

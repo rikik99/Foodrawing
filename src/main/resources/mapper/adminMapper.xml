@@ -374,26 +374,105 @@
 		</if>
 	</select>
 	<select id="findAdminByAdminId" parameterType="Long">
-		SELECT * FROM ADMIN_TB WHERE ID = #{adminId}
+		SELECT * FROM
+		ADMIN_TB WHERE ID = #{adminId}
 	</select>
 	<select id="findProductByName" parameterType="String">
-	select * from PRODUCT_TB where name= #{name}
+		select * from
+		PRODUCT_TB where name= #{name}
 	</select>
 	<select id="findAdminByUserId" parameterType="Long">
-	select ID
-	FROM ADMIN_TB
-	WHERE USER_ID = #{userId}
+		select ID
+		FROM
+		ADMIN_TB
+		WHERE USER_ID = #{userId}
 	</select>
 
-<insert id="insertSalesPost" parameterType="com.food.domain.sales.dto.SalesPostDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
-    INSERT INTO SALES_POST_TB (ADMIN_ID, PRODUCT_NUMBER, TITLE, DESCRIPTION, CREATED_DATE, LAST_POST_DATE, UPDATED_DATE, START_POST_DATE, STATUS)
-    VALUES (#{adminId}, #{productNumber}, #{title}, #{description}, #{createdDate}, #{lastPostDate}, #{updatedDate}, #{startPostDate}, #{status})
-</insert>
+	<insert id="insertSalesPost"
+		parameterType="com.food.domain.sales.dto.SalesPostDTO"
+		useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
+		INSERT INTO
+		SALES_POST_TB (ADMIN_ID, PRODUCT_NUMBER, TITLE, DESCRIPTION,
+		CREATED_DATE, LAST_POST_DATE, UPDATED_DATE, START_POST_DATE, STATUS)
+		VALUES (#{adminId}, #{productNumber}, #{title}, #{description},
+		#{createdDate}, #{lastPostDate}, #{updatedDate}, #{startPostDate},
+		#{status})
+	</insert>
 
-<insert id="insertSalesPostFile" parameterType="com.food.domain.sales.dto.SalesPostFileDTO">
-    INSERT INTO SALES_POST_FILE_TB (SALES_POST_ID, ORIGINAL_NAME, FILE_PATH, FILE_TYPE, UPLOAD_DATE)
-    VALUES (#{salesPostId}, #{originalName}, #{filePath}, #{fileType}, #{uploadDate})
-</insert>
-
-	
+	<insert id="insertSalesPostFile"
+		parameterType="com.food.domain.sales.dto.SalesPostFileDTO">
+		INSERT INTO SALES_POST_FILE_TB (SALES_POST_ID,
+		ORIGINAL_NAME, FILE_PATH,
+		FILE_TYPE, UPLOAD_DATE)
+		VALUES
+		(#{salesPostId}, #{originalName}, #{filePath}, #{fileType},
+		#{uploadDate})
+	</insert>
+	<select id="findSalesInquiries">
+		SELECT ID, CUSTOMER_ID, SUBJECT, TYPE, SECRET,
+		MESSAGE, SALES_POST_ID,
+		RESOLVED_YN, CREATED_DATE
+		FROM INQUIRIES_TB
+		WHERE TYPE = 2
+	</select>
+	<select id="findSalesInquiriesWithSearch">
+		SELECT I.ID, I.CUSTOMER_ID, I.SUBJECT, I.TYPE, I.SECRET, I.MESSAGE,
+		I.SALES_POST_ID, I.RESOLVED_YN, I.CREATED_DATE
+		FROM INQUIRIES_TB I
+		WHERE I.TYPE = 2 AND 1=1
+		<if test="register_fr_date != null and register_fr_date != ''">
+			AND I.CREATED_DATE &gt;= TO_DATE(#{register_fr_date},
+			'YYYY-MM-DD')
+		</if>
+		<if test="register_to_date != null and register_to_date != ''">
+			AND I.CREATED_DATE &lt;= TO_DATE(#{register_to_date},
+			'YYYY-MM-DD')
+		</if>
+		<if test="searchInput != null and searchInput != ''">
+			AND I.SALES_POST_ID IN (
+			SELECT S.PRODUCT_NUMBER
+			FROM
+			INQUIRIES_TB I
+			JOIN SALES_POST_TB S ON
+			I.SALES_POST_ID = S.ID
+			WHERE
+			S.PRODUCT_NUMBER = #{searchInput}
+			)
+			OR I.SALES_POST_ID IN (
+			SELECT
+			S.TITLE
+			FROM
+			INQUIRIES_TB I
+			JOIN SALES_POST_TB S ON
+			I.SALES_POST_ID =
+			S.ID
+			WHERE S.TITLE = #{searchInput}
+			)
+			OR I.CUSTOMER_ID IN (
+			SELECT
+			C.NICKNAME
+			FROM
+			INQUIRIES_TB I
+			JOIN CUSTOMER_TB C ON
+			I.CUSTOMER_ID = C.ID
+			WHERE C.NICKNAME = #{searchInput}
+			)
+		</if>
+		<if test="resolvedYn != null and resolvedYn != ''">
+			AND I.RESOLVED_YN = #{resolvedYn}
+		</if>
+	</select>
+	<select id="findSalesPostById" parameterType="Long">
+		SELECT ID,
+		ADMIN_ID, PRODUCT_NUMBER, TITLE, DESCRIPTION, CREATED_DATE,
+		LAST_POST_DATE, UPDATED_DATE, START_POST_DATE, STATUS
+		FROM
+		SALES_POST_TB
+		WHERE ID = #{salesPostId}
+	</select>
+	<select id="findCustomerByCustomerId" parameterType="Long">
+	SELECT ID, USER_ID, NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE, ADDRESS, ADDRESS_DETAIL, ZIPCODE
+	FROM CUSTOMER_TB
+	WHERE ID = #{customerId}
+	</select>
 </mapper>
