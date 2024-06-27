@@ -419,45 +419,34 @@
 		SELECT I.ID, I.CUSTOMER_ID, I.SUBJECT, I.TYPE, I.SECRET, I.MESSAGE,
 		I.SALES_POST_ID, I.RESOLVED_YN, I.CREATED_DATE
 		FROM INQUIRIES_TB I
-		WHERE I.TYPE = 2 AND 1=1
+		WHERE I.TYPE = 2
 		<if test="register_fr_date != null and register_fr_date != ''">
-			AND I.CREATED_DATE &gt;= TO_DATE(#{register_fr_date},
+			AND TRUNC(I.CREATED_DATE) &gt;= TO_DATE(#{register_fr_date},
 			'YYYY-MM-DD')
 		</if>
 		<if test="register_to_date != null and register_to_date != ''">
-			AND I.CREATED_DATE &lt;= TO_DATE(#{register_to_date},
+			AND TRUNC(I.CREATED_DATE) &lt;= TO_DATE(#{register_to_date},
 			'YYYY-MM-DD')
 		</if>
-		<if test="searchInput != null and searchInput != ''">
-			AND I.SALES_POST_ID IN (
-			SELECT S.PRODUCT_NUMBER
-			FROM
-			INQUIRIES_TB I
-			JOIN SALES_POST_TB S ON
-			I.SALES_POST_ID = S.ID
-			WHERE
-			S.PRODUCT_NUMBER = #{searchInput}
-			)
-			OR I.SALES_POST_ID IN (
-			SELECT
-			S.TITLE
-			FROM
-			INQUIRIES_TB I
-			JOIN SALES_POST_TB S ON
-			I.SALES_POST_ID =
-			S.ID
-			WHERE S.TITLE = #{searchInput}
-			)
-			OR I.CUSTOMER_ID IN (
-			SELECT
-			C.NICKNAME
-			FROM
-			INQUIRIES_TB I
-			JOIN CUSTOMER_TB C ON
-			I.CUSTOMER_ID = C.ID
-			WHERE C.NICKNAME = #{searchInput}
-			)
-		</if>
+    <if test="searchInput != null and searchInput != ''">
+        AND (
+            I.SALES_POST_ID IN (
+                SELECT S.ID
+                FROM SALES_POST_TB S
+                WHERE S.PRODUCT_NUMBER LIKE '%' || #{searchInput} || '%'
+            )
+            OR I.SALES_POST_ID IN (
+                SELECT S.ID
+                FROM SALES_POST_TB S
+                WHERE S.TITLE LIKE '%' || #{searchInput} || '%'
+            )
+            OR I.CUSTOMER_ID IN (
+                SELECT C.ID
+                FROM CUSTOMER_TB C
+                WHERE C.NICKNAME LIKE '%' || #{searchInput} || '%'
+            )
+        )
+    </if>
 		<if test="resolvedYn != null and resolvedYn != ''">
 			AND I.RESOLVED_YN = #{resolvedYn}
 		</if>
@@ -471,8 +460,13 @@
 		WHERE ID = #{salesPostId}
 	</select>
 	<select id="findCustomerByCustomerId" parameterType="Long">
-	SELECT ID, USER_ID, NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE, ADDRESS, ADDRESS_DETAIL, ZIPCODE
-	FROM CUSTOMER_TB
-	WHERE ID = #{customerId}
+		SELECT ID, USER_ID, NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE,
+		ADDRESS, ADDRESS_DETAIL, ZIPCODE
+		FROM CUSTOMER_TB
+		WHERE ID = #{customerId}
 	</select>
+	<insert id="insertResponse" parameterType="map">
+		Insert into RESPONSE_TB (INQUIRIES_ID, ADMIN_ID, MESSAGE, CREATED_DATE)
+		VALUES (#{inquiriesId}, #{adminId}, #{message}, CURRENT_TIMESTAMP)
+	</insert>
 </mapper>

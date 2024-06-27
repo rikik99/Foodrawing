@@ -86,4 +86,6 @@ public interface AdminMapper {
 	List<InquiriesDTO> findSalesInquiriesWithSearch(Map<String, String> allParams);
 
 	CustomerDTO findCustomerByCustomerId(Long customerId);
+
+	void insertResponse(Map<String, Object> allParams);
 }

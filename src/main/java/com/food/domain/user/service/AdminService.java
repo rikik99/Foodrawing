@@ -392,7 +392,13 @@ public class AdminService {
 			for(InquiriesDTO Inquiry : inquiries) {
 				Long salesPostId = Inquiry.getSalesPostId();
 				SalesPostDTO salesPotDTO = adminMapper.findSalesPostById(salesPostId);
+				String productNumber = salesPotDTO.getProductNumber();
+				ProductDTO productDTO = adminMapper.findProductByProductNumber(productNumber);
+				Long customerId = Inquiry.getCustomerId();
+				CustomerDTO customerDTO = adminMapper.findCustomerByCustomerId(customerId);
 				Inquiry.setSalesPotDTO(salesPotDTO);
+				Inquiry.setProductDTO(productDTO);
+				Inquiry.setCustomerDTO(customerDTO);
 				inquirieList.add(Inquiry);
 			}
 						
@@ -400,5 +406,17 @@ public class AdminService {
 			int end = Math.min((start + pageable.getPageSize()), inquirieList.size());
 			Page<InquiriesDTO> page = new PageImpl<>(inquirieList.subList(start, end), pageable, inquirieList.size());
 			return page;
+		}
+
+		public void salesResponse(Map<String, Object> allParams) {
+			Long userId = null;
+	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+	            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+	            userId = userDetails.getId();
+	        }
+	        Long adminId = adminMapper.findAdminByUserId(userId);
+	        allParams.put("adminId", adminId);
+	        adminMapper.insertResponse(allParams);
 		}
 }

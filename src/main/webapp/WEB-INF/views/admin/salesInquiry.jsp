@@ -50,10 +50,10 @@
 					<div class="half-width">
 						<label for="radio-group">해결 상태</label>
 						<div id="radio-group">
-							<label><input type="radio" name="resolvedYn" value=""
-								checked> 전체</label> <label><input type="radio"
+							<label><input type="radio" name="resolvedYn" value="" id="resolvedYn"
+								checked> 전체</label> <label><input type="radio" id="resolvedYn"
 								name="resolvedYn" value="N"> 답변 대기</label> <label><input
-								type="radio" name="resolvedYn" value="Y"> 답변 완료</label>
+								type="radio" name="resolvedYn" id="resolvedYn" value="Y"> 답변 완료</label>
 						</div>
 					</div>
 				</div>
@@ -75,7 +75,7 @@
 				<thead>
 					<tr>
 						<th class="title-column">판매글 제목</th>
-						<th class="product-name-column">상품 이름</th>
+						<th class="product-name-column">상품 코드</th>
 						<th class="customer-id-column">고객 아이디</th>
 						<th class="inquiry-content-column">문의 내용</th>
 						<th class="inquiry-date-column">문의 날짜</th>
@@ -84,9 +84,9 @@
 				</thead>
 				<tbody>
 					<c:forEach items="${inquiries.content}" var="inquiries">
-						<tr class="inquiryToggle">
+						<tr class="inquiryToggle" onclick="handleInquiryToggleClick(event);">
 							<td class="title-column">${inquiries.salesPotDTO.title}</td>
-							<td class="product-name-column">${inquiries.productDTO.name}</td>
+							<td class="product-name-column">${inquiries.productDTO.productNumber}</td>
 							<td class="customer-id-column">${inquiries.customerDTO.nickname}</td>
 							<td class="inquiry-content-column">${inquiries.message}</td>
 							<td class="inquiry-date-column">${inquiries.createdDate}</td>
@@ -101,14 +101,12 @@
 							</c:choose>
 							</td>
 						</tr>
-						<tr class="inquiryToggleNenu">
+						<tr class="inquiryToggleMenu">
 							<td colspan="6">
 								<div class="response-form">
-									<form>
 										<label for="response1" class="response-label">답변 작성</label>
-										<textarea id="response1" class="response-textarea"></textarea>
-										<button type="submit" class="primary">답변 보내기</button>
-									</form>
+										<textarea id="message" class="response-textarea"></textarea>
+										<button type="button" class="primary responseBtn" data-inquiriesId="${ inquiries.id}">답변 보내기</button>
 								</div>
 							</td>
 						</tr>

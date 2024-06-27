@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	setupCheckboxEventListeners();
 	setupPaginationLinks();
 	initializeCKEditor();
-	inquiryToggleFunction();
 	// 초기 로드 설정
 	const pathSegments = window.location.pathname.split('/');
 	const initialPage = pathSegments[pathSegments.length - 1];
@@ -25,10 +24,12 @@ document.addEventListener('DOMContentLoaded', function() {
 		loadContent('/admin/mainContent', 'mainContent', false);
 	}
 });
+
 window.addEventListener('beforeunload', function() {
 	// 로컬 저장소에서 fileDTOList 항목 삭제
 	localStorage.removeItem('fileDTOList');
 });
+
 // popstate 이벤트 리스너를 전역 범위에서 한 번만 추가
 window.addEventListener('popstate', function(event) {
 	if (event.state && event.state.url) {
@@ -37,6 +38,7 @@ window.addEventListener('popstate', function(event) {
 });
 
 document.addEventListener('click', function(e) {
+
 	if (e.target.classList.contains('date-range-btn')) {
 		const range = e.target.getAttribute('data-range');
 		const group = e.target.getAttribute('data-group');
@@ -81,41 +83,69 @@ document.addEventListener('click', function(e) {
 				break;
 		}
 	}
- if (e.target.classList.contains('stock-update-btn')) {
-                const container = e.target.closest('.stock-update-container');
-                const productNumber = container.getAttribute('data-product-number');
-                const stockAction = container.querySelector('.stock-action').value;
-                const stockQuantity = container.querySelector('.stock-quantity').value;
-                const expirationDate = container.querySelector('.expirationDate').value;
+	if (e.target.classList.contains('stock-update-btn')) {
+		const container = e.target.closest('.stock-update-container');
+		const productNumber = container.getAttribute('data-product-number');
+		const stockAction = container.querySelector('.stock-action').value;
+		const stockQuantity = container.querySelector('.stock-quantity').value;
+		const expirationDate = container.querySelector('.expirationDate').value;
 
-                const stockData = {
-                    productNumber: productNumber,
-                    type: stockAction,
-                    quantity: stockQuantity,
-                    expirationDate: expirationDate
-                };
+		const stockData = {
+			productNumber: productNumber,
+			type: stockAction,
+			quantity: stockQuantity,
+			expirationDate: expirationDate
+		};
 
-                fetch('/admin/updateStock', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(stockData),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        loadContent('/admin/stockManagement', 'stockManagement', true);
-                    } else {
-                        alert('재고 업데이트에 실패했습니다.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('재고 업데이트 중 오류가 발생했습니다.');
-                });
-            }
+		fetch('/admin/updateStock', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(stockData),
+		})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					alert(data.message);
+					loadContent('/admin/stockManagement', 'stockManagement', true);
+				} else {
+					alert('재고 업데이트에 실패했습니다.');
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				alert('재고 업데이트 중 오류가 발생했습니다.');
+			});
+	}
+	if (e.target.classList.contains(('responseBtn'))) {
+		const inquiriesId = e.target.getAttribute('data-inquiriesId');
+		const message = e.target.closest('tr').querySelector('.response-textarea').value;
+		const responseData = {
+			inquiriesId: inquiriesId,
+			message: message
+		};
+		fetch('/admin/salesResponse', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(responseData),
+		})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					alert(data.message);
+					loadContent('/admin/salesInquiry', 'salesInquiry', true);
+				} else {
+					alert('답변 작성에 실패했습니다.');
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				alert('답변 작성 중 오류가 발생했습니다.');
+			});
+	}
 });
 
 document.addEventListener('click', async function(event) {
@@ -166,9 +196,6 @@ document.addEventListener('click', async function(event) {
 	}
 });
 
-
-
-
 document.addEventListener('change', function(e) {
 	if (e.target && e.target.id === 'productList') {
 		console.log("상품명 선택했어요");
@@ -191,8 +218,7 @@ function performSearch(urlPath) {
 		{ id: 'last_fr_date', name: 'last_fr_date' },
 		{ id: 'last_to_date', name: 'last_to_date' },
 		{ id: 'register_fr_date', name: 'register_fr_date' },
-		{ id: 'register_to_date', name: 'register_to_date' },
-		{ id: 'sale_status', name: 'sale_status' }
+		{ id: 'register_to_date', name: 'register_to_date' }
 	];
 
 	fields.forEach(field => {
@@ -205,15 +231,27 @@ function performSearch(urlPath) {
 		}
 	});
 
-	const radioButtons = document.getElementsByName('sale_status');
-	let selectedValue = '';
-	for (const radioButton of radioButtons) {
+	// Adding resolvedYn parameter
+	const resolvedYnRadioButtons = document.getElementsByName('resolvedYn');
+	let resolvedYnValue = '';
+	for (const radioButton of resolvedYnRadioButtons) {
 		if (radioButton.checked) {
-			selectedValue = radioButton.value;
+			resolvedYnValue = radioButton.value;
 			break;
 		}
 	}
-	if (selectedValue) params.append('sale_status', selectedValue);
+	if (resolvedYnValue) params.append('resolvedYn', resolvedYnValue);
+
+	// Adding sale_status parameter
+	const saleStatusRadioButtons = document.getElementsByName('sale_status');
+	let saleStatusValue = '';
+	for (const radioButton of saleStatusRadioButtons) {
+		if (radioButton.checked) {
+			saleStatusValue = radioButton.value;
+			break;
+		}
+	}
+	if (saleStatusValue) params.append('sale_status', saleStatusValue);
 
 	params.append('page', '0'); // 검색 시 첫 페이지로 이동
 	params.append('size', '5'); // 기본 페이지 크기 설정
@@ -233,6 +271,7 @@ function performSearch(urlPath) {
 		})
 		.catch(error => console.error('Error:', error));
 }
+
 
 function loadPage(page, size, urlPath) {
 	const params = new URLSearchParams(window.location.search);
@@ -275,26 +314,12 @@ function setupNavigation() {
 	});
 
 	const links = document.querySelectorAll('.sidebar ul li a');
-
 	links.forEach(link => {
 		link.removeEventListener('click', handleLinkClick);
 		link.addEventListener('click', handleLinkClick);
 	});
 }
-function inquiryToggleFunction() {
-	const inquiryToggles = document.querySelectorAll('.inquiryToggle');
-	inquiryToggles.forEach(inquiryToggle => {
-		inquiryToggle.removeEventListener('click', handleInquiryToggleClick);
-		inquiryToggle.addEventListener('click', handleInquiryToggleClick);
-	});
-}
-function handleInquiryToggleClick(event) {
-	event.preventDefault();
-	const inquiryToggleNenu = this.parentElement.parentElement.nextElementSibling;
-	if(inquiryToggleNenu) {
-		inquiryToggleNenu.classList.toggle('visible');
-	}
-}
+
 function handleDropdownClick(event) {
 	event.preventDefault();
 	const dropdownMenu = this.parentElement.parentElement.nextElementSibling;
@@ -325,6 +350,7 @@ function highlightMenu(target) {
 		activeLink.parentElement.classList.add('active');
 	}
 }
+
 function loadContent(url, target, pushState = true) {
 	const mainContent = document.querySelector('.main-content');
 	localStorage.removeItem('fileDTOList');
@@ -372,7 +398,6 @@ function loadContent(url, target, pushState = true) {
 		})
 		.catch(error => console.error('Error loading content:', error));
 }
-
 
 function setupCheckboxEventListeners() {
 	const selectAllCheckbox = document.getElementById('selectAll');
@@ -489,3 +514,12 @@ function initializeCKEditor() {
 }
 
 document.addEventListener('DOMContentLoaded', initializeCKEditor);
+
+function handleInquiryToggleClick(event) {
+	event.preventDefault();
+	const inquiryToggle = event.target.closest('.inquiryToggle');
+	const inquiryToggleMenu = inquiryToggle.nextElementSibling;
+	if (inquiryToggleMenu && inquiryToggleMenu.classList.contains('inquiryToggleMenu')) {
+		inquiryToggleMenu.classList.toggle('visible');
+	}
+}

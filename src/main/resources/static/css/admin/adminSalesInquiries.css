@@ -345,7 +345,7 @@ button.editButton:hover {
     background-color: #e9ecef;
     border-color: #dee2e6;
 }
-.inquiryToggleNenu {
+.inquiryToggleMenu {
 	display: none;
 	background-color: #081028;
 	list-style: none;
@@ -355,8 +355,8 @@ button.editButton:hover {
 	max-height: 0;
 }
 
-.inquiryToggleNenu.visible {
-	display: block;
+.inquiryToggleMenu.visible {
+	display: table-row;
 	max-height: 500px;
 	opacity: 1;
 }

@@ -13,7 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,28 +52,30 @@ public class AdminController {
 
 	@GetMapping("/login")
 	public ModelAndView login(Authentication authentication) {
-		// 로그인된 사용자가 로그인 페이지로 접근할 경우 메인 페이지로 리다이렉트
-		if (authentication != null && authentication.isAuthenticated()) {
-			return new ModelAndView("redirect:/admin/mainContent");
-		}
-		ModelAndView mv = new ModelAndView();
-		mv.setViewName("admin/login");
-		return mv;
+	    ModelAndView mv = new ModelAndView();
+	    // 익명 인증이 아닌 경우 메인 페이지로 리다이렉트
+	    if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
+	        mv.setViewName("redirect:/admin/mainContent");
+	        return mv;
+	    }
+	    mv.setViewName("admin/login");
+	    return mv;
 	}
 
-	@GetMapping("/main")
-	public ModelAndView admindashboard() {
-		ModelAndView mv = new ModelAndView();
-		mv.setViewName("admin/adminMain");
-		return mv;
-	}
 
 	@GetMapping("/mainContent")
 	public ModelAndView adminMain() {
-		ModelAndView mv = new ModelAndView();
-		mv.setViewName("admin/mainContent");
-		return mv;
+	    ModelAndView mv = new ModelAndView();
+	    // 익명 인증이거나 인증되지 않은 경우 로그인 페이지로 리다이렉트
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+	        mv.setViewName("redirect:/admin/login");
+	        return mv;
+	    }
+	    mv.setViewName("admin/mainContent");
+	    return mv;
 	}
+
 
 	@GetMapping("/productManagement")
 	public ModelAndView productManagement(@RequestParam Map<String, String> allParams) {
@@ -269,6 +273,7 @@ public class AdminController {
 		allParams.put("size", String.valueOf(size));
 		Pageable pageable = PageRequest.of(page, size);
 		Page<InquiriesDTO> inquiries;
+		log.info("salesInquiry Params ={}", allParams);
 		// 검색 조건이 있는지 확인
 		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
 				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
@@ -276,6 +281,7 @@ public class AdminController {
 		if (hasSearchParams) {
 			// 검색 조건이 있을 경우
 			inquiries = adminService.findInquiriesWithSearch(pageable, allParams);
+
 		} else {
 			// 검색 조건이 없을 경우
 			inquiries = adminService.findInquiries(pageable, allParams);
@@ -288,7 +294,14 @@ public class AdminController {
 		mv.addObject("size", size);
 		return mv;
 	}
-
+	@PostMapping("/salesResponse")
+	@ResponseBody
+	public ResponseEntity<?> salesResponse(@RequestBody Map<String, Object> allParams) {
+		adminService.salesResponse(allParams);
+		return ResponseEntity.ok(Map.of("success", true, "message", "답변이 성공적으로 작성되었습니다."));
+	}
+	
+	
 	@GetMapping("/salesReview")
 	public ModelAndView salesReview() {
 		ModelAndView mv = new ModelAndView();
@@ -340,21 +353,22 @@ public class AdminController {
 
 	@GetMapping("/logout")
 	public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) {
-		HttpSession session = request.getSession();
-		session.invalidate();
+	    HttpSession session = request.getSession();
+	    session.invalidate();
 
-		// JWT 쿠키 삭제
-		Cookie cookie = new Cookie("jwt", null);
-		cookie.setHttpOnly(true);
-		cookie.setSecure(true);
-		cookie.setPath("/");
-		cookie.setMaxAge(0); // 쿠키 삭제
-		response.addCookie(cookie);
+	    // JWT 쿠키 삭제
+	    Cookie cookie = new Cookie("jwt", null);
+	    cookie.setHttpOnly(true);
+	    cookie.setSecure(false); // HTTPS가 아닌 경우 false로 설정
+	    cookie.setPath("/");
+	    cookie.setMaxAge(0); // 쿠키 삭제
+	    response.addCookie(cookie);
 
-		ModelAndView mv = new ModelAndView();
-		mv.setViewName("redirect:/login");
-		return mv;
+	    ModelAndView mv = new ModelAndView();
+	    mv.setViewName("redirect:/login");
+	    return mv;
 	}
+
 
 	private Map<String, String> convertEmptyStringsToNull(Map<String, String> params) {
 		Map<String, String> result = new HashMap<>();
