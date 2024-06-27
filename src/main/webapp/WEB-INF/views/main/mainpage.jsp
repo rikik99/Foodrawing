@@ -91,6 +91,7 @@
             padding: 10px;
             cursor: pointer;
             border-radius: 50%;
+            display: block !important;
         }
 
         .image-controls button i {
@@ -120,30 +121,6 @@
 
         .content-wrapper img {
             margin-right: 20px;
-        }
-
-        .slick-prev, .slick-next {
-            display: block !important;
-            background-color: rgba(0, 0, 0, 0.5);
-            color: white;
-            border: none;
-            font-size: 24px;
-            line-height: 50px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 1;
-        }
-
-        .slick-prev {
-            left: 10px;
-        }
-
-        .slick-next {
-            right: 10px;
         }
 
         .saleicon {
@@ -360,6 +337,7 @@
             autoplay: true,
             vertical: true,
             autoplaySpeed: 1000,
+            arrows: false,
             responsive: [
                 {
                     breakpoint: 768,
@@ -384,9 +362,7 @@
             slidesToScroll: 1,
             autoplay: true,
             autoplaySpeed: 2000,
-            arrows: true,
-            prevArrow: '<button type="button" class="slick-prev"><i class="fas fa-chevron-left"></i></button>',
-            nextArrow: '<button type="button" class="slick-next"><i class="fas fa-chevron-right"></i></button>',
+            arrows: false,
             responsive: [
                 {
                     breakpoint: 768,
