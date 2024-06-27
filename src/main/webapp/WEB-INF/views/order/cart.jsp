@@ -406,11 +406,27 @@ function checkoutSelectedItems() {
             alert('품절된 상품이 있습니다.');
             return;
         }
-        // GET 요청에 필요한 URL 파라미터를 구성
-        var params = new URLSearchParams();
-        params.append('customerId', customerId);
-        selectedIds.forEach(id => params.append('productIds', id));
-        window.location.href = '/checkoutPage?' + params.toString();
+        // Create a form and submit it with POST method
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/checkoutPage';
+
+        var customerIdInput = document.createElement('input');
+        customerIdInput.type = 'hidden';
+        customerIdInput.name = 'customerId';
+        customerIdInput.value = customerId;
+        form.appendChild(customerIdInput);
+
+        selectedIds.forEach(id => {
+            var productNumberInput = document.createElement('input');
+            productNumberInput.type = 'hidden';
+            productNumberInput.name = 'productNumbers';
+            productNumberInput.value = id;
+            form.appendChild(productNumberInput);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
     })
     .catch(error => {
         console.error('결제 준비 오류:', error);
@@ -463,22 +479,45 @@ function checkoutAllItems() {
             productNumbers: productNumber
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         if (!data.success) {
             alert('품절된 상품이 있습니다.');
             return;
         }
-        var params = new URLSearchParams();
-        params.append('customerId', customerId);
-        productNumber.forEach(id => params.append('productNumbers', id));
-        window.location.href = '/checkoutPage?' + params.toString();
+        // Create a form and submit it with POST method
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/checkoutPage';
+
+        var customerIdInput = document.createElement('input');
+        customerIdInput.type = 'hidden';
+        customerIdInput.name = 'customerId';
+        customerIdInput.value = customerId;
+        form.appendChild(customerIdInput);
+
+        productNumber.forEach(id => {
+            var productNumberInput = document.createElement('input');
+            productNumberInput.type = 'hidden';
+            productNumberInput.name = 'productNumbers';
+            productNumberInput.value = id;
+            form.appendChild(productNumberInput);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
     })
     .catch(error => {
         console.error('결제 준비 오류:', error);
         alert('결제 준비 중 오류가 발생했습니다.');
     });
 }
+
 
 function toggleSelectAll(selectAllCheckbox) {
     const selectItems = document.querySelectorAll('.select-item');
