@@ -528,7 +528,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const wishIcon = document.getElementById('wish-icon');
 
     wishIcon.addEventListener('click', function() {
-        const wished = wishIcon.getAttribute('data-wished') === 'true';
+        const wished = wishIcon.getAttribute('data-wished') === 'true'; 
         
         if (wished) {
             wishIcon.src = '/images/svg/iconUtilWish.svg';
