@@ -20,8 +20,6 @@
 	height: 600px;
 }
 
-
-
 .product-title .product-name {
 	font-size: 1.2em;
 	font-weight: bold;
@@ -31,8 +29,6 @@
 	color: #b4b4b4;
 	margin-top: 5px;
 }
-
-
 
 .product-rating {
 	color: #ffa500;
@@ -44,7 +40,6 @@
 	color: #888;
 	margin-top: 10px;
 }
-
 </style>
 </head>
 <body>
@@ -64,9 +59,9 @@
 							<div class="product-card">
 								<div class="product-top">
 									<a class="product-card-href"
-										href="/ProductDetail?productNumber=${product.productNumber}">
+										href="/ProductDetail?salesPostId=${product.salesPostId}">
 										<div class="badge">BEST</div> <img src="${product.filePath}"
-										alt="${product.productName}">
+										alt="${product.salesPostTitle}">
 									</a> <a class="product-card-cart-href" href="#">
 										<div class="cart-icon">
 											<img src="/images/basket-icon.png" alt="Cart Icon">
@@ -74,14 +69,14 @@
 									</a>
 								</div>
 								<a class="product-card-href"
-									href="/ProductDetail?productNumber=${product.productNumber}">
+									href="/ProductDetail?salesPostId=${product.salesPostId}">
 									<div class="product-details">
 										<div class="product-title">
-											<span class="product-name">${product.productName}</span><br>
-											<span class="product-description">${product.productDescription}</span>
+											<span class="product-name">${product.salesPostTitle}</span><br>
+											<span class="product-description">${product.salesPostDescription}</span>
 										</div>
 										<div class="product-price">
-											${product.productPrice}원
+											${product.unitPrice}원
 										</div>
 										<div class="product-rating">★ 4.7 (64)</div>
 										<div class="delivery-info">
