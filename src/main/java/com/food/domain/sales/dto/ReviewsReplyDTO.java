@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 public class ReviewsReplyDTO {
     private Long id;
     private Long reviewId;
-    private Long userId;
-    private String content;
+    private Long adminId;
+    private String message;
     private LocalDateTime createdDate;
     private LocalDateTime uploadDate;
 }

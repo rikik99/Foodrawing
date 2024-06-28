@@ -15,7 +15,7 @@
 	crossorigin="anonymous">
 <link rel="stylesheet" href="css/common.css">
 <link rel="stylesheet" href="css/bestpage.css">
-<link rel="stylesheet" href="css/sidebar.css">
+<!-- <link rel="stylesheet" href="css/sidebar.css"> -->
 <link rel="stylesheet" href="css/product/productimage.css">
 <link rel="stylesheet" href="css/product/slider.css">
 <link rel="stylesheet" href="css/product/cart.css">
@@ -489,41 +489,117 @@
 	integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
 	crossorigin="anonymous"></script>
 	
-	<!-- <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const wishIcon = document.getElementById('wish-icon');
-        const productNumber = document.getElementById('product_number').value;
+	<script>
+	   // UTF-8 문자열을 Base64로 인코딩하는 함수
+    function btoaUtf8(str) {
+        return btoa(unescape(encodeURIComponent(str)));
+    }
 
-        wishIcon.addEventListener('click', function() {
-            const isWished = wishIcon.getAttribute('data-wished') === 'true';
-            const url = isWished ? '/wishlist/remove' : '/wishlist/add';
-            const newIconSrc = isWished ? 'iconUtilWish.svg' : 'iconUtilWishOn.svg';
+    // Base64를 UTF-8 문자열로 디코딩하는 함수
+    function atobUtf8(str) {
+        return decodeURIComponent(escape(atob(str)));
+    }
+	document.addEventListener('DOMContentLoaded', function () {
+	    const salesPostId = '${salesInfo.id}';
+	    var discountPrice = '${discountPrice}';
+	    const price = '${productInfo.price}';
+	    
+	    if(discountPrice == 0) {
+	        discountPrice = price;
+	    }
+	    
+	    const productInfo = {
+	        salesPostId: salesPostId,
+	        name: '${productInfo.name}',
+	        filePath: '${productFileInfo.filePath}',
+	        price: discountPrice
+	    };
 
-            /*fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ productNumber: productNumber })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    wishIcon.src = newIconSrc;
-                    wishIcon.setAttribute('data-wished', !isWished);
-                } else {
+	    // 쿠키에 저장된 최근 본 상품 목록을 가져옴
+	    let recentViewedProducts = JSON.parse(atobUtf8(getCookie('recentViewedProducts') || 'W10=')); // Base64 디코딩
+
+	    // 현재 상품을 최근 본 상품 목록에 추가
+	    recentViewedProducts = recentViewedProducts.filter(product => product.salesPostId !== salesPostId);
+	    recentViewedProducts.unshift(productInfo);
+
+	    // 최대 5개의 최근 본 상품만 저장
+	    if (recentViewedProducts.length > 5) {
+	        recentViewedProducts.pop();
+	    }
+
+	    // 쿠키에 저장
+	    setCookie('recentViewedProducts', btoaUtf8(JSON.stringify(recentViewedProducts)), 7); // Base64 인코딩
+
+	    function setCookie(name, value, days) {
+	        const d = new Date();
+	        d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+	        const expires = "expires=" + d.toUTCString();
+	        document.cookie = name + "=" + value + ";" + expires + ";path=/";
+	    }
+
+	    function getCookie(name) {
+	        const decodedCookie = decodeURIComponent(document.cookie);
+	        const ca = decodedCookie.split(';');
+	        name = name + "=";
+	        for (let i = 0; i < ca.length; i++) {
+	            let c = ca[i];
+	            while (c.charAt(0) == ' ') {
+	                c = c.substring(1);
+	            }
+	            if (c.indexOf(name) == 0) {
+	                return c.substring(name.length, c.length);
+	            }
+	        }
+	        return "";
+	    }
+	});
+
+    </script>
+	
+	<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const wishIcon = document.getElementById('wish-icon');
+            const salesPostId = document.getElementById('salesPostId').value;
+            const customerId = 1; //설정해 줘야함
+
+            wishIcon.addEventListener('click', function() {
+                const isWished = wishIcon.getAttribute('data-wished') === 'true';
+                const url = isWished ? '/wishlist/remove' : '/wishlist/add';
+                const newIconSrc = isWished ? '/images/svg/iconUtilWish.svg' : '/images/svg/iconUtilWishOn.svg';
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        salesPostId: salesPostId, 
+                        customerId: customerId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        wishIcon.src = newIconSrc;
+                        wishIcon.setAttribute('data-wished', !isWished);
+                        if(isWished) {
+                        	alert('위시리스트에 상품이 삭제되었습니다. ')
+                        } else{
+	                        alert('위시리스트에 상품이 담겼습니다. ')
+                        }
+                    } else {
+                        alert('위시리스트 상태를 업데이트하는데 문제가 발생했습니다.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
                     alert('위시리스트 상태를 업데이트하는데 문제가 발생했습니다.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('위시리스트 상태를 업데이트하는데 문제가 발생했습니다.');
-            });*/
+                });
+            });
         });
-    });
-</script> -->
+    </script>
 
-<script>
+<!-- <script>
 document.addEventListener('DOMContentLoaded', function() {
     const wishIcon = document.getElementById('wish-icon');
 
@@ -539,7 +615,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-</script>
+</script> -->
 	
 <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -858,6 +934,8 @@ document.addEventListener('DOMContentLoaded', function() {
 				<div class="right-column">
 					<input type="hidden" id="product_number" name="productNumber"
 						value="${productInfo.productNumber}">
+					<input type="hidden" id="salesPostId" name="salesPostId"
+						value="${salesInfo.id}">
 					<div class="product-title">
 						<h1 class="product-name">${productInfo.name}1.05kg</h1>
 						<img id="wish-icon" class="wish-icon" src="/images/svg/iconUtilWish.svg" data-wished="false" alt="위시리스트 아이콘">
