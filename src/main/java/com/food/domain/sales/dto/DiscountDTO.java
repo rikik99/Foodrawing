@@ -1,6 +1,7 @@
 package com.food.domain.sales.dto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,4 +24,20 @@ public class DiscountDTO {
     private Long maxDiscount;
     private String description;
     private Long minPrice;
+    
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YY.MM.dd");
+
+    public String getFormattedStartDate() {
+        if (startDate != null) {
+            return startDate.format(formatter);
+        }
+        return "";
+    }
+    public String getFormattedEndDate() {
+    	if (endDate != null) {
+    		return endDate.format(formatter);
+    	}
+    	return "";
+    }
+    
 }

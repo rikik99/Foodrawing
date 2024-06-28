@@ -146,6 +146,34 @@ document.addEventListener('click', function(e) {
 				alert('답변 작성 중 오류가 발생했습니다.');
 			});
 	}
+	if (e.target.classList.contains(('replyBtn'))) {
+		const reviewId = e.target.getAttribute('data-reviewsId');
+		const message = e.target.closest('tr').querySelector('.reply-textarea').value;
+		const replyData = {
+			reviewId: reviewId,
+			message: message
+		};
+		fetch('/admin/reviewReply', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(replyData),
+		})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					alert(data.message);
+					loadContent('/admin/salesReview', 'salesReview', true);
+				} else {
+					alert('답변 작성에 실패했습니다.');
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				alert('답변 작성 중 오류가 발생했습니다.');
+			});
+	}
 });
 
 document.addEventListener('click', async function(event) {
@@ -218,7 +246,11 @@ function performSearch(urlPath) {
 		{ id: 'last_fr_date', name: 'last_fr_date' },
 		{ id: 'last_to_date', name: 'last_to_date' },
 		{ id: 'register_fr_date', name: 'register_fr_date' },
-		{ id: 'register_to_date', name: 'register_to_date' }
+		{ id: 'register_to_date', name: 'register_to_date' },
+		{ id: 'fr_min', name: 'fr_min' },
+		{ id: 'to_min', name: 'to_min' },
+		{ id: 'fr_max', name: 'fr_max' },
+		{ id: 'to_max', name: 'to_max' }
 	];
 
 	fields.forEach(field => {
@@ -231,27 +263,36 @@ function performSearch(urlPath) {
 		}
 	});
 
-	// Adding resolvedYn parameter
-	const resolvedYnRadioButtons = document.getElementsByName('resolvedYn');
-	let resolvedYnValue = '';
-	for (const radioButton of resolvedYnRadioButtons) {
-		if (radioButton.checked) {
-			resolvedYnValue = radioButton.value;
-			break;
-		}
-	}
-	if (resolvedYnValue) params.append('resolvedYn', resolvedYnValue);
+	const radioButtonGroups = [
+		{ name: 'resolvedYn', paramName: 'resolvedYn' },
+		{ name: 'replyYn', paramName: 'replyYn' },
+		{ name: 'discountType', paramName: 'discountType' },
+		{ name: 'sale_status', paramName: 'sale_status' },
+		{ name: 'onsaleYn', paramName:'onsaleYn'}
+	];
 
-	// Adding sale_status parameter
-	const saleStatusRadioButtons = document.getElementsByName('sale_status');
-	let saleStatusValue = '';
-	for (const radioButton of saleStatusRadioButtons) {
-		if (radioButton.checked) {
-			saleStatusValue = radioButton.value;
+	radioButtonGroups.forEach(group => {
+		const radioButtons = document.getElementsByName(group.name);
+		let selectedValue = '';
+		for (const radioButton of radioButtons) {
+			if (radioButton.checked) {
+				selectedValue = radioButton.value;
+				break;
+			}
+		}
+		if (selectedValue) params.append(group.paramName, selectedValue);
+	});
+
+	// Adding rating parameter
+	const ratingButtons = document.querySelectorAll('.star-rating .star');
+	let ratingValue = '';
+	for (const radioButton of ratingButtons) {
+		if (radioButton.classList.contains('checked')) {
+			ratingValue = radioButton.getAttribute('data-value');
 			break;
 		}
 	}
-	if (saleStatusValue) params.append('sale_status', saleStatusValue);
+	if (ratingValue) params.append('rating', ratingValue);
 
 	params.append('page', '0'); // 검색 시 첫 페이지로 이동
 	params.append('size', '5'); // 기본 페이지 크기 설정
@@ -267,10 +308,11 @@ function performSearch(urlPath) {
 			setupPaginationLinks();
 			setupCheckboxEventListeners();
 			initializeCKEditor();
-			history.pushState({ url: url, target: 'productManagement' }, '', url);
+			history.pushState({ url: url, target: urlPath.split('/').pop() }, '', url);
 		})
 		.catch(error => console.error('Error:', error));
 }
+
 
 
 function loadPage(page, size, urlPath) {
@@ -521,5 +563,13 @@ function handleInquiryToggleClick(event) {
 	const inquiryToggleMenu = inquiryToggle.nextElementSibling;
 	if (inquiryToggleMenu && inquiryToggleMenu.classList.contains('inquiryToggleMenu')) {
 		inquiryToggleMenu.classList.toggle('visible');
+	}
+}
+function handleReviewToggleClick(event) {
+	event.preventDefault();
+	const reviewToggle = event.target.closest('.reviewToggle');
+	const reviewToggleMenu = reviewToggle.nextElementSibling;
+	if (reviewToggleMenu && reviewToggleMenu.classList.contains('reviewToggleMenu')) {
+		reviewToggleMenu.classList.toggle('visible');
 	}
 }

@@ -50,10 +50,11 @@
 					<div class="half-width">
 						<label for="radio-group">해결 상태</label>
 						<div id="radio-group">
-							<label><input type="radio" name="resolvedYn" value="" id="resolvedYn"
-								checked> 전체</label> <label><input type="radio" id="resolvedYn"
-								name="resolvedYn" value="N"> 답변 대기</label> <label><input
-								type="radio" name="resolvedYn" id="resolvedYn" value="Y"> 답변 완료</label>
+							<label><input type="radio" name="resolvedYn" value=""
+								id="resolvedYn" checked> 전체</label> <label><input
+								type="radio" id="resolvedYn" name="resolvedYn" value="N">
+								답변 대기</label> <label><input type="radio" name="resolvedYn"
+								id="resolvedYn" value="Y"> 답변 완료</label>
 						</div>
 					</div>
 				</div>
@@ -67,7 +68,7 @@
 			<!-- 상품 목록 -->
 			<div class="product-list-header">
 				<div>
-					<span>조회된 판매글 수: <strong>10</strong>개
+					<span>조회된 판매글 수: <strong>${totalElements}</strong>개
 					</span>
 				</div>
 			</div>
@@ -84,32 +85,50 @@
 				</thead>
 				<tbody>
 					<c:forEach items="${inquiries.content}" var="inquiries">
-						<tr class="inquiryToggle" onclick="handleInquiryToggleClick(event);">
+						<tr class="inquiryToggle"
+							onclick="handleInquiryToggleClick(event);">
 							<td class="title-column">${inquiries.salesPotDTO.title}</td>
 							<td class="product-name-column">${inquiries.productDTO.productNumber}</td>
 							<td class="customer-id-column">${inquiries.customerDTO.nickname}</td>
 							<td class="inquiry-content-column">${inquiries.message}</td>
 							<td class="inquiry-date-column">${inquiries.createdDate}</td>
-							<td class="status-column">
-							<c:choose>
-								<c:when test="${inquiries.resolvedYn == 'Y'}">
+							<td class="status-column"><c:choose>
+									<c:when test="${inquiries.resolvedYn == 'Y'}">
 								답변 완료
 								</c:when>
-								<c:when test="${inquiries.resolvedYn == 'N'}">
+									<c:when test="${inquiries.resolvedYn == 'N'}">
 								답변 대기
 								</c:when>
-							</c:choose>
-							</td>
+								</c:choose></td>
 						</tr>
-						<tr class="inquiryToggleMenu">
-							<td colspan="6">
-								<div class="response-form">
-										<label for="response1" class="response-label">답변 작성</label>
-										<textarea id="message" class="response-textarea"></textarea>
-										<button type="button" class="primary responseBtn" data-inquiriesId="${ inquiries.id}">답변 보내기</button>
-								</div>
-							</td>
-						</tr>
+						<c:choose>
+							<c:when test="${inquiries.resolvedYn == 'Y'}">
+								<tr class="inquiryToggleMenu">
+									<td colspan="6">
+										<div class="response-form">
+											<div class="responseTitle">
+												<p>푸드로잉</p>
+												<p>${inquiries.responseDTO.createdDate}</p>
+											</div>
+											<textarea id="message" class="response-textarea"  readonly="readonly">${inquiries.responseDTO.message}</textarea>
+										</div>
+									</td>
+								</tr>
+							</c:when>
+							<c:when test="${inquiries.resolvedYn == 'N'}">
+								<tr class="inquiryToggleMenu">
+									<td colspan="6">
+										<div class="response-form">
+											<label for="response1" class="response-label">답변 작성</label>
+											<textarea id="message" class="response-textarea"></textarea>
+											<button type="button" class="primary responseBtn"
+												data-inquiriesId="${ inquiries.id}">답변 보내기</button>
+										</div>
+									</td>
+								</tr>
+							</c:when>
+						</c:choose>
+
 					</c:forEach>
 
 				</tbody>

@@ -25,9 +25,14 @@ import com.food.domain.product.dto.ProductDTO;
 import com.food.domain.product.dto.ProductFileDTO;
 import com.food.domain.product.dto.StockDTO;
 import com.food.domain.product.dto.StockTransactionDTO;
+import com.food.domain.sales.dto.DiscountDTO;
+import com.food.domain.sales.dto.ReviewDTO;
+import com.food.domain.sales.dto.ReviewFileDTO;
+import com.food.domain.sales.dto.ReviewsReplyDTO;
 import com.food.domain.sales.dto.SalesPostDTO;
 import com.food.domain.sales.dto.SalesPostFileDTO;
 import com.food.domain.support.dto.InquiriesDTO;
+import com.food.domain.support.dto.ResponseDTO;
 import com.food.domain.user.dto.AdminDTO;
 import com.food.domain.user.dto.CustomerDTO;
 import com.food.domain.user.mapper.AdminMapper;
@@ -368,15 +373,18 @@ public class AdminService {
 			List<InquiriesDTO> inquiries = adminMapper.findSalesInquiries();
 			List<InquiriesDTO> inquirieList = new ArrayList<>();
 			for(InquiriesDTO Inquiry : inquiries) {
+				Long InquiryId = Inquiry.getId();
 				Long salesPostId = Inquiry.getSalesPostId();
 				SalesPostDTO salesPotDTO = adminMapper.findSalesPostById(salesPostId);
 				String productNumber = salesPotDTO.getProductNumber();
 				ProductDTO productDTO = adminMapper.findProductByProductNumber(productNumber);
 				Long customerId = Inquiry.getCustomerId();
 				CustomerDTO customerDTO = adminMapper.findCustomerByCustomerId(customerId);
+				ResponseDTO responseDTO = adminMapper.findResponseByInquiryId(InquiryId);
 				Inquiry.setSalesPotDTO(salesPotDTO);
 				Inquiry.setProductDTO(productDTO);
 				Inquiry.setCustomerDTO(customerDTO);
+				Inquiry.setResponseDTO(responseDTO);
 				inquirieList.add(Inquiry);
 			}
 						
@@ -407,7 +415,8 @@ public class AdminService {
 			Page<InquiriesDTO> page = new PageImpl<>(inquirieList.subList(start, end), pageable, inquirieList.size());
 			return page;
 		}
-
+		
+		@Transactional
 		public void salesResponse(Map<String, Object> allParams) {
 			Long userId = null;
 	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -418,5 +427,96 @@ public class AdminService {
 	        Long adminId = adminMapper.findAdminByUserId(userId);
 	        allParams.put("adminId", adminId);
 	        adminMapper.insertResponse(allParams);
+	        adminMapper.updateResolvedYn(allParams);
 		}
+
+		public Page<ReviewDTO> findReviews(Pageable pageable, Map<String, String> allParams) {
+			List<ReviewDTO> reviews = adminMapper.findReviews();
+			List<ReviewDTO> reviewList = new ArrayList<>();
+			for(ReviewDTO review : reviews) {
+				Long reviewId = review.getId();
+				Long salesPostId = review.getSalesPostId();
+				SalesPostDTO salesPotDTO = adminMapper.findSalesPostById(salesPostId);
+				String productNumber = salesPotDTO.getProductNumber();
+				ProductDTO productDTO = adminMapper.findProductByProductNumber(productNumber);
+				Long customerId = review.getCustomerId();
+				CustomerDTO customerDTO = adminMapper.findCustomerByCustomerId(customerId);
+				ReviewsReplyDTO reviewsReplyDTO = adminMapper.findReplyByReviewId(reviewId);
+				ReviewFileDTO reviewFileDTO = adminMapper.findReviewFileByReviewId(reviewId);
+				review.setSalesPotDTO(salesPotDTO);
+				review.setProductDTO(productDTO);
+				review.setCustomerDTO(customerDTO);
+				review.setReviewsReplyDTO(reviewsReplyDTO);
+				review.setReviewFileDTO(reviewFileDTO);
+				reviewList.add(review);
+			}
+						
+			int start = (int) pageable.getOffset();
+			int end = Math.min((start + pageable.getPageSize()), reviewList.size());
+			Page<ReviewDTO> page = new PageImpl<>(reviewList.subList(start, end), pageable, reviewList.size());
+			return page;
+		}
+
+		public Page<ReviewDTO> findReviewsWithSearch(Pageable pageable, Map<String, String> allParams) {
+			List<ReviewDTO> reviews = adminMapper.findReviewsWithSearch(allParams);
+			List<ReviewDTO> reviewList = new ArrayList<>();
+			for(ReviewDTO review : reviews) {
+				Long reviewId = review.getId();
+				Long salesPostId = review.getSalesPostId();
+				SalesPostDTO salesPotDTO = adminMapper.findSalesPostById(salesPostId);
+				String productNumber = salesPotDTO.getProductNumber();
+				ProductDTO productDTO = adminMapper.findProductByProductNumber(productNumber);
+				Long customerId = review.getCustomerId();
+				CustomerDTO customerDTO = adminMapper.findCustomerByCustomerId(customerId);
+				ReviewsReplyDTO reviewsReplyDTO = adminMapper.findReplyByReviewId(reviewId);
+				ReviewFileDTO reviewFileDTO = adminMapper.findReviewFileByReviewId(reviewId);
+				review.setSalesPotDTO(salesPotDTO);
+				review.setProductDTO(productDTO);
+				review.setCustomerDTO(customerDTO);
+				review.setReviewsReplyDTO(reviewsReplyDTO);
+				review.setReviewFileDTO(reviewFileDTO);
+				reviewList.add(review);
+			}
+						
+			int start = (int) pageable.getOffset();
+			int end = Math.min((start + pageable.getPageSize()), reviewList.size());
+			Page<ReviewDTO> page = new PageImpl<>(reviewList.subList(start, end), pageable, reviewList.size());
+			return page;
+		}
+
+		public void reviewReply(Map<String, Object> allParams) {
+			Long userId = null;
+	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+	            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+	            userId = userDetails.getId();
+	        }
+	        Long adminId = adminMapper.findAdminByUserId(userId);
+	        allParams.put("adminId", adminId);
+	        adminMapper.insertReply(allParams);
+	        adminMapper.updateReplyYn(allParams);
+		}
+
+		public Page<DiscountDTO> findDiscounts(Pageable pageable, Map<String, String> allParams) {
+			List<DiscountDTO> discounts = adminMapper.findDisconts();
+			int start = (int) pageable.getOffset();
+			int end = Math.min((start + pageable.getPageSize()), discounts.size());
+			Page<DiscountDTO> page = new PageImpl<>(discounts.subList(start, end), pageable, discounts.size());
+			return page;
+		}
+
+		public Page<DiscountDTO> findDiscountsWithSearch(Pageable pageable, Map<String, String> allParams) {
+			List<DiscountDTO> discounts = adminMapper.findDiscountsWithSearch(allParams);
+			int start = (int) pageable.getOffset();
+			int end = Math.min((start + pageable.getPageSize()), discounts.size());
+			Page<DiscountDTO> page = new PageImpl<>(discounts.subList(start, end), pageable, discounts.size());
+			return page;
+		}
+
+		   @Transactional
+		    public void discountUpdate(List<Map<String, Object>> allParams) {
+		        for (Map<String, Object> params : allParams) {
+		        	adminMapper.updateDiscount(params);
+		        }
+		    }
 }

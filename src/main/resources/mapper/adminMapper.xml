@@ -421,32 +421,37 @@
 		FROM INQUIRIES_TB I
 		WHERE I.TYPE = 2
 		<if test="register_fr_date != null and register_fr_date != ''">
-			AND TRUNC(I.CREATED_DATE) &gt;= TO_DATE(#{register_fr_date},
+			AND TRUNC(I.CREATED_DATE) &gt;=
+			TO_DATE(#{register_fr_date},
 			'YYYY-MM-DD')
 		</if>
 		<if test="register_to_date != null and register_to_date != ''">
-			AND TRUNC(I.CREATED_DATE) &lt;= TO_DATE(#{register_to_date},
+			AND TRUNC(I.CREATED_DATE) &lt;=
+			TO_DATE(#{register_to_date},
 			'YYYY-MM-DD')
 		</if>
-    <if test="searchInput != null and searchInput != ''">
-        AND (
-            I.SALES_POST_ID IN (
-                SELECT S.ID
-                FROM SALES_POST_TB S
-                WHERE S.PRODUCT_NUMBER LIKE '%' || #{searchInput} || '%'
-            )
-            OR I.SALES_POST_ID IN (
-                SELECT S.ID
-                FROM SALES_POST_TB S
-                WHERE S.TITLE LIKE '%' || #{searchInput} || '%'
-            )
-            OR I.CUSTOMER_ID IN (
-                SELECT C.ID
-                FROM CUSTOMER_TB C
-                WHERE C.NICKNAME LIKE '%' || #{searchInput} || '%'
-            )
-        )
-    </if>
+		<if test="searchInput != null and searchInput != ''">
+			AND (
+			I.SALES_POST_ID IN (
+			SELECT S.ID
+			FROM SALES_POST_TB S
+			WHERE S.PRODUCT_NUMBER LIKE '%' || #{searchInput} || '%'
+			)
+			OR
+			I.SALES_POST_ID IN (
+			SELECT S.ID
+			FROM SALES_POST_TB S
+			WHERE S.TITLE LIKE
+			'%' || #{searchInput} || '%'
+			)
+			OR I.CUSTOMER_ID IN (
+			SELECT C.ID
+			FROM
+			CUSTOMER_TB C
+			WHERE C.NICKNAME LIKE '%' || #{searchInput} || '%'
+			)
+			)
+		</if>
 		<if test="resolvedYn != null and resolvedYn != ''">
 			AND I.RESOLVED_YN = #{resolvedYn}
 		</if>
@@ -460,13 +465,170 @@
 		WHERE ID = #{salesPostId}
 	</select>
 	<select id="findCustomerByCustomerId" parameterType="Long">
-		SELECT ID, USER_ID, NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE,
-		ADDRESS, ADDRESS_DETAIL, ZIPCODE
+		SELECT ID,
+		USER_ID, NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE,
+		ADDRESS,
+		ADDRESS_DETAIL, ZIPCODE
 		FROM CUSTOMER_TB
 		WHERE ID = #{customerId}
 	</select>
 	<insert id="insertResponse" parameterType="map">
-		Insert into RESPONSE_TB (INQUIRIES_ID, ADMIN_ID, MESSAGE, CREATED_DATE)
-		VALUES (#{inquiriesId}, #{adminId}, #{message}, CURRENT_TIMESTAMP)
+		Insert into
+		RESPONSE_TB (INQUIRIES_ID, ADMIN_ID, MESSAGE, CREATED_DATE)
+		VALUES
+		(#{inquiriesId}, #{adminId}, #{message}, CURRENT_TIMESTAMP)
 	</insert>
+	<update id="updateResolvedYn" parameterType="map">
+		update INQUIRIES_TB
+		set RESOLVED_YN = 'Y'
+		WHERE ID = #{inquiriesId}
+	</update>
+	<select id="findResponseByInquiryId" parameterType="Long">
+		SELECT ID,
+		INQUIRIES_ID, ADMIN_ID, MESSAGE, CREATED_DATE
+		FROM RESPONSE_TB
+		WHERE
+		INQUIRIES_ID = #{inquiryId}
+	</select>
+	<select id="findReviews">
+		SELECT ID, SALES_POST_ID, CUSTOMER_ID, RATING,
+		MESSAGE, CREATED_DATE, UPLOAD_DATE, REPLY_YN
+		FROM REVIEW_TB
+	</select>
+	<select id="findReviewsWithSearch" parameterType="map">
+		SELECT R.ID, R.SALES_POST_ID, R.CUSTOMER_ID, R.RATING, R.MESSAGE,
+		R.CREATED_DATE, R.UPLOAD_DATE, R.REPLY_YN
+		FROM REVIEW_TB R
+		WHERE 1=1
+		<if test="register_fr_date != null and register_fr_date != ''">
+			AND TRUNC(R.CREATED_DATE) &gt;=
+			TO_DATE(#{register_fr_date},
+			'YYYY-MM-DD')
+		</if>
+		<if test="register_to_date != null and register_to_date != ''">
+			AND TRUNC(R.CREATED_DATE) &lt;=
+			TO_DATE(#{register_to_date},
+			'YYYY-MM-DD')
+		</if>
+		<if test="searchInput != null and searchInput != ''">
+			AND (
+			R.SALES_POST_ID IN (
+			SELECT S.ID
+			FROM SALES_POST_TB S
+			WHERE S.PRODUCT_NUMBER LIKE '%' || #{searchInput} || '%'
+			)
+			OR
+			R.SALES_POST_ID IN (
+			SELECT S.ID
+			FROM SALES_POST_TB S
+			WHERE S.TITLE LIKE
+			'%' || #{searchInput} || '%'
+			)
+			OR R.CUSTOMER_ID IN (
+			SELECT C.ID
+			FROM
+			CUSTOMER_TB C
+			WHERE C.NICKNAME LIKE '%' || #{searchInput} || '%'
+			)
+			)
+		</if>
+		<if test="resolvedYn != null and resolvedYn != ''">
+			AND R.REPLY_YN = #{replyYn}
+		</if>
+		<if test="rating != null and rating != ''">
+			AND R.RATING = #{rating}
+		</if>
+		<if test="replyYn != null and replyYn != ''">
+			AND R.REPLY_YN = #{replyYn}
+		</if>
+	</select>
+	<select id="findReplyByReviewId" parameterType="Long">
+		SELECT ID,
+		REVIEW_ID, ADMIN_ID, MESSAGE, CREATED_DATE, UPLOAD_DATE, REVIEW_ID,
+		ADMIN_ID, MESSAGE, CREATED_DATE, UPLOAD_DATE
+		FROM REVIEWS_REPLY_TB
+		WHERE REVIEW_ID = #{reviewId}
+	</select>
+	<select id="findReviewFileByReviewId" parameterType="Long">
+		SELECT ID,
+		REVIEW_ID, ORIGINAL_NAME, FILE_PATH, FILE_TYPE, UPLOAD_DATE
+		FROM
+		REVIEW_FILE_TB
+		WHERE REVIEW_ID = #{reviewId}
+	</select>
+	<insert id="insertReply" parameterType="map">
+		Insert into
+		REVIEWS_REPLY_TB (REVIEW_ID, ADMIN_ID, MESSAGE, CREATED_DATE,
+		UPLOAD_DATE)
+		VALUES
+		(#{reviewId}, #{adminId}, #{message},
+		CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+	</insert>
+	<update id="updateReplyYn" parameterType="map">
+		update REVIEW_TB
+		set
+		REPLY_YN = 'Y'
+		WHERE ID = #{reviewId}
+	</update>
+	<select id="findDisconts">
+		SELECT
+		ID, ONSALE_YN, NAME, TYPE, START_DATE,
+		END_DATE, DISCOUNT_TYPE,
+		DISCOUNT_VALUE, MAX_DISCOUNT, DESCRIPTION,
+		MIN_PRICE
+		FROM DISCOUNT_TB
+	</select>
+	<select id="findDiscountsWithSearch" parameterType="map">
+		SELECT
+		D.ID, D.ONSALE_YN, D.NAME, D.TYPE, D.START_DATE, D.END_DATE,
+		D.DISCOUNT_TYPE, D.DISCOUNT_VALUE, D.MAX_DISCOUNT, D.DESCRIPTION,
+		D.MIN_PRICE
+		FROM DISCOUNT_TB D
+		WHERE 1=1
+		<if
+			test="register_fr_date != null and register_fr_date != '' and register_to_date != null and register_to_date != ''">
+			AND TRUNC(D.START_DATE) &lt;=
+			TO_DATE(#{register_to_date},
+			'YYYY-MM-DD')
+			AND TRUNC(D.END_DATE) &gt;=
+			TO_DATE(#{register_fr_date},
+			'YYYY-MM-DD')
+		</if>
+		<if test="fr_min != null and fr_min != ''">
+			AND D.MIN_PRICE &gt;= #{fr_min}
+		</if>
+		<if test="to_min != null and to_min != ''">
+			AND D.MIN_PRICE &lt;= #{to_min}
+		</if>
+		<if test="fr_max != null and fr_max != ''">
+			AND D.MAX_DISCOUNT &gt;= #{fr_max}
+		</if>
+		<if test="to_max != null and to_max != ''">
+			AND D.MAX_DISCOUNT &lt;= #{to_max}
+		</if>
+		<if test="onsaleYn != null and onsaleYn != ''">
+			AND D.ONSALE_YN = #{onsaleYn}
+		</if>
+		<if test="discountType != null and discountType != ''">
+			AND D.DISCOUNT_TYPE = #{discountType}
+		</if>
+		<if test="type != null and type != ''">
+			AND D.TYPE = #{type}
+		</if>
+	</select>
+	<update id="updateDiscount" parameterType="map">
+	 UPDATE DISCOUNT_TB
+        SET 
+            NAME = #{name},
+            DESCRIPTION = #{description},
+            DISCOUNT_TYPE = #{discountType},
+            TYPE = #{type},
+            DISCOUNT_VALUE = #{discountValue},
+            MIN_PRICE = #{minPrice},
+            MAX_DISCOUNT = #{maxDiscount},
+            START_DATE = #{startDate},
+            END_DATE = #{endDate},
+            ONSALE_YN = #{onsaleYn}
+        WHERE ID = #{id}
+	</update>
 </mapper>

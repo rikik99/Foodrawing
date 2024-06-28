@@ -31,6 +31,8 @@ import org.springframework.web.servlet.ModelAndView;
 import com.food.domain.product.dto.ProductCategoryDTO;
 import com.food.domain.product.dto.ProductDTO;
 import com.food.domain.product.dto.StockTransactionDTO;
+import com.food.domain.sales.dto.DiscountDTO;
+import com.food.domain.sales.dto.ReviewDTO;
 import com.food.domain.sales.dto.SalesPostDTO;
 import com.food.domain.sales.dto.SalesPostFileDTO;
 import com.food.domain.support.dto.InquiriesDTO;
@@ -303,19 +305,87 @@ public class AdminController {
 	
 	
 	@GetMapping("/salesReview")
-	public ModelAndView salesReview() {
+	public ModelAndView salesReview(@RequestParam Map<String, String> allParams) {
 		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+
+		// 페이지 정보와 사이즈 정보를 allParams에 추가
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		Page<ReviewDTO> reviews;
+		log.info("reviews Params ={}", allParams);
+		// 검색 조건이 있는지 확인
+		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
+				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
+
+		if (hasSearchParams) {
+			// 검색 조건이 있을 경우
+			reviews = adminService.findReviewsWithSearch(pageable, allParams);
+
+		} else {
+			// 검색 조건이 없을 경우
+			reviews = adminService.findReviews(pageable, allParams);
+		}
+		mv.addObject("reviews", reviews);
+		log.info("reviews = {}",reviews.getContent());
+		mv.addObject("currentPage", reviews.getNumber());
+		mv.addObject("pageCount", reviews.getTotalPages());
+		mv.addObject("totalElements", reviews.getTotalElements());
+		mv.addObject("size", size);
 		mv.setViewName("admin/salesReview");
 		return mv;
 	}
 
+	@PostMapping("/reviewReply")
+	@ResponseBody
+	public ResponseEntity<?> reviewReply(@RequestBody Map<String, Object> allParams) {
+		adminService.reviewReply(allParams);
+		return ResponseEntity.ok(Map.of("success", true, "message", "답변이 성공적으로 작성되었습니다."));
+	}
+	
 	@GetMapping("/discountList")
-	public ModelAndView discountList() {
+	public ModelAndView discountList(@RequestParam Map<String, String> allParams) {
 		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+
+		// 페이지 정보와 사이즈 정보를 allParams에 추가
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		Page<DiscountDTO> discounts;
+		log.info("reviews Params ={}", allParams);
+		// 검색 조건이 있는지 확인
+		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
+				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
+
+		if (hasSearchParams) {
+			// 검색 조건이 있을 경우
+			discounts = adminService.findDiscountsWithSearch(pageable, allParams);
+
+		} else {
+			// 검색 조건이 없을 경우
+			discounts = adminService.findDiscounts(pageable, allParams);
+		}
+		mv.addObject("discounts", discounts);
+		log.info("discounts = {}",discounts.getContent());
+		mv.addObject("currentPage", discounts.getNumber());
+		mv.addObject("pageCount", discounts.getTotalPages());
+		mv.addObject("totalElements", discounts.getTotalElements());
+		mv.addObject("size", size);
 		mv.setViewName("admin/discountList");
 		return mv;
 	}
 
+    @PostMapping("/discountUpdate")
+    @ResponseBody
+    public ResponseEntity<?> discountUpdate(@RequestBody List<Map<String, Object>> allParams) {
+        adminService.discountUpdate(allParams);
+        return ResponseEntity.ok(Map.of("success", true, "message", "할인 정보가 성공적으로 수정되었습니다."));
+    }
+	
 	@GetMapping("/discountManagement")
 	public ModelAndView discountManagement() {
 		ModelAndView mv = new ModelAndView();
