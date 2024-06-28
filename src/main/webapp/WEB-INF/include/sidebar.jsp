@@ -12,7 +12,7 @@
         최근 본  
         <div class="recent-view-carousel" id="recent-view-carousel">
             <div class="carousel-slides slides">
-                <!-- 최근 본 상품 목록 표시 -->
+                <!-- 최근 본 상품 목록 표시 --> 
             </div>
             <div class="carousel-navigation">
                 <button class="carousel-prev" onclick="prevSlide('recent-view-carousel')">&#60;</button>
