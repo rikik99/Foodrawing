@@ -1,17 +1,18 @@
 package com.food.global.configuration;
 
-import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 
 import com.food.domain.user.service.CustomOAuth2UserService;
 import com.food.domain.user.service.CustomUserDetailsService;
@@ -22,9 +23,6 @@ import com.food.global.auth.CustomOAuth2SuccessHandler;
 import com.food.global.auth.JwtAuthenticationFilter;
 import com.food.global.auth.JwtUtil;
 
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.SessionCookieConfig;
 import jakarta.servlet.http.Cookie;
 
 @Configuration
@@ -59,40 +57,40 @@ public class SecurityConfig {
 		return new JwtAuthenticationFilter(jwtUtil, customUserDetailsService);
 	}
 
-	  @Bean
-	    public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
-	        http.csrf(csrf -> csrf.disable()).securityMatcher("/admin/**")
-	            .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-	                .requestMatchers("/admin/login", "/admin/loginFail").permitAll()
-	                .anyRequest().hasAuthority("ROLE_ADMIN"))
-	            .formLogin(formLogin -> formLogin
-	                .loginPage("/admin/login")
-	                .loginProcessingUrl("/admin/login")
-	                .defaultSuccessUrl("/admin/mainContent", true)
-	                .successHandler(customAuthenticationSuccessHandler)
-	                .failureHandler(customAuthenticationFailureHandler)
-	                .permitAll())
-	            .logout(logout -> logout
-	                .logoutUrl("/admin/logout")
-	                .logoutSuccessHandler((request, response, authentication) -> {
-	                    Cookie cookie = new Cookie("jwt", null);
-	                    cookie.setHttpOnly(true);
-	                    cookie.setSecure(false); // HTTP 환경에서는 false로 설정
-	                    cookie.setPath("/");
-	                    cookie.setMaxAge(0); // 쿠키 삭제
-	                    response.addCookie(cookie);
-	                    request.getSession().invalidate(); // 세션 무효화
-	                    response.sendRedirect("/login");
-	                })
-	                .permitAll())
-	            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // 세션을 필요할 때만 생성하도록 설정
-	            .userDetailsService(customUserDetailsService);
+    @Bean
+    public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable()).securityMatcher("/admin/**")
+            .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                .requestMatchers("/admin/login", "/admin/loginFail").permitAll()
+                .anyRequest().hasAuthority("ROLE_ADMIN"))
+            .formLogin(formLogin -> formLogin
+                .loginPage("/admin/login")
+                .loginProcessingUrl("/admin/login")
+                .defaultSuccessUrl("/admin/mainContent", true)
+                .successHandler(customAuthenticationSuccessHandler)
+                .failureHandler(customAuthenticationFailureHandler)
+                .permitAll())
+            .logout(logout -> logout
+                .logoutUrl("/admin/logout")
+                .logoutSuccessHandler((request, response, authentication) -> {
+                    Cookie cookie = new Cookie("jwt", null);
+                    cookie.setHttpOnly(true);
+                    cookie.setSecure(false); // HTTP 환경에서는 false로 설정
+                    cookie.setPath("/");
+                    cookie.setMaxAge(0); // 쿠키 삭제
+                    response.addCookie(cookie);
+                    request.getSession().invalidate(); // 세션 무효화
+                    response.sendRedirect("/login");
+                })
+                .permitAll())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // 세션을 필요할 때만 생성하도록 설정
+            .userDetailsService(customUserDetailsService);
 
-	        // X-Frame-Options SAMEORIGIN 설정 추가
-	        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
+        // X-Frame-Options SAMEORIGIN 설정 추가
+        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
-	        return http.build();
-	    }
+        return http.build();
+    }
 
 	@Bean
 	public SecurityFilterChain userSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -105,7 +103,8 @@ public class SecurityConfig {
 						"/findPassword", "/sendPasswordResetCode", "/verify-password-code", "/passwordReset", "/best",
 						"/ProductDetail", "/cart/checkStock", "/cart/addToCart", "/cart", "/cart/deleteCartItem",
 						"/order/prepareCheckout", "/checkoutPage", "/order/prepareCheckoutAll", "/cart/updateCartItem",
-						"/cart/deleteSelectedItems", "/payment/result", "/payment/restoreStock").permitAll()
+						"/cart/deleteSelectedItems", "/payment/result", "/payment/restoreStock", "/buy/checkoutPage",
+						"/wishlist/add", "/wishlist/remove").permitAll()
 						.anyRequest().authenticated())
 				.formLogin(formLogin -> formLogin.loginPage("/login").defaultSuccessUrl("/", true)
 						.successHandler(customAuthenticationSuccessHandler)
@@ -124,17 +123,14 @@ public class SecurityConfig {
 							request.getSession().invalidate(); // 세션 무효화
 							response.sendRedirect("/login");
 						}).permitAll())
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // 세션을
-																												// 필요할
-																												// 때만
-																												// 생성하도록
-																												// 설정
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // 세션을 필요할 때만 생성하도록 설정
 				.userDetailsService(customUserDetailsService);
 
-		http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        // X-Frame-Options SAMEORIGIN 설정 추가
+        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
-		return http.build();
-	}
+        return http.build();
+    }
 
 	@Bean
 	public UserDetailsService userDetailsService() {
@@ -144,19 +140,5 @@ public class SecurityConfig {
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
-	}
-
-	@Bean
-	public ServletContextInitializer initializer() {
-		return new ServletContextInitializer() {
-			@Override
-			public void onStartup(ServletContext servletContext) throws ServletException {
-				SessionCookieConfig sessionCookieConfig = servletContext.getSessionCookieConfig();
-				sessionCookieConfig.setMaxAge(-1); // 브라우저 닫을 때 세션 쿠키 삭제
-				sessionCookieConfig.setHttpOnly(true);
-				sessionCookieConfig.setSecure(false);
-				System.out.println("Session Cookie Config MaxAge set to: " + sessionCookieConfig.getMaxAge());
-			}
-		};
 	}
 }

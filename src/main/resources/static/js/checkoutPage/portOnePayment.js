@@ -87,8 +87,8 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
             var randomPgProvider = pgProviders[Math.floor(Math.random() * pgProviders.length)];
 
             IMP.request_pay({
-            		//pg: randomPgProvider,
-                pg: "kicc.T5102001",
+            		pg: randomPgProvider,
+                //pg: "uplus.tlgdacomxpay",
                 pay_method: "card",
                 merchant_uid: 'merchant_' + orderNumber,
                 name: '주문명:결제테스트',

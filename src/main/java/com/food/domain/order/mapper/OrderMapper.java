@@ -16,4 +16,6 @@ public interface OrderMapper {
 
 	List<CartInfoDTO> findItemsByIds(Map<String, Object> params);
 
+	List<CartInfoDTO> findItem(String productNumber);
+
 }

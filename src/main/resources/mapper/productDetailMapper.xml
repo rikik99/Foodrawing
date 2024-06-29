@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.food.domain.product.mapper.ProductDetailMapper">
+	<select id="getProductById">
+		SELECT PRODUCT_NUMBER, NAME, DESCRIPTION, PRICE, QUANTITY, CREATED_DATE
+		FROM PRODUCT_TB
+		WHERE PRODUCT_NUMBER = #{productNumber}
+	</select>
+    
+    <select id="getProductFileByProductNumber">
+    	SELECT ID, PRODUCT_NUMBER, ORIGINAL_NAME, FILE_PATH, FILE_TYPE, UPLOAD_DATE
+    	FROM PRODUCT_FILE_TB
+    	WHERE PRODUCT_NUMBER = #{productNumber}
+    </select>
+    
+    <select id="getCategoryByCategryCode">
+    	SELECT ID, NAME, CATEGORY_CODE, NEXT_VAL
+    	FROM PRODUCT_CATEGORY_TB
+    	WHERE CATEGORY_CODE = #{categoryCode}
+    </select>
+
+		<select id="getDiscount">
+		    SELECT
+		        d.ID AS DISCOUNT_ID,
+		        d.ONSALE_YN,
+		        d.NAME,
+		        d.TYPE,
+		        d.START_DATE,
+		        d.END_DATE,
+		        d.DISCOUNT_TYPE,
+		        d.DISCOUNT_VALUE,
+		        d.MAX_DISCOUNT,
+		        d.DESCRIPTION,
+		        d.MIN_PRICE,
+		        dt.ID AS TARGET_ID,
+		        dt.DISCOUNT_ID,
+		        dt.TARGET_TYPE,
+		        dt.TARGET_ID
+		    FROM
+		        DISCOUNT_TB d
+		    JOIN
+		        DISCOUNT_TARGET_TB dt ON d.ID = dt.DISCOUNT_ID
+		    WHERE
+		        ((dt.TARGET_TYPE = 'CATEGORY' AND dt.TARGET_ID = #{productCategoryInfo.id})
+		        OR (dt.TARGET_TYPE = 'PRODUCT' AND dt.TARGET_ID = #{productNumber}))
+		        AND d.START_DATE &lt;= SYSDATE
+		        AND d.END_DATE &gt;= SYSDATE
+		</select>
+</mapper>

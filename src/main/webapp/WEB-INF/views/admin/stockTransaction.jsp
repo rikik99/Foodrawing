@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,45 +12,73 @@
         <jsp:include page="/WEB-INF/views/admin/layout.jsp" />
         <div class="main-content dark-mode" id="mainContent">
             <h1>입출고 목록</h1>
-            <!-- 재고 목록 -->
             <div class="product-list-header">
                 <div>
-                    <span>조회된 상품 개수: <strong>10</strong>개</span>
+                    <span>조회된 상품 개수: <strong>${totalElements}</strong>개</span>
                 </div>
             </div>
             <table class="product-list dark-mode">
                 <thead>
                     <tr>
                         <th>이미지</th>
-                        <th class="sortable" data-column="product" data-type="string">상품명(상품 코드, 상품명)<span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
-                        <th class="sortable" data-column="type" data-type="string">입/출고<span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
-                        <th class="sortable" data-column="quantity" data-type="number">수량<span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
-                        <th class="sortable" data-column="date" data-type="date">입출고 날짜<span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
-                        <th class="sortable" data-column="expiration" data-type="date">유통 기한<span class="sort-icon asc">▲</span><span class="sort-icon desc">▼</span></th>
+                        <th class="sortable" data-column="PRODUCT_NUMBER" data-sort="${sort.startsWith('product,') ? sort.split(',')[1] : '-'}">상품명(상품 코드, 상품명)
+                            <span class="sort-icon default">-</span>
+                            <span class="sort-icon asc">▲</span>
+                            <span class="sort-icon desc">▼</span>
+                        </th>
+                        <th class="sortable" data-column="TRANSACTION_TYPE" data-sort="${sort.startsWith('transactionType,') ? sort.split(',')[1] : '-'}">입/출고
+                            <span class="sort-icon default">-</span>
+                            <span class="sort-icon asc">▲</span>
+                            <span class="sort-icon desc">▼</span>
+                        </th>
+                        <th class="sortable" data-column="QUANTITY" data-sort="${sort.startsWith('quantity,') ? sort.split(',')[1] : '-'}">수량
+                            <span class="sort-icon default">-</span>
+                            <span class="sort-icon asc">▲</span>
+                            <span class="sort-icon desc">▼</span>
+                        </th>
+                        <th class="sortable" data-column="TRANSACTION_DATE" data-sort="${sort.startsWith('TRANSACTION_DATE,') ? sort.split(',')[1] : '-'}">입출고 날짜
+                            <span class="sort-icon default">-</span>
+                            <span class="sort-icon asc">▲</span>
+                            <span class="sort-icon desc">▼</span>
+                        </th>
+                        <th class="sortable" data-column="EXPIRATION_DATE" data-sort="${sort.startsWith('expirationDate,') ? sort.split(',')[1] : '-'}">유통 기한
+                            <span class="sort-icon default">-</span>
+                            <span class="sort-icon asc">▲</span>
+                            <span class="sort-icon desc">▼</span>
+                        </th>
                     </tr>
                 </thead>
                 <tbody id="stockTableBody">
-                    <tr>
-                        <td><img src="http://example.com/image1.jpg" alt="상품1 이미지" width="50" height="50"></td>
-                        <td data-column="product" data-type="string">001, 상품 1</td>
-                        <td data-column="type" data-type="string">입고</td>
-                        <td data-column="quantity" data-type="number">10</td>
-                        <td data-column="date" data-type="date">2024-06-17</td>
-                        <td data-column="expiration" data-type="date">2024-06-30</td>
-                    </tr>
-                    <tr>
-                        <td><img src="http://example.com/image2.jpg" alt="상품2 이미지" width="50" height="50"></td>
-                        <td data-column="product" data-type="string">002, 상품 2</td>
-                        <td data-column="type" data-type="string">출고</td>
-                        <td data-column="quantity" data-type="number">5</td>
-                        <td data-column="date" data-type="date">2024-06-18</td>
-                        <td data-column="expiration" data-type="date">2024-06-30</td>
-                    </tr>
+                    <c:forEach items="${transaction}" var="transaction">
+                        <tr>
+                            <td><img class="productImg" src="${transaction.productFileDTO.filePath}" alt="상품 이미지"></td>
+                            <td><p>${transaction.productNumber}</p><p>${transaction.productDTO.name}</p></td>
+                            <td><c:choose>
+                                    <c:when test="${fn:trim(transaction.transactionType) == 'IN'}">입고</c:when>
+                                    <c:when test="${fn:trim(transaction.transactionType) == 'OUT'}">출고</c:when>
+                                    <c:otherwise>알 수 없음</c:otherwise>
+                                </c:choose></td>
+                            <td>${transaction.quantity}</td>
+                            <td>${transaction.transactionDate}</td>
+                            <td>${transaction.expirationDate}</td>
+                        </tr>
+                    </c:forEach>
                 </tbody>
             </table>
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <c:forEach begin="1" end="${pageCount}" var="i">
+                        <li class="page-item ${currentPage + 1 == i ? 'active' : ''}">
+                            <a class="page-link" data-page="${i - 1}" data-size="${size}" data-url="/admin/stockTransaction">${i}</a>
+                        </li>
+                    </c:forEach>
+                </ul>
+            </nav>
         </div>
         <button id="toggleMode" class="primary">Toggle Mode</button>
-        <script src="<c:url value='/js/adminMain.js'/>"></script>
+        <script src="<c:url value='/js/admin/main.js'/>"></script>
+        <script src="<c:url value='/js/admin/toggleMode.js'/>"></script>
+        <script src="<c:url value='/js/admin/sortTable.js'/>"></script>
     </div>
 </body>
 </html>

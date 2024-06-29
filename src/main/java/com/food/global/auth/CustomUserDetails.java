@@ -36,6 +36,10 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
         return authorities;
     }
 
+    public Long getId() {
+        return userDTO.getId();
+    }
+    
     @Override
     public String getPassword() {
         return userDTO.getPassword();
