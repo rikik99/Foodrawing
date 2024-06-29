@@ -1,16 +1,18 @@
 package com.food.global.configuration;
 
-import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 
 import com.food.domain.user.service.CustomOAuth2UserService;
 import com.food.domain.user.service.CustomUserDetailsService;
@@ -21,9 +23,6 @@ import com.food.global.auth.CustomOAuth2SuccessHandler;
 import com.food.global.auth.JwtAuthenticationFilter;
 import com.food.global.auth.JwtUtil;
 
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.SessionCookieConfig;
 import jakarta.servlet.http.Cookie;
 
 @Configuration
@@ -104,7 +103,8 @@ public class SecurityConfig {
 						"/findPassword", "/sendPasswordResetCode", "/verify-password-code", "/passwordReset", "/best",
 						"/ProductDetail", "/cart/checkStock", "/cart/addToCart", "/cart", "/cart/deleteCartItem",
 						"/order/prepareCheckout", "/checkoutPage", "/order/prepareCheckoutAll", "/cart/updateCartItem",
-						"/cart/deleteSelectedItems", "/payment/result", "/payment/restoreStock", "/buy/checkoutPage").permitAll()
+						"/cart/deleteSelectedItems", "/payment/result", "/payment/restoreStock", "/buy/checkoutPage",
+						"/wishlist/add", "/wishlist/remove").permitAll()
 						.anyRequest().authenticated())
 				.formLogin(formLogin -> formLogin.loginPage("/login").defaultSuccessUrl("/", true)
 						.successHandler(customAuthenticationSuccessHandler)
@@ -123,11 +123,7 @@ public class SecurityConfig {
 							request.getSession().invalidate(); // 세션 무효화
 							response.sendRedirect("/login");
 						}).permitAll())
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // 세션을
-																												// 필요할
-																												// 때만
-																												// 생성하도록
-																												// 설정
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // 세션을 필요할 때만 생성하도록 설정
 				.userDetailsService(customUserDetailsService);
 
         // X-Frame-Options SAMEORIGIN 설정 추가
@@ -145,5 +141,4 @@ public class SecurityConfig {
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-
 }
