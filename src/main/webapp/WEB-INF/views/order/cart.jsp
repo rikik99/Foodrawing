@@ -28,6 +28,11 @@
             align-items: center;
             border-bottom: 1px solid #ccc;
             padding: 10px 0;
+            position: relative;
+        }
+
+        .order-cart-item .img-container {
+            position: relative;
         }
 
         .order-cart-item img {
@@ -129,7 +134,33 @@
             border-radius: 5px;
         }
         .select-item {
-        	margin-right: 5px;
+            margin-right: 5px;
+        }
+
+        /* 품절 표시 스타일 */
+        .sold-out-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2em;
+            border-radius: 5px;
+        }
+        
+        .btn-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-placeholder {
+            width: 80px;
+            height: 20px;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
@@ -153,20 +184,34 @@
     <!-- 장바구니 아이템 -->
     <c:forEach var="item" items="${cartItems}">
         <div class="order-cart-item" data-item-id="${item.productNumber}">
-            <input type="checkbox" class="select-item">
-            <img src="${item.filePath}" alt="상품 이미지">
+            <input type="checkbox" class="select-item" onclick="toggleSelectItem()">
+            <div class="img-container">
+                <img src="${item.filePath}" alt="상품 이미지">
+                <c:if test="${item.productQuantity == 0}">
+                    <div class="sold-out-overlay">품절</div>
+                </c:if>
+            </div>
             <div class="order-details">
+                <input type="hidden" id="salesPostId" class="salesPostId" name="salesPostId" value="${item.salesPostId}">
                 <h2>${item.name}</h2>
                 <p>${item.description}</p>
             </div>
             <div class="order-quantity">
-                <button type="button" data-product-id="${item.productNumber}" onclick="changeQuantity(this, -1)">-</button>
-                <input type="text" value="${item.quantity}" size="2" readonly>
-                <button type="button" data-product-id="${item.productNumber}" onclick="changeQuantity(this, 1)">+</button>
+                <button type="button" data-product-number="${item.productNumber}" onclick="changeQuantity(this, -1)">-</button>
+                <input type="text" class="quantity" value="${item.quantity}" size="2" readonly>
+                <input type="hidden" class="productQuantity" value="${item.productQuantity}">
+                <button type="button" data-product-number="${item.productNumber}" onclick="changeQuantity(this, 1)">+</button>
             </div>
             <div class="price">${item.price}원</div>
-            <button class="btn-update" type="button" data-product-id="${item.productNumber}" onclick="updateCartItem(this)">수정</button>
-            <button class="btn-delete" type="button" data-product-id="${item.productNumber}" onclick="deleteCartItem(this)">삭제</button>
+            <div class="btn-container">
+                <c:if test="${item.productQuantity > 0}">
+                    <button class="btn-update" type="button" data-product-number="${item.productNumber}" data-product-quantity="${item.productQuantity}" onclick="updateCartItem(this)">수정</button>
+                </c:if>
+                <c:if test="${item.productQuantity == 0}">
+                    <div class="btn-placeholder"></div>
+                </c:if>
+            </div>
+            <button class="btn-delete" type="button" data-product-number="${item.productNumber}" onclick="deleteCartItem(this)">삭제</button>
         </div>
     </c:forEach>
 
@@ -201,8 +246,8 @@
 
 <script>
 function changeQuantity(button, amount) {
-    var productId = button.getAttribute('data-product-id');
-    var quantityInput = document.querySelector('.order-cart-item[data-item-id="' + productId + '"] .order-quantity input');
+    var productNumber = button.getAttribute('data-product-number');
+    var quantityInput = document.querySelector('.order-cart-item[data-item-id="' + productNumber + '"] .order-quantity .quantity');
     if (quantityInput) {
         var newQuantity = parseInt(quantityInput.value) + amount;
 
@@ -212,16 +257,24 @@ function changeQuantity(button, amount) {
 
         quantityInput.value = newQuantity;
     } else {
-        console.error('수량 입력 필드를 찾을 수 없습니다: ' + productId);
+        console.error('수량 입력 필드를 찾을 수 없습니다: ' + productNumber);
     }
 }
 
 function updateCartItem(button) {
-    var productId = button.getAttribute('data-product-id');
-    var quantityInput = document.querySelector('.order-cart-item[data-item-id="' + productId + '"] .order-quantity input');
+    var productNumber = button.getAttribute('data-product-number');
+    var quantityInput = document.querySelector('.order-cart-item[data-item-id="' + productNumber + '"] .order-quantity .quantity');
+    var productQuantity = parseInt(button.getAttribute('data-product-quantity'));
+
     if (quantityInput) {
         var newQuantity = parseInt(quantityInput.value);
-        var customerId = 1/* 고객 ID를 적절히 넣어야 합니다 */;
+
+        if (newQuantity > productQuantity) {
+            alert('재고가 부족합니다.');
+            return;
+        }
+
+        var customerId = 1; // 고객 ID를 적절히 넣어야 합니다
 
         fetch('/cart/updateCartItem', {
             method: 'POST',
@@ -230,13 +283,13 @@ function updateCartItem(button) {
             },
             body: JSON.stringify({
                 customerId: customerId,
-                productNumber: productId,
+                productNumber: productNumber,
                 quantity: newQuantity
             }),
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error('수량 업데이트 실패: ' + productId);
+                throw new Error('수량 업데이트 실패: ' + productNumber);
             }
             return response.json();
         })
@@ -249,14 +302,14 @@ function updateCartItem(button) {
             alert('수량 업데이트 중 오류가 발생했습니다.');
         });
     } else {
-        console.error('수량 입력 필드를 찾을 수 없습니다: ' + productId);
+        console.error('수량 입력 필드를 찾을 수 없습니다: ' + productNumber);
     }
 }
 
 function deleteCartItem(button) {
-    var productId = button.getAttribute('data-product-id');
+    var productNumber = button.getAttribute('data-product-number');
     var customerId = 1; // 고객 ID를 적절히 넣어야 합니다
-    
+
     fetch('/cart/deleteCartItem', {
         method: 'POST',
         headers: {
@@ -264,20 +317,20 @@ function deleteCartItem(button) {
         },
         body: JSON.stringify({
             customerId: customerId,
-            productNumber: productId
+            productNumber: productNumber
         }),
     })
     .then(response => {
         if (!response.ok) {
             return response.json().then(data => {
-                throw new Error(data.message || '장바구니에서 삭제 실패: ' + productId);
+                throw new Error(data.message || '장바구니에서 삭제 실패: ' + productNumber);
             });
         }
         return response.json();
     })
     .then(data => {
         if (data.success) {
-            var cartItem = document.querySelector('.order-cart-item[data-item-id="' + productId + '"]');
+            var cartItem = document.querySelector('.order-cart-item[data-item-id="' + productNumber + '"]');
             cartItem.remove();
             alert('항목이 성공적으로 삭제되었습니다.');
             calculateTotal();
@@ -293,10 +346,11 @@ function deleteCartItem(button) {
 
 function deleteSelectedItems() {
     var selectedItems = document.querySelectorAll('.select-item:checked');
-    var customerId = 1/* 고객 ID를 적절히 넣어야 합니다 */;
+    var customerId = 1; // 고객 ID를 적절히 넣어야 합니다
+
     selectedItems.forEach(item => {
-        var productId = item.closest('.order-cart-item').getAttribute('data-item-id');
-        deleteCartItem(productId);
+        var productNumber = item.closest('.order-cart-item').getAttribute('data-item-id');
+        deleteCartItem(document.querySelector('.order-cart-item[data-item-id="' + productNumber + '"] .btn-delete'));
     });
 }
 
@@ -305,6 +359,37 @@ function checkoutSelectedItems() {
     var selectedIds = Array.from(selectedItems).map(item => item.closest('.order-cart-item').getAttribute('data-item-id'));
     var customerId = 1; // 고객 ID를 적절히 넣어야 합니다
 
+    if (selectedIds.length === 0) {
+        alert('선택된 항목이 없습니다.');
+        return;
+    }
+
+    var soldOutItems = document.querySelectorAll('.order-cart-item .sold-out-overlay');
+    var hasSoldOut = false;
+    var insufficientStock = false;
+
+    selectedItems.forEach(item => {
+        var productNumber = item.closest('.order-cart-item').getAttribute('data-item-id');
+        var productQuantity = parseInt(item.closest('.order-cart-item').querySelector('.productQuantity').value);
+        var quantity = parseInt(item.closest('.order-cart-item').querySelector('.quantity').value);
+        if (productQuantity == 0) {
+            hasSoldOut = true;
+        }
+        if (quantity > productQuantity) {
+            insufficientStock = true;
+        }
+    });
+
+    if (hasSoldOut) {
+        alert('품절된 상품이 있습니다.');
+        return;
+    }
+
+    if (insufficientStock) {
+        alert('재고가 부족한 상품이 있습니다.');
+        return;
+    }
+
     fetch('/order/prepareCheckout', {
         method: 'POST',
         headers: {
@@ -312,21 +397,36 @@ function checkoutSelectedItems() {
         },
         body: JSON.stringify({
             customerId: customerId,
-            productIds: selectedIds
+            productNumbers: selectedIds
         }),
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('선택된 항목 결제 준비 실패');
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-        // GET 요청에 필요한 URL 파라미터를 구성
-        var params = new URLSearchParams();
-        params.append('customerId', customerId);
-        selectedIds.forEach(id => params.append('productIds', id));
-        window.location.href = '/checkoutPage?' + params.toString();
+        if (!data.success) {
+            alert('품절된 상품이 있습니다.');
+            return;
+        }
+        // Create a form and submit it with POST method
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/checkoutPage';
+
+        var customerIdInput = document.createElement('input');
+        customerIdInput.type = 'hidden';
+        customerIdInput.name = 'customerId';
+        customerIdInput.value = customerId;
+        form.appendChild(customerIdInput);
+
+        selectedIds.forEach(id => {
+            var productNumberInput = document.createElement('input');
+            productNumberInput.type = 'hidden';
+            productNumberInput.name = 'productNumbers';
+            productNumberInput.value = id;
+            form.appendChild(productNumberInput);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
     })
     .catch(error => {
         console.error('결제 준비 오류:', error);
@@ -337,10 +437,35 @@ function checkoutSelectedItems() {
 function checkoutAllItems() {
     var customerId = 1; // 고객 ID를 적절히 넣어야 합니다
     var cartItems = document.querySelectorAll('.order-cart-item');
-    var productIds = Array.from(cartItems).map(item => item.getAttribute('data-item-id'));
-    
-    if (productIds.length === 0) {
+    var productNumber = Array.from(cartItems).map(item => item.getAttribute('data-item-id'));
+
+    if (productNumber.length === 0) {
         alert('장바구니에 담긴 항목이 없습니다.');
+        return;
+    }
+
+    var soldOutItems = document.querySelectorAll('.order-cart-item .sold-out-overlay');
+    var hasSoldOut = false;
+    var insufficientStock = false;
+
+    cartItems.forEach(item => {
+        var productQuantity = parseInt(item.querySelector('.productQuantity').value);
+        var quantity = parseInt(item.querySelector('.quantity').value);
+        if (productQuantity == 0) {
+            hasSoldOut = true;
+        }
+        if (quantity > productQuantity) {
+            insufficientStock = true;
+        }
+    });
+
+    if (hasSoldOut) {
+        alert('품절된 상품이 있습니다.');
+        return;
+    }
+
+    if (insufficientStock) {
+        alert('재고가 부족한 상품이 있습니다.');
         return;
     }
 
@@ -351,26 +476,48 @@ function checkoutAllItems() {
         },
         body: JSON.stringify({
             customerId: customerId,
-            productIds: productIds
+            productNumbers: productNumber
         })
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('전체 항목 결제 준비 실패');
+            throw new Error('Network response was not ok');
         }
-        return response.json().catch(() => ({}));  // 빈 JSON 응답을 허용
+        return response.json();
     })
     .then(data => {
-        var params = new URLSearchParams();
-        params.append('customerId', customerId);
-        productIds.forEach(id => params.append('productIds', id));
-        window.location.href = '/checkoutPage?' + params.toString();
+        if (!data.success) {
+            alert('품절된 상품이 있습니다.');
+            return;
+        }
+        // Create a form and submit it with POST method
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/checkoutPage';
+
+        var customerIdInput = document.createElement('input');
+        customerIdInput.type = 'hidden';
+        customerIdInput.name = 'customerId';
+        customerIdInput.value = customerId;
+        form.appendChild(customerIdInput);
+
+        productNumber.forEach(id => {
+            var productNumberInput = document.createElement('input');
+            productNumberInput.type = 'hidden';
+            productNumberInput.name = 'productNumbers';
+            productNumberInput.value = id;
+            form.appendChild(productNumberInput);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
     })
     .catch(error => {
         console.error('결제 준비 오류:', error);
         alert('결제 준비 중 오류가 발생했습니다.');
     });
 }
+
 
 function toggleSelectAll(selectAllCheckbox) {
     const selectItems = document.querySelectorAll('.select-item');
@@ -379,21 +526,35 @@ function toggleSelectAll(selectAllCheckbox) {
     });
 }
 
+function toggleSelectItem() {
+    const selectAllCheckbox = document.getElementById('select-all');
+    const selectItems = document.querySelectorAll('.select-item');
+    const allSelected = Array.from(selectItems).every(item => item.checked);
+    selectAllCheckbox.checked = allSelected;
+}
+
 function calculateTotal() {
     var total = 0;
     var cartItems = document.querySelectorAll('.order-cart-item');
     cartItems.forEach(function (item) {
         var priceElement = item.querySelector('.price');
-        var quantityElement = item.querySelector('.order-quantity input');
+        var quantityElement = item.querySelector('.quantity');
         var price = parseInt(priceElement.innerText.replace('원', '').replace(',', ''));
         var quantity = parseInt(quantityElement.value);
-        total += price * quantity;
+        var productQuantity = parseInt(item.querySelector('.productQuantity').value)
+        if(productQuantity > 0) {
+            total += price * quantity;
+        }
     });
     document.getElementById('total-price').innerText = '총 금액: ' + total.toLocaleString() + '원';
 }
 
 document.addEventListener('DOMContentLoaded', function () {
     calculateTotal();
+    const selectItems = document.querySelectorAll('.select-item');
+    selectItems.forEach(item => {
+        item.addEventListener('click', toggleSelectItem);
+    });
 });
 </script>
 </body>

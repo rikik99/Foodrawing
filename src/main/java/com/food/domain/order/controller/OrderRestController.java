@@ -39,14 +39,20 @@ public class OrderRestController {
     }
 
     @PostMapping("/prepareCheckoutAll")
-    public ResponseEntity<Void> prepareCheckoutAll(@RequestBody CheckoutRequestDTO request, HttpSession session) {
+    public ResponseEntity<Map<String, Boolean>> prepareCheckoutAll(@RequestBody CheckoutRequestDTO request, HttpSession session) {
         try {
             session.setAttribute("checkoutAll", true);
             session.setAttribute("customerId", request.getCustomerId());
-            return ResponseEntity.ok().build();
+            // You can add additional logic here if needed
+
+            Map<String, Boolean> response = new HashMap<>();
+            response.put("success", true);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            Map<String, Boolean> response = new HashMap<>();
+            response.put("success", false);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 }
