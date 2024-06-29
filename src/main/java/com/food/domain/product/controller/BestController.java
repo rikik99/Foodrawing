@@ -33,5 +33,5 @@ public class BestController {
         model.addAttribute("bestSellingProducts", bestSellingProducts);
         return "main/mainpage";
     }
-    
+     
 }
