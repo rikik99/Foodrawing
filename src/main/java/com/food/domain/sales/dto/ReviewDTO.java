@@ -21,7 +21,7 @@ public class ReviewDTO {
     private Long salesPostId;
     private Long customerId;
     private Long rating;
-    private String replyYn;
+    private Long replyYn;
     private String message;
     private LocalDateTime createdDate;
     private LocalDateTime uploadDate;

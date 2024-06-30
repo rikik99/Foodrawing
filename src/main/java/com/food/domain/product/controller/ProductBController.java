@@ -44,19 +44,19 @@ public class ProductBController {
 	   ModelAndView mv = new ModelAndView();
 	   
 	   //salesPost 고정
-	   salesPost.setId(1L);
+	   salesPost.setId(3L);
 	   
 	   //SalesPostTb productNumber 가져오기
 	   salesPost.setProductNumber(salesMapper.getIdByProductNumber(salesPost));
+	   System.out.println("productNumber and Sales Post id : " + salesPost.getProductNumber() + " / " + salesPost.getId());
 	   
 	   //상품 등록 정보 가져오기 + file
 	   SalesPostDTO salesInfo = salesMapper.getSalesById(salesPost);
 	   mv.addObject("salesInfo", salesInfo);
 	   
 	   //상품 고정 바꾸기
-	   String productNumber = "ST001";
-	   
-	   salesPost.setProductNumber(productNumber);
+	   //String productNumber = "ST003";   
+	   //salesPost.setProductNumber(productNumber);
 	   
 	   //상품 등록 파일 정보 가져오기
 	   //SalesPostFileDTO salesFileInfo = salesMapper.getSalesFileById(salesPost);
