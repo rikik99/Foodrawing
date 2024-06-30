@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 	const insertProductForm = document.getElementById('insertProductForm');
-	const insertSalsePostForm = document.getElementById('insertSalsePostForm');
+	const insertDiscountForm = document.getElementById('insertDiscountForm');
 	if (insertProductForm) {
 		insertProductForm.addEventListener('submit', async function(event) {
 			event.preventDefault();
@@ -72,6 +72,43 @@ document.addEventListener('DOMContentLoaded', function() {
 				console.error('Error:', error);
 			}
 		});
+	} else {
+		if (insertDiscountForm) {
+			insertDiscountForm.addEventListener('submit', async function(event) {
+				event.preventDefault();
+
+				const formData = new FormData(insertDiscountForm);
+				const data = {};
+
+				formData.forEach((value, key) => {
+					data[key] = value;
+				});
+
+				try {
+					const response = await fetch(insertDiscountForm.action, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(data)
+					});
+
+					if (response.ok) {
+						const message = await response.text();
+						alert(message);
+
+						if (window.opener) {
+							window.opener.loadContent('/admin/discountList', 'discountList', true);
+							window.close();
+						}
+					} else {
+						console.error('Failed to submit form');
+					}
+				} catch (error) {
+					console.error('Error:', error);
+				}
+			});
+		}
 	}
 
 	const fileInput = document.getElementById('file');

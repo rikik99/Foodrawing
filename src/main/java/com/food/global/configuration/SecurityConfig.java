@@ -102,7 +102,7 @@ public class SecurityConfig {
                     "/findUsername", "/verify-id-code", "/showUsername", "/findPassword", "/sendPasswordResetCode", 
                     "/verify-password-code", "/passwordReset", "/best", "/ProductDetail", "/cart/checkStock", "/cart/addToCart", 
                     "/cart", "/cart/deleteCartItem", "/order/prepareCheckout", "/checkoutPage", "/order/prepareCheckoutAll", 
-                    "/cart/updateCartItem", "/cart/deleteSelectedItems", "/payment/result", "/payment/restoreStock").permitAll()
+                    "/cart/updateCartItem", "/cart/deleteSelectedItems", "/payment/result", "/payment/restoreStock", "/mainpage").permitAll()
                 .anyRequest().authenticated())
             .formLogin(formLogin -> formLogin
                 .loginPage("/login")

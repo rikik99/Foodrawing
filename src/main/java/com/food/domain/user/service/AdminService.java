@@ -54,9 +54,9 @@ public class AdminService {
 	@Autowired
 	SalesPostFile salesPostFileUtil;
 
-    @Value("${file.upload-dir}")
-    private String uploadDir;
-	
+	@Value("${file.upload-dir}")
+	private String uploadDir;
+
 	public Page<ProductDTO> findProductList(Pageable pageable) {
 		List<ProductDTO> products = adminMapper.findProductList();
 		List<ProductDTO> productList = new ArrayList<>();
@@ -136,11 +136,11 @@ public class AdminService {
 
 	}
 
-    public void deleteProductsByProductNumbers(List<String> productNumbers) throws Exception {
-        for (String productNumber : productNumbers) {
-        	adminMapper.deleteProductByProductNumber(productNumber);
-        }
-    }
+	public void deleteProductsByProductNumbers(List<String> productNumbers) throws Exception {
+		for (String productNumber : productNumbers) {
+			adminMapper.deleteProductByProductNumber(productNumber);
+		}
+	}
 
 	public Page<ProductDTO> findStockListWithSearch(Map<String, String> allParams) {
 		int page = Integer.parseInt((String) allParams.get("page"));
@@ -171,7 +171,7 @@ public class AdminService {
 	}
 
 	public Page<ProductDTO> findStockList(Pageable pageable) {
-		
+
 		List<ProductDTO> products = adminMapper.findProductList();
 		List<ProductDTO> productList = new ArrayList<>();
 
@@ -195,70 +195,68 @@ public class AdminService {
 
 		return page;
 	}
-	
+
 	@Transactional
 	public void stockUpdate(Map<String, Object> allParams) {
-	    String productNumber = (String) allParams.get("productNumber");
-	    String type = (String) allParams.get("type");
-	    Long quantity = Long.valueOf((String) allParams.get("quantity"));
+		String productNumber = (String) allParams.get("productNumber");
+		String type = (String) allParams.get("type");
+		Long quantity = Long.valueOf((String) allParams.get("quantity"));
 
-	    // 현재 재고 조회
-	    StockDTO currentStock = adminMapper.findStockByProductNumber(productNumber);
-	    Long updatedQuantity = currentStock.getQuantity();
+		// 현재 재고 조회
+		StockDTO currentStock = adminMapper.findStockByProductNumber(productNumber);
+		Long updatedQuantity = currentStock.getQuantity();
 
-	    if ("IN".equals(type)) {
-	        updatedQuantity += quantity;
-	    } else if ("OUT".equals(type)) {
-	        updatedQuantity -= quantity;
-	        // 재고가 0 이하가 되지 않도록 처리
-	        if (updatedQuantity < 0) {
-	            updatedQuantity = 0L;
-	        }
-	    }
-	    System.out.println("type = ?"+type);
-	    // 재고 업데이트
-	    allParams.put("updatedQuantity", updatedQuantity);
-	    adminMapper.updateStock(allParams);
-	    ProductDTO productDTO = adminMapper.findProductByProductNumber(productNumber);
-	    Long productQuantity = productDTO.getQuantity();
-	    if("OUT".equals(type)) {
-	    	productQuantity += quantity;
-	    	allParams.put("productQuantity", productQuantity);
-	    	adminMapper.updateQuantity(allParams);	    	
-	    }
-	    adminMapper.insertTransaction(allParams);
+		if ("IN".equals(type)) {
+			updatedQuantity += quantity;
+		} else if ("OUT".equals(type)) {
+			updatedQuantity -= quantity;
+			// 재고가 0 이하가 되지 않도록 처리
+			if (updatedQuantity < 0) {
+				updatedQuantity = 0L;
+			}
+		}
+		System.out.println("type = ?" + type);
+		// 재고 업데이트
+		allParams.put("updatedQuantity", updatedQuantity);
+		adminMapper.updateStock(allParams);
+		ProductDTO productDTO = adminMapper.findProductByProductNumber(productNumber);
+		Long productQuantity = productDTO.getQuantity();
+		if ("OUT".equals(type)) {
+			productQuantity += quantity;
+			allParams.put("productQuantity", productQuantity);
+			adminMapper.updateQuantity(allParams);
+		}
+		adminMapper.insertTransaction(allParams);
 	}
 
 	public Page<StockTransactionDTO> findTransactionList(Pageable pageable) {
-        String orderByClause = pageable.getSort().stream()
-                .map(order -> {
-                    String property = order.getProperty();
-                    String direction = order.getDirection().name();
-                    if ("productNumber".equals(property)) {
-                        return "TO_NUMBER(REGEXP_SUBSTR(PRODUCT_NUMBER, '[0-9]+')) " + direction;
-                    } else {
-                        return property + " " + direction;
-                    }
-                })
-                .collect(Collectors.joining(", "));
+		String orderByClause = pageable.getSort().stream().map(order -> {
+			String property = order.getProperty();
+			String direction = order.getDirection().name();
+			if ("productNumber".equals(property)) {
+				return "TO_NUMBER(REGEXP_SUBSTR(PRODUCT_NUMBER, '[0-9]+')) " + direction;
+			} else {
+				return property + " " + direction;
+			}
+		}).collect(Collectors.joining(", "));
 
-        int pageSize = pageable.getPageSize();
-        int offset = (int) pageable.getOffset() + 1; // Oracle에서는 1부터 시작
-        System.out.println("orderByClause = "+orderByClause);
-        List<StockTransactionDTO> transactions = adminMapper.findTransactionList(orderByClause, pageSize, offset);
-        int totalElements = adminMapper.countTransactionList(); // 전체 레코드 수 가져오기
+		int pageSize = pageable.getPageSize();
+		int offset = (int) pageable.getOffset() + 1; // Oracle에서는 1부터 시작
+		System.out.println("orderByClause = " + orderByClause);
+		List<StockTransactionDTO> transactions = adminMapper.findTransactionList(orderByClause, pageSize, offset);
+		int totalElements = adminMapper.countTransactionList(); // 전체 레코드 수 가져오기
 
-        for (StockTransactionDTO transaction : transactions) {
-            String productNumber = transaction.getProductNumber();
-            ProductFileDTO file = adminMapper.findProductFileByProductNumber(productNumber);
-            ProductDTO product = adminMapper.findProductByProductNumber(productNumber);
-            transaction.setProductFileDTO(file);
-            transaction.setProductDTO(product);
-        }
+		for (StockTransactionDTO transaction : transactions) {
+			String productNumber = transaction.getProductNumber();
+			ProductFileDTO file = adminMapper.findProductFileByProductNumber(productNumber);
+			ProductDTO product = adminMapper.findProductByProductNumber(productNumber);
+			transaction.setProductFileDTO(file);
+			transaction.setProductDTO(product);
+		}
 
-        Page<StockTransactionDTO> page = new PageImpl<>(transactions, pageable, totalElements);
-        return page;
-    }
+		Page<StockTransactionDTO> page = new PageImpl<>(transactions, pageable, totalElements);
+		return page;
+	}
 
 	public Page<SalesPostDTO> findPostList(Pageable pageable) {
 		List<SalesPostDTO> posts = adminMapper.findPostList();
@@ -314,209 +312,224 @@ public class AdminService {
 	}
 
 	public Map<String, String> getProductDetails(String name) {
-	    Map<String, String> details = new HashMap<>();
-	    String productCode = adminMapper.findProductByName(name);
-	    ProductFileDTO productFileDTO = adminMapper.findProductFileByProductNumber(productCode);
-	    String filePath = productFileDTO.getFilePath();
-	    details.put("productCode", productCode);
-	    details.put("imagePath", filePath);
-	    return details;
+		Map<String, String> details = new HashMap<>();
+		String productCode = adminMapper.findProductByName(name);
+		ProductFileDTO productFileDTO = adminMapper.findProductFileByProductNumber(productCode);
+		String filePath = productFileDTO.getFilePath();
+		details.put("productCode", productCode);
+		details.put("imagePath", filePath);
+		return details;
 	}
 
-	   public List<SalesPostFileDTO> uploadImages(Long salesPostId, MultipartFile[] files) throws Exception {
-	        return salesPostFileUtil.parseFileInfos(salesPostId, files);
+	public List<SalesPostFileDTO> uploadImages(Long salesPostId, MultipartFile[] files) throws Exception {
+		return salesPostFileUtil.parseFileInfos(salesPostId, files);
+	}
+
+	public SalesPostFileDTO uploadImage(MultipartFile file) throws Exception {
+		return salesPostFileUtil.parseFileInfos(null, new MultipartFile[] { file }).stream().findFirst()
+				.orElseThrow(() -> new Exception("File upload failed"));
+	}
+
+	@Transactional
+	public void insertSalesPost(Map<String, Object> allParams, List<SalesPostFileDTO> fileDTOList) throws Exception {
+		Long userId = null;
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+			CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+			userId = userDetails.getId();
+		}
+		Long adminId = adminMapper.findAdminByUserId(userId);
+
+		SalesPostDTO salesPost = new SalesPostDTO();
+		salesPost.setAdminId(adminId);
+		salesPost.setProductNumber((String) allParams.get("productNumber"));
+		salesPost.setTitle((String) allParams.get("title"));
+		salesPost.setDescription((String) allParams.get("description"));
+		salesPost.setCreatedDate(LocalDateTime.now());
+		salesPost.setLastPostDate(
+				LocalDate.parse((String) allParams.get("lastPostDate"), DateTimeFormatter.ISO_DATE).atStartOfDay());
+		salesPost.setUpdatedDate(LocalDateTime.now());
+		salesPost.setStartPostDate(
+				LocalDate.parse((String) allParams.get("startPostDate"), DateTimeFormatter.ISO_DATE).atStartOfDay());
+		salesPost.setStatus(Long.parseLong((String) allParams.get("status")));
+
+		// 판매글 저장
+		adminMapper.insertSalesPost(salesPost);
+
+		// 저장된 판매글의 ID 가져오기
+		Long salesPostId = salesPost.getId();
+		if (salesPostId == null) {
+			throw new RuntimeException("Failed to retrieve generated sales post ID");
+		}
+
+		// 파일 정보 업데이트 및 저장
+		for (SalesPostFileDTO fileDTO : fileDTOList) {
+			fileDTO.setSalesPostId(salesPostId);
+			adminMapper.insertSalesPostFile(fileDTO);
+		}
+	}
+
+	public Page<InquiriesDTO> findInquiries(Pageable pageable, Map<String, String> allParams) {
+		List<InquiriesDTO> inquiries = adminMapper.findSalesInquiries();
+		List<InquiriesDTO> inquirieList = new ArrayList<>();
+		for (InquiriesDTO Inquiry : inquiries) {
+			Long InquiryId = Inquiry.getId();
+			Long salesPostId = Inquiry.getSalesPostId();
+			SalesPostDTO salesPotDTO = adminMapper.findSalesPostById(salesPostId);
+			String productNumber = salesPotDTO.getProductNumber();
+			ProductDTO productDTO = adminMapper.findProductByProductNumber(productNumber);
+			Long customerId = Inquiry.getCustomerId();
+			CustomerDTO customerDTO = adminMapper.findCustomerByCustomerId(customerId);
+			ResponseDTO responseDTO = adminMapper.findResponseByInquiryId(InquiryId);
+			Inquiry.setSalesPotDTO(salesPotDTO);
+			Inquiry.setProductDTO(productDTO);
+			Inquiry.setCustomerDTO(customerDTO);
+			Inquiry.setResponseDTO(responseDTO);
+			inquirieList.add(Inquiry);
+		}
+
+		int start = (int) pageable.getOffset();
+		int end = Math.min((start + pageable.getPageSize()), inquirieList.size());
+		Page<InquiriesDTO> page = new PageImpl<>(inquirieList.subList(start, end), pageable, inquirieList.size());
+		return page;
+	}
+
+	public Page<InquiriesDTO> findInquiriesWithSearch(Pageable pageable, Map<String, String> allParams) {
+		List<InquiriesDTO> inquiries = adminMapper.findSalesInquiriesWithSearch(allParams);
+		List<InquiriesDTO> inquirieList = new ArrayList<>();
+		for (InquiriesDTO Inquiry : inquiries) {
+			Long salesPostId = Inquiry.getSalesPostId();
+			SalesPostDTO salesPotDTO = adminMapper.findSalesPostById(salesPostId);
+			String productNumber = salesPotDTO.getProductNumber();
+			ProductDTO productDTO = adminMapper.findProductByProductNumber(productNumber);
+			Long customerId = Inquiry.getCustomerId();
+			CustomerDTO customerDTO = adminMapper.findCustomerByCustomerId(customerId);
+			Inquiry.setSalesPotDTO(salesPotDTO);
+			Inquiry.setProductDTO(productDTO);
+			Inquiry.setCustomerDTO(customerDTO);
+			inquirieList.add(Inquiry);
+		}
+
+		int start = (int) pageable.getOffset();
+		int end = Math.min((start + pageable.getPageSize()), inquirieList.size());
+		Page<InquiriesDTO> page = new PageImpl<>(inquirieList.subList(start, end), pageable, inquirieList.size());
+		return page;
+	}
+
+	@Transactional
+	public void salesResponse(Map<String, Object> allParams) {
+		Long userId = null;
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+			CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+			userId = userDetails.getId();
+		}
+		Long adminId = adminMapper.findAdminByUserId(userId);
+		allParams.put("adminId", adminId);
+		adminMapper.insertResponse(allParams);
+		adminMapper.updateResolvedYn(allParams);
+	}
+
+	public Page<ReviewDTO> findReviews(Pageable pageable, Map<String, String> allParams) {
+		List<ReviewDTO> reviews = adminMapper.findReviews();
+		List<ReviewDTO> reviewList = new ArrayList<>();
+		for (ReviewDTO review : reviews) {
+			Long reviewId = review.getId();
+			Long salesPostId = review.getSalesPostId();
+			SalesPostDTO salesPotDTO = adminMapper.findSalesPostById(salesPostId);
+			String productNumber = salesPotDTO.getProductNumber();
+			ProductDTO productDTO = adminMapper.findProductByProductNumber(productNumber);
+			Long customerId = review.getCustomerId();
+			CustomerDTO customerDTO = adminMapper.findCustomerByCustomerId(customerId);
+			ReviewsReplyDTO reviewsReplyDTO = adminMapper.findReplyByReviewId(reviewId);
+			ReviewFileDTO reviewFileDTO = adminMapper.findReviewFileByReviewId(reviewId);
+			review.setSalesPotDTO(salesPotDTO);
+			review.setProductDTO(productDTO);
+			review.setCustomerDTO(customerDTO);
+			review.setReviewsReplyDTO(reviewsReplyDTO);
+			review.setReviewFileDTO(reviewFileDTO);
+			reviewList.add(review);
+		}
+
+		int start = (int) pageable.getOffset();
+		int end = Math.min((start + pageable.getPageSize()), reviewList.size());
+		Page<ReviewDTO> page = new PageImpl<>(reviewList.subList(start, end), pageable, reviewList.size());
+		return page;
+	}
+
+	public Page<ReviewDTO> findReviewsWithSearch(Pageable pageable, Map<String, String> allParams) {
+		List<ReviewDTO> reviews = adminMapper.findReviewsWithSearch(allParams);
+		List<ReviewDTO> reviewList = new ArrayList<>();
+		for (ReviewDTO review : reviews) {
+			Long reviewId = review.getId();
+			Long salesPostId = review.getSalesPostId();
+			SalesPostDTO salesPotDTO = adminMapper.findSalesPostById(salesPostId);
+			String productNumber = salesPotDTO.getProductNumber();
+			ProductDTO productDTO = adminMapper.findProductByProductNumber(productNumber);
+			Long customerId = review.getCustomerId();
+			CustomerDTO customerDTO = adminMapper.findCustomerByCustomerId(customerId);
+			ReviewsReplyDTO reviewsReplyDTO = adminMapper.findReplyByReviewId(reviewId);
+			ReviewFileDTO reviewFileDTO = adminMapper.findReviewFileByReviewId(reviewId);
+			review.setSalesPotDTO(salesPotDTO);
+			review.setProductDTO(productDTO);
+			review.setCustomerDTO(customerDTO);
+			review.setReviewsReplyDTO(reviewsReplyDTO);
+			review.setReviewFileDTO(reviewFileDTO);
+			reviewList.add(review);
+		}
+
+		int start = (int) pageable.getOffset();
+		int end = Math.min((start + pageable.getPageSize()), reviewList.size());
+		Page<ReviewDTO> page = new PageImpl<>(reviewList.subList(start, end), pageable, reviewList.size());
+		return page;
+	}
+
+	public void reviewReply(Map<String, Object> allParams) {
+		Long userId = null;
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+			CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+			userId = userDetails.getId();
+		}
+		Long adminId = adminMapper.findAdminByUserId(userId);
+		allParams.put("adminId", adminId);
+		adminMapper.insertReply(allParams);
+		adminMapper.updateReplyYn(allParams);
+	}
+
+	public Page<DiscountDTO> findDiscounts(Pageable pageable, Map<String, String> allParams) {
+		List<DiscountDTO> discounts = adminMapper.findDisconts();
+		int start = (int) pageable.getOffset();
+		int end = Math.min((start + pageable.getPageSize()), discounts.size());
+		Page<DiscountDTO> page = new PageImpl<>(discounts.subList(start, end), pageable, discounts.size());
+		return page;
+	}
+
+	public Page<DiscountDTO> findDiscountsWithSearch(Pageable pageable, Map<String, String> allParams) {
+		List<DiscountDTO> discounts = adminMapper.findDiscountsWithSearch(allParams);
+		int start = (int) pageable.getOffset();
+		int end = Math.min((start + pageable.getPageSize()), discounts.size());
+		Page<DiscountDTO> page = new PageImpl<>(discounts.subList(start, end), pageable, discounts.size());
+		return page;
+	}
+
+	@Transactional
+	public void discountUpdate(List<Map<String, Object>> allParams) {
+	    for (Map<String, Object> params : allParams) {
+	        if ("P".equals(params.get("discountType"))) {
+	            Number discountValue = (Number) params.get("discountValue");
+	            if (discountValue.longValue() > 100) {
+	                throw new IllegalArgumentException("할인율은 100 이하로 설정해야 합니다.");
+	            }
+	        }
+	        adminMapper.updateDiscount(params);
 	    }
+	}
 
-	    public SalesPostFileDTO uploadImage(MultipartFile file) throws Exception {
-	        return salesPostFileUtil.parseFileInfos(null, new MultipartFile[]{file}).stream()
-	                .findFirst()
-	                .orElseThrow(() -> new Exception("File upload failed"));
-	    }
-	    @Transactional
-	    public void insertSalesPost(Map<String, Object> allParams, List<SalesPostFileDTO> fileDTOList) throws Exception {
-	        Long userId = null;
-	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-	            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-	            userId = userDetails.getId();
-	        }
-	        Long adminId = adminMapper.findAdminByUserId(userId);
+	public void insertDiscount(Map<String, Object> allParams) {
+		adminMapper.insertDiscount(allParams);
+	}
 
-	        SalesPostDTO salesPost = new SalesPostDTO();
-	        salesPost.setAdminId(adminId);
-	        salesPost.setProductNumber((String) allParams.get("productNumber"));
-	        salesPost.setTitle((String) allParams.get("title"));
-	        salesPost.setDescription((String) allParams.get("description"));
-	        salesPost.setCreatedDate(LocalDateTime.now());
-	        salesPost.setLastPostDate(LocalDate.parse((String) allParams.get("lastPostDate"), DateTimeFormatter.ISO_DATE).atStartOfDay());
-	        salesPost.setUpdatedDate(LocalDateTime.now());
-	        salesPost.setStartPostDate(LocalDate.parse((String) allParams.get("startPostDate"), DateTimeFormatter.ISO_DATE).atStartOfDay());
-	        salesPost.setStatus(Long.parseLong((String) allParams.get("status")));
 
-	        // 판매글 저장
-	        adminMapper.insertSalesPost(salesPost);
 
-	        // 저장된 판매글의 ID 가져오기
-	        Long salesPostId = salesPost.getId();
-	        if (salesPostId == null) {
-	            throw new RuntimeException("Failed to retrieve generated sales post ID");
-	        }
-
-	        // 파일 정보 업데이트 및 저장
-	        for (SalesPostFileDTO fileDTO : fileDTOList) {
-	            fileDTO.setSalesPostId(salesPostId);
-	            adminMapper.insertSalesPostFile(fileDTO);
-	        }
-	    }
-
-		public Page<InquiriesDTO> findInquiries(Pageable pageable, Map<String, String> allParams) {
-			List<InquiriesDTO> inquiries = adminMapper.findSalesInquiries();
-			List<InquiriesDTO> inquirieList = new ArrayList<>();
-			for(InquiriesDTO Inquiry : inquiries) {
-				Long InquiryId = Inquiry.getId();
-				Long salesPostId = Inquiry.getSalesPostId();
-				SalesPostDTO salesPotDTO = adminMapper.findSalesPostById(salesPostId);
-				String productNumber = salesPotDTO.getProductNumber();
-				ProductDTO productDTO = adminMapper.findProductByProductNumber(productNumber);
-				Long customerId = Inquiry.getCustomerId();
-				CustomerDTO customerDTO = adminMapper.findCustomerByCustomerId(customerId);
-				ResponseDTO responseDTO = adminMapper.findResponseByInquiryId(InquiryId);
-				Inquiry.setSalesPotDTO(salesPotDTO);
-				Inquiry.setProductDTO(productDTO);
-				Inquiry.setCustomerDTO(customerDTO);
-				Inquiry.setResponseDTO(responseDTO);
-				inquirieList.add(Inquiry);
-			}
-						
-			int start = (int) pageable.getOffset();
-			int end = Math.min((start + pageable.getPageSize()), inquirieList.size());
-			Page<InquiriesDTO> page = new PageImpl<>(inquirieList.subList(start, end), pageable, inquirieList.size());
-			return page;
-		}
-
-		public Page<InquiriesDTO> findInquiriesWithSearch(Pageable pageable, Map<String, String> allParams) {
-			List<InquiriesDTO> inquiries = adminMapper.findSalesInquiriesWithSearch(allParams);
-			List<InquiriesDTO> inquirieList = new ArrayList<>();
-			for(InquiriesDTO Inquiry : inquiries) {
-				Long salesPostId = Inquiry.getSalesPostId();
-				SalesPostDTO salesPotDTO = adminMapper.findSalesPostById(salesPostId);
-				String productNumber = salesPotDTO.getProductNumber();
-				ProductDTO productDTO = adminMapper.findProductByProductNumber(productNumber);
-				Long customerId = Inquiry.getCustomerId();
-				CustomerDTO customerDTO = adminMapper.findCustomerByCustomerId(customerId);
-				Inquiry.setSalesPotDTO(salesPotDTO);
-				Inquiry.setProductDTO(productDTO);
-				Inquiry.setCustomerDTO(customerDTO);
-				inquirieList.add(Inquiry);
-			}
-						
-			int start = (int) pageable.getOffset();
-			int end = Math.min((start + pageable.getPageSize()), inquirieList.size());
-			Page<InquiriesDTO> page = new PageImpl<>(inquirieList.subList(start, end), pageable, inquirieList.size());
-			return page;
-		}
-		
-		@Transactional
-		public void salesResponse(Map<String, Object> allParams) {
-			Long userId = null;
-	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-	            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-	            userId = userDetails.getId();
-	        }
-	        Long adminId = adminMapper.findAdminByUserId(userId);
-	        allParams.put("adminId", adminId);
-	        adminMapper.insertResponse(allParams);
-	        adminMapper.updateResolvedYn(allParams);
-		}
-
-		public Page<ReviewDTO> findReviews(Pageable pageable, Map<String, String> allParams) {
-			List<ReviewDTO> reviews = adminMapper.findReviews();
-			List<ReviewDTO> reviewList = new ArrayList<>();
-			for(ReviewDTO review : reviews) {
-				Long reviewId = review.getId();
-				Long salesPostId = review.getSalesPostId();
-				SalesPostDTO salesPotDTO = adminMapper.findSalesPostById(salesPostId);
-				String productNumber = salesPotDTO.getProductNumber();
-				ProductDTO productDTO = adminMapper.findProductByProductNumber(productNumber);
-				Long customerId = review.getCustomerId();
-				CustomerDTO customerDTO = adminMapper.findCustomerByCustomerId(customerId);
-				ReviewsReplyDTO reviewsReplyDTO = adminMapper.findReplyByReviewId(reviewId);
-				ReviewFileDTO reviewFileDTO = adminMapper.findReviewFileByReviewId(reviewId);
-				review.setSalesPotDTO(salesPotDTO);
-				review.setProductDTO(productDTO);
-				review.setCustomerDTO(customerDTO);
-				review.setReviewsReplyDTO(reviewsReplyDTO);
-				review.setReviewFileDTO(reviewFileDTO);
-				reviewList.add(review);
-			}
-						
-			int start = (int) pageable.getOffset();
-			int end = Math.min((start + pageable.getPageSize()), reviewList.size());
-			Page<ReviewDTO> page = new PageImpl<>(reviewList.subList(start, end), pageable, reviewList.size());
-			return page;
-		}
-
-		public Page<ReviewDTO> findReviewsWithSearch(Pageable pageable, Map<String, String> allParams) {
-			List<ReviewDTO> reviews = adminMapper.findReviewsWithSearch(allParams);
-			List<ReviewDTO> reviewList = new ArrayList<>();
-			for(ReviewDTO review : reviews) {
-				Long reviewId = review.getId();
-				Long salesPostId = review.getSalesPostId();
-				SalesPostDTO salesPotDTO = adminMapper.findSalesPostById(salesPostId);
-				String productNumber = salesPotDTO.getProductNumber();
-				ProductDTO productDTO = adminMapper.findProductByProductNumber(productNumber);
-				Long customerId = review.getCustomerId();
-				CustomerDTO customerDTO = adminMapper.findCustomerByCustomerId(customerId);
-				ReviewsReplyDTO reviewsReplyDTO = adminMapper.findReplyByReviewId(reviewId);
-				ReviewFileDTO reviewFileDTO = adminMapper.findReviewFileByReviewId(reviewId);
-				review.setSalesPotDTO(salesPotDTO);
-				review.setProductDTO(productDTO);
-				review.setCustomerDTO(customerDTO);
-				review.setReviewsReplyDTO(reviewsReplyDTO);
-				review.setReviewFileDTO(reviewFileDTO);
-				reviewList.add(review);
-			}
-						
-			int start = (int) pageable.getOffset();
-			int end = Math.min((start + pageable.getPageSize()), reviewList.size());
-			Page<ReviewDTO> page = new PageImpl<>(reviewList.subList(start, end), pageable, reviewList.size());
-			return page;
-		}
-
-		public void reviewReply(Map<String, Object> allParams) {
-			Long userId = null;
-	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-	            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-	            userId = userDetails.getId();
-	        }
-	        Long adminId = adminMapper.findAdminByUserId(userId);
-	        allParams.put("adminId", adminId);
-	        adminMapper.insertReply(allParams);
-	        adminMapper.updateReplyYn(allParams);
-		}
-
-		public Page<DiscountDTO> findDiscounts(Pageable pageable, Map<String, String> allParams) {
-			List<DiscountDTO> discounts = adminMapper.findDisconts();
-			int start = (int) pageable.getOffset();
-			int end = Math.min((start + pageable.getPageSize()), discounts.size());
-			Page<DiscountDTO> page = new PageImpl<>(discounts.subList(start, end), pageable, discounts.size());
-			return page;
-		}
-
-		public Page<DiscountDTO> findDiscountsWithSearch(Pageable pageable, Map<String, String> allParams) {
-			List<DiscountDTO> discounts = adminMapper.findDiscountsWithSearch(allParams);
-			int start = (int) pageable.getOffset();
-			int end = Math.min((start + pageable.getPageSize()), discounts.size());
-			Page<DiscountDTO> page = new PageImpl<>(discounts.subList(start, end), pageable, discounts.size());
-			return page;
-		}
-
-		   @Transactional
-		    public void discountUpdate(List<Map<String, Object>> allParams) {
-		        for (Map<String, Object> params : allParams) {
-		        	adminMapper.updateDiscount(params);
-		        }
-		    }
 }

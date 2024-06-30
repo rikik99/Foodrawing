@@ -382,16 +382,32 @@ public class AdminController {
     @PostMapping("/discountUpdate")
     @ResponseBody
     public ResponseEntity<?> discountUpdate(@RequestBody List<Map<String, Object>> allParams) {
+    	log.info("discountUpdate allParams = {}",allParams);
         adminService.discountUpdate(allParams);
         return ResponseEntity.ok(Map.of("success", true, "message", "할인 정보가 성공적으로 수정되었습니다."));
     }
 	
-	@GetMapping("/discountManagement")
-	public ModelAndView discountManagement() {
+	@GetMapping("/insertDiscount")
+	public ModelAndView insertDiscountForm() {
 		ModelAndView mv = new ModelAndView();
-		mv.setViewName("admin/discountManagement");
+		mv.setViewName("admin/insertDiscount");
 		return mv;
 	}
+	
+	@PostMapping("/insertDiscount")
+	@ResponseBody
+	public ResponseEntity<?> insertDiscount(@RequestBody Map<String, Object> allParams) {
+		try {
+
+			adminService.insertDiscount(allParams);
+			return ResponseEntity.ok("할인이 성공적으로 등록되었습니다.");
+		} catch (Exception e) {
+			e.printStackTrace(); // Print the stack trace to see the error
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("할인 등록에 실패했습니다.");
+		}
+	}
+	
+	
 
 	@GetMapping("/couponList")
 	public ModelAndView couponList() {
