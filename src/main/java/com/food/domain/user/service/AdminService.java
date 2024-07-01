@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ import com.food.domain.product.dto.ProductFileDTO;
 import com.food.domain.product.dto.StockDTO;
 import com.food.domain.product.dto.StockTransactionDTO;
 import com.food.domain.sales.dto.DiscountDTO;
+import com.food.domain.sales.dto.DiscountTargetDTO;
 import com.food.domain.sales.dto.ReviewDTO;
 import com.food.domain.sales.dto.ReviewFileDTO;
 import com.food.domain.sales.dto.ReviewsReplyDTO;
@@ -35,6 +38,8 @@ import com.food.domain.support.dto.InquiriesDTO;
 import com.food.domain.support.dto.ResponseDTO;
 import com.food.domain.user.dto.AdminDTO;
 import com.food.domain.user.dto.CustomerDTO;
+import com.food.domain.user.dto.MemberRatingDTO;
+import com.food.domain.user.dto.UserDTO;
 import com.food.domain.user.mapper.AdminMapper;
 import com.food.global.auth.CustomUserDetails;
 import com.food.global.util.ProductFile;
@@ -528,6 +533,142 @@ public class AdminService {
 
 	public void insertDiscount(Map<String, Object> allParams) {
 		adminMapper.insertDiscount(allParams);
+	}
+
+	public void deleteDiscountsById(List<Long> discountIds) {
+		for (Long discountId : discountIds) {
+			adminMapper.deleteDiscountsById(discountId);
+		}
+	}
+
+	public Page<DiscountDTO> findDiscountTargetList(Pageable pageable, Map<String, String> allParams) {
+		List<DiscountDTO> discounts = adminMapper.findDisconts();
+		for(DiscountDTO discount : discounts) {
+			Long discountId = discount.getId();
+			DiscountTargetDTO discountTarget = adminMapper.findDiscountTargetByDiscountId(discountId);
+			String target = discountTarget.getTargetType().trim().toUpperCase();
+			String targetId = discountTarget.getTargetId();
+			String targetName = "";
+			switch (target) {
+			case "ALL":
+				targetName = "모두";
+				break;
+			case "PRODUCT":
+				ProductDTO product = adminMapper.findProductByProductNumber(targetId);
+				targetName = product.getName();
+				break;
+			case "MEMBER_RATING":
+				Long memberId = Long.valueOf(targetId);
+				MemberRatingDTO member = adminMapper.findMemberRatingById(memberId);
+				targetName = member.getRating();
+				break;
+			case "CUSTOMER":
+				Long customerId = Long.valueOf(targetId);
+				CustomerDTO customer = adminMapper.findCustomerByCustomerId(customerId);
+				String userName = adminMapper.findUserNameById(customer.getUserId());
+				targetName = userName;
+				break;
+			case "CATEGORY":
+				Long categoryId = Long.valueOf(targetId);
+				ProductCategoryDTO category = adminMapper.findProductCategoryById(categoryId);
+				targetName = category.getName();
+				break;
+			}
+			discountTarget.setTargetName(targetName);
+			discount.setDiscountTargetDTO(discountTarget);
+		}
+		int start = (int) pageable.getOffset();
+		int end = Math.min((start + pageable.getPageSize()), discounts.size());
+		Page<DiscountDTO> page = new PageImpl<>(discounts.subList(start, end), pageable, discounts.size());
+		return page;
+	}
+
+	public Page<DiscountDTO> findDiscountTargetListWithSearch(Pageable pageable, Map<String, String> allParams) {
+        List<DiscountDTO> discounts = adminMapper.findDiscountTargetListWithSearch(allParams);
+        List<DiscountDTO> filteredDiscounts = new ArrayList<>();
+
+        for (DiscountDTO discount : discounts) {
+            Long discountId = discount.getId();
+            DiscountTargetDTO discountTarget = adminMapper.findDiscountTargetByDiscountId(discountId);
+            String target = discountTarget.getTargetType().trim().toUpperCase();
+            String targetId = discountTarget.getTargetId();
+            String targetName = "";
+
+            switch (target) {
+                case "ALL":
+                    targetName = "모두";
+                    break;
+                case "PRODUCT":
+                    ProductDTO product = adminMapper.findProductByProductNumber(targetId);
+                    targetName = product.getName();
+                    break;
+                case "MEMBER_RATING":
+                    Long memberId = Long.valueOf(targetId);
+                    MemberRatingDTO member = adminMapper.findMemberRatingById(memberId);
+                    targetName = member.getRating();
+                    break;
+                case "CUSTOMER":
+                    Long customerId = Long.valueOf(targetId);
+                    CustomerDTO customer = adminMapper.findCustomerByCustomerId(customerId);
+                    String userName = adminMapper.findUserNameById(customer.getUserId());
+                    targetName = userName;
+                    break;
+                case "CATEGORY":
+                    Long categoryId = Long.valueOf(targetId);
+                    ProductCategoryDTO category = adminMapper.findProductCategoryById(categoryId);
+                    targetName = category.getName();
+                    break;
+            }
+            discountTarget.setTargetName(targetName);
+            discount.setDiscountTargetDTO(discountTarget);
+
+            // 검색어에 따른 필터링
+            String searchInput = allParams.get("searchInput");
+            if (searchInput != null && !searchInput.isEmpty()) {
+                if ((target.equals("CUSTOMER") && targetName.contains(searchInput)) ||
+                    (target.equals("MEMBER_RATING") && targetName.contains(searchInput)) ||
+                    discount.getName().contains(searchInput)) {
+                    filteredDiscounts.add(discount);
+                }
+            } else {
+                filteredDiscounts.add(discount);
+            }
+        }
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), filteredDiscounts.size());
+        Page<DiscountDTO> page = new PageImpl<>(filteredDiscounts.subList(start, end), pageable, filteredDiscounts.size());
+        return page;
+    }
+
+	public List<DiscountDTO> findDiscountList() {
+		
+		return adminMapper.findDisconts();
+	}
+
+	public Page<?> findTargetsByTypeAndQuery(String targetType, String keyword, Pageable pageable) {
+	    if (keyword == null || keyword.isEmpty()) {
+	        keyword = "%"; // 검색어가 없을 경우 모든 항목을 반환
+	    } else {
+	        keyword = "%" + keyword + "%"; // SQL LIKE 연산자를 위한 검색어 포맷
+	    }
+
+	    switch (targetType) {
+	        case "PRODUCT":
+	            List<ProductDTO> products = adminMapper.findProductsByQuery(keyword, pageable);
+	            long productTotal = adminMapper.countProductsByQuery(keyword);
+	            return new PageImpl<>(products, pageable, productTotal);
+	        case "CUSTOMER":
+	            List<CustomerDTO> customers = adminMapper.findCustomersByQuery(keyword, pageable);
+	            customers.forEach(customer -> {
+	                UserDTO user = adminMapper.findUserById(customer.getUserId());
+	                customer.setUserDTO(user);
+	            });
+	            long customerTotal = adminMapper.countCustomersByQuery(keyword);
+	            return new PageImpl<>(customers, pageable, customerTotal);
+	        default:
+	            return new PageImpl<>(Collections.emptyList(), pageable, 0);
+	    }
 	}
 
 

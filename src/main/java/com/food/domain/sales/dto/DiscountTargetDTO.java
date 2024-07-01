@@ -13,5 +13,7 @@ public class DiscountTargetDTO {
     private Long id;
     private Long discountId;
     private String targetType;
-    private Long targetId;
+    private String targetId;
+    private String targetName;
+    private Object target;
 }

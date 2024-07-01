@@ -58,7 +58,8 @@ document.addEventListener('click', function(e) {
 	}
 	if (e.target.id === 'deleteSelectedButton') {
 		const urlPath = e.target.getAttribute('data-url');
-		deleteSelectedProducts(urlPath);
+		const pageType = e.target.getAttribute('data-pageType');
+		deleteSelectedProducts(urlPath, pageType);
 	}
 	if (e.target.classList.contains('stock-range-btn')) {
 		const stockType = e.target.getAttribute('data-stock');
@@ -268,7 +269,8 @@ function performSearch(urlPath) {
 		{ name: 'replyYn', paramName: 'replyYn' },
 		{ name: 'discountType', paramName: 'discountType' },
 		{ name: 'sale_status', paramName: 'sale_status' },
-		{ name: 'onsaleYn', paramName:'onsaleYn'}
+		{ name: 'onsaleYn', paramName:'onsaleYn'},
+		{name:'targetType', paramName:'targetType'}
 	];
 
 	radioButtonGroups.forEach(group => {
@@ -465,30 +467,46 @@ function setupCheckboxEventListeners() {
 	});
 }
 
-function deleteSelectedProducts(urlPath) {
-	const productCheckboxes = document.querySelectorAll('.selectProduct:checked');
-	const selectedProducts = Array.from(productCheckboxes).map(checkbox => {
-		return checkbox.closest('tr').querySelector('td:nth-child(3) p').textContent;
-	});
+function deleteSelectedProducts(urlPath, pageType) {
+    const productCheckboxes = document.querySelectorAll('.selectProduct:checked');
+    let selectedItems;
+    let bodyContent;
 
-	if (selectedProducts.length > 0) {
-		fetch('/admin/deleteProducts', {
-			method: 'DELETE',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ productNumbers: selectedProducts })
-		})
-			.then(response => response.ok ? response.text() : Promise.reject('Failed to delete products'))
-			.then(message => {
-				alert(message);
-				loadContent(urlPath, urlPath.split('/').pop(), false);
-			})
-			.catch(error => console.error('Error:', error));
-	} else {
-		alert('삭제할 항목을 선택해주세요.');
-	}
+    if (pageType === 'productManagement') {
+        const selectedProductNumbers = Array.from(productCheckboxes).map(checkbox => {
+            return checkbox.closest('tr').querySelector('td:nth-child(3) p').textContent;
+        });
+        selectedItems = selectedProductNumbers;
+        bodyContent = { productNumbers: selectedItems };
+    } else if (pageType === 'discountList') {
+        const selectedDiscountIds = Array.from(productCheckboxes).map(checkbox => {
+            return checkbox.closest('tr').getAttribute('data-discountId');
+        });
+        selectedItems = selectedDiscountIds;
+        bodyContent = { discountIds: selectedItems };
+    }
+
+    if (selectedItems.length > 0) {
+        const endpoint = pageType === 'productManagement' ? '/admin/deleteProducts' : '/admin/deleteDiscounts';
+
+        fetch(endpoint, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(bodyContent)
+        })
+            .then(response => response.ok ? response.text() : Promise.reject('Failed to delete items'))
+            .then(message => {
+                alert(message);
+                loadContent(urlPath, urlPath.split('/').pop(), false);
+            })
+            .catch(error => console.error('Error:', error));
+    } else {
+        alert('삭제할 항목을 선택해주세요.');
+    }
 }
+
 
 function setDateRange(range, group) {
 	const today = new Date();

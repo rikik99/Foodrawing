@@ -1,0 +1,206 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #333;
+    overflow: hidden;
+}
+
+.discount-form-container {
+    width: 80%;
+    max-width: 1200px;
+    padding: 20px;
+    background-color: #1c2331;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    overflow-y: auto; /* Add vertical scroll */
+    max-height: 100vh; /* Ensure the container does not exceed the viewport height */
+}
+
+.discount-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    background-color: #1c2331;
+}
+
+.discount-form h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+.form-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.form-table td {
+    padding: 10px;
+    vertical-align: middle;
+    color: #ffffff;
+}
+
+.form-table label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #ffffff;
+}
+
+.form-table input[type="text"], 
+.form-table input[type="number"],
+.form-table input[type="date"], 
+.form-table select, 
+.form-table textarea {
+    width: calc(100% - 20px);
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background: #ffffff;
+    color: #000000;
+}
+
+.form-table textarea {
+    resize: none;
+}
+
+button.primary {
+    display: block;
+    width: 100%;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    margin-top: 20px;
+}
+
+button.primary:hover {
+    background-color: #0056b3;
+}
+
+.suggestions-container, .selected-targets-container {
+    width: 100%;
+    max-width: 600px;
+    padding: 20px;
+    background-color: #1c2331;
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin: 20px 0;
+    overflow-y: auto;
+}
+
+.suggestion-item, .selected-target {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #333;
+    color: #fff;
+}
+
+.suggestion-item strong, .selected-target strong {
+    display: inline-block;
+    width: 100px;
+}
+
+.selected-target {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #444;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    color: #fff;
+}
+
+.selected-target strong {
+    margin-right: auto; /* Add margin to push other elements to the right */
+}
+
+.selected-target .target-info {
+    flex: 1;
+}
+
+.selected-target button {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-left: 10px; /* Add space between text and button */
+}
+
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+    .discount-form, .suggestions-container, .selected-targets-container {
+        width: 90%;
+        padding: 10px;
+    }
+    .form-table td {
+        display: block;
+        width: 100%;
+    }
+    .form-table td:first-child {
+        margin-top: 10px;
+    }
+}
+
+/* Pagination styles */
+.pagination {
+    display: flex;
+    justify-content: center;
+    padding-left: 0;
+    list-style: none;
+    border-radius: 0.25rem;
+    margin-top: 20px; /* Add margin-top to separate from the form */
+}
+
+.page-item {
+    margin: 0 5px; /* Add margin between pagination items */
+    cursor: pointer;
+}
+
+.page-item .page-link {
+    position: relative;
+    display: block;
+    padding: 0.5rem 0.75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    color: #007bff;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+}
+
+.page-item.active .page-link {
+    z-index: 3;
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.page-item .page-link:hover {
+    z-index: 2;
+    color: #0056b3;
+    text-decoration: none;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+}

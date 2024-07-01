@@ -21,6 +21,9 @@ function setupOpenWindow(buttonId, url) {
     });
 }
 
+// 할인 대상 추가 윈도우 열기 설정
+setupOpenWindow('addDiscountTarget', '/admin/insertDiscountTarget');
+
 // 할인 추가 윈도우 열기 설정
 setupOpenWindow('addDiscount', '/admin/insertDiscount');
 

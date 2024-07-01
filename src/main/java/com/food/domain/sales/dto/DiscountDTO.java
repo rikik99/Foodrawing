@@ -24,7 +24,7 @@ public class DiscountDTO {
     private Long maxDiscount;
     private String description;
     private Long minPrice;
-    
+    private DiscountTargetDTO discountTargetDTO;
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YY.MM.dd");
 
     public String getFormattedStartDate() {

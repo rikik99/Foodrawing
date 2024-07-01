@@ -11,13 +11,24 @@
 	<div class="dashboard-container">
 		<jsp:include page="/WEB-INF/views/admin/layout.jsp" />
 		<div class="main-content dark-mode" id="mainContent">
-			<h1>할인 관리</h1>
+			<h1>할인 대상 관리</h1>
 			<div class="search-bar">
 				<div class="full-width">
 					<div class="half-width">
 						<label for="searchInput">검색어</label> <input type="text"
 							class="searchInput" placeholder="제목, 상품명, 작성자를 입력하세요"
 							id="searchInput" name="searchInput">
+					</div>
+				</div>
+				<div class="full-width">
+					<div class="half-width">
+						<label for="radio-group">할인 유형</label>
+						<div id="radio-group">
+							<label><input type="radio" name="type" value="" checked>
+								전체</label> <label><input type="radio" name="type" value="이벤트">
+								이벤트</label> <label><input type="radio" name="type" value="쿠폰">
+								쿠폰</label>
+						</div>
 					</div>
 					<div class="half-width">
 						<label for="radio-group">진행 상태</label>
@@ -32,12 +43,15 @@
 				</div>
 				<div class="full-width">
 					<div class="half-width">
-						<label for="radio-group">할인 유형</label>
+						<label for="radio-group">할인 대상</label>
 						<div id="radio-group">
-							<label><input type="radio" name="type" value="" checked>
-								전체</label> <label><input type="radio" name="type" value="이벤트">
-								이벤트</label> <label><input type="radio" name="type" value="쿠폰">
-								쿠폰</label>
+						<label><input type="radio" name="targetType" value=""
+								checked>모두</label>
+							<label><input type="radio" name="targetType" value="ALL">전체</label> <label><input type="radio"
+								name="targetType" value="PRODUCT">상품</label> <label><input
+								type="radio" name="targetType" value="MEMBER_RATING">등급</label> <label><input type="radio" name="targetType"
+								value="CUSTOMER">회원</label> <label><input type="radio"
+								name="targetType" value="CATEGORY">카테고리</label>
 						</div>
 					</div>
 					<div class="half-width">
@@ -48,20 +62,6 @@
 								name="discountType" value="P"> 퍼센트</label> <label><input
 								type="radio" name="discountType" value="A"> 금액</label>
 						</div>
-					</div>
-				</div>
-				<div class="full-width dark-mode">
-					<div class="half-width">
-						<label for="fr_min">최소 구매 값</label> <input type="number"
-							name="fr_min" id="fr_min" placeholder="원단위" class="secondary">
-						<input type="number" name="to_min" id="to_min" placeholder="원단위"
-							class="secondary">
-					</div>
-					<div class="half-width">
-						<label for="fr_max">최대 할인 값</label> <input type="number"
-							name="fr_max" id="fr_max" placeholder="원단위" class="secondary">
-						<input type="number" name="to_max" id="to_max" placeholder="원단위"
-							class="secondary">
 					</div>
 				</div>
 				<div class="full-width dark-mode">
@@ -89,7 +89,7 @@
 				</div>
 				<div class="search-buttons full-width">
 					<button type="button" class="primary search-btn"
-						data-url="/admin/discountList">검색</button>
+						data-url="/admin/discountTarget">검색</button>
 					<button type="reset" class="secondary">초기화</button>
 				</div>
 			</div>
@@ -101,11 +101,12 @@
 					</div>
 				</div>
 				<div>
-					<button type="button" id="addDiscount" class="primary">할인
+					<button type="button" id="addDiscountTarget" class="primary">할인 대상
 						추가</button>
 					<button type="button" id="editDiscount" class="primary">할인
 						수정</button>
-					<button id="deleteSelectedButton" class="danger" data-url="/admin/discountList" data-pageType = "discountList">선택삭제</button>
+					<button id="deleteSelectedButton" class="danger"
+						data-url="/admin/discountList" data-pageType="discountList">선택삭제</button>
 				</div>
 			</div>
 			<table class="discount-table product-list dark-mode">
@@ -113,12 +114,11 @@
 					<tr>
 						<th><input type="checkbox" id="selectAll" class="secondary"></th>
 						<th class="discount-name-column">할인명</th>
-						<th class="discount-description-column">할인 설명</th>
 						<th class="discount-type-column">할인 유형</th>
 						<th class="discount-category-column">할인 종류</th>
 						<th class="discount-value-column">할인 값</th>
-						<th class="min-purchase-value-column">최소 구매 값</th>
-						<th class="max-discount-value-column">최대 할인 값</th>
+						<th class="discount-target-column">할인 대상</th>
+						<th class="discount-targetName-column">대상 이름</th>
 						<th class="start-date-column">시작 날짜</th>
 						<th class="end-date-column">종료 날짜</th>
 						<th class="status-column">진행 여부</th>
@@ -127,9 +127,8 @@
 				<tbody>
 					<c:forEach items="${discounts.content}" var="discounts">
 						<tr data-discountId=${discounts.id }>
-						<td><input type="checkbox" class="selectProduct secondary"></td>
+							<td><input type="checkbox" class="selectProduct secondary"></td>
 							<td class="discount-name-column">${discounts.name}</td>
-							<td class="discount-description-column">${discounts.description}</td>
 							<td class="discount-type-column"><c:choose>
 									<c:when test="${discounts.discountType == 'P'}">퍼센트</c:when>
 									<c:when test="${discounts.discountType == 'A'}">금액</c:when>
@@ -141,11 +140,39 @@
 									<c:when test="${discounts.discountType == 'A'}">&#8361;${discounts.discountValue}</c:when>
 									<c:otherwise>오류</c:otherwise>
 								</c:choose></td>
-							<td class="min-purchase-value-column">&#8361;${discounts.minPrice}</td>
-							<td class="max-discount-value-column">&#8361;${discounts.maxDiscount}</td>
+							<td class="discount-target-column"><c:choose>
+									<c:when
+										test="${discounts.discountTargetDTO.targetType == 'ALL'}">
+								전체 할인
+								</c:when>
+									<c:when
+										test="${discounts.discountTargetDTO.targetType == 'PRODUCT'}">
+								상품 할인
+								</c:when>
+									<c:when
+										test="${discounts.discountTargetDTO.targetType == 'MEMBER_RATING'}">
+								등급 할인
+								</c:when>
+									<c:when
+										test="${discounts.discountTargetDTO.targetType == 'CUSTOMER'}">
+								개별 할인
+								</c:when>
+									<c:when
+										test="${discounts.discountTargetDTO.targetType == 'CATEGORY'}">
+								카테고리 할인
+								</c:when>
+								</c:choose></td>
+							<td class="discount-targetName-column">${discounts.discountTargetDTO.targetName}</td>
 							<td class="start-date-column">${discounts.formattedStartDate}</td>
 							<td class="end-date-column">${discounts.formattedEndDate}</td>
-							<td class="status-column">${discounts.onsaleYn}</td>
+							<td class="status-column"><c:choose>
+									<c:when test="${discounts.onsaleYn == 'N'}">
+								종료
+								</c:when>
+									<c:when test="${discounts.onsaleYn == 'Y'}">
+								진행 중
+								</c:when>
+								</c:choose></td>
 						</tr>
 					</c:forEach>
 				</tbody>
@@ -155,7 +182,7 @@
 					<c:forEach begin="1" end="${pageCount}" var="i">
 						<li class="page-item ${currentPage + 1 == i ? 'active' : ''}">
 							<a class="page-link" data-page="${i - 1}"
-							data-url="/admin/discountList" data-size="${size}">${i}</a>
+							data-url="/admin/discountTarget" data-size="${size}">${i}</a>
 						</li>
 					</c:forEach>
 				</ul>
