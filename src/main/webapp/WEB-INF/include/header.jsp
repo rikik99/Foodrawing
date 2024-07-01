@@ -28,7 +28,7 @@
 		      		<img class="btn-cart-icon" src="/images/basket-icon.png">
 		      		<span class="count" id="headerCartCount">${cartItemCount}</span>
 		      	</a>
-		      	<a href="#" class="ms-2"><img class="btn-search" src="/images/user-profile.png"></a>
+		      	<a href="/myPage" class="ms-2"><img class="btn-search" src="/images/user-profile.png"></a>
 		      </div>
 		    </header>
 	  	</div>

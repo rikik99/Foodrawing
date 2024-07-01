@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.food.domain.product.dto.CustomPageDTO;
 import com.food.domain.product.dto.ProductDTO;
@@ -22,10 +23,19 @@ import com.food.domain.product.service.ProductService;
 @RestController
 public class ProductController {
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
-//커스텀페이지
+
     @Autowired
     private ProductService productService;
 
+    // 영양소 커스텀 페이지로 이동
+    @GetMapping("/custompage")
+    public ModelAndView nutrientCustom() {
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("main/custompage"); // custompage.jsp로 이동
+        return mv;
+    }
+
+    // 영양소 필터링에 따른 제품 데이터 반환
     @RequestMapping("/nutrition")
     public List<CustomPageDTO> getProductNutritions(
         @RequestParam(value = "protein", required = false) Long protein,
@@ -34,7 +44,7 @@ public class ProductController {
         @RequestParam(value = "sugar", required = false) Long sugar,
         @RequestParam(value = "sodium", required = false) Long sodium,
         @RequestParam(value = "carbohydrate", required = false) Long carbohydrate) {
-    	
+        
         ProductNutritionDTO criteria = new ProductNutritionDTO();
         criteria.setProtein(protein);
         criteria.setTransFat(transFat);
@@ -94,8 +104,4 @@ public class ProductController {
         logger.info("Custom List: {}", customList);
         return customList;
     }
-
-    
-    
-    }
-
+}

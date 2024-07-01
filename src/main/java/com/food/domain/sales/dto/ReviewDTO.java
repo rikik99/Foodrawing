@@ -21,7 +21,11 @@ public class ReviewDTO {
     private Long salesPostId;
     private Long customerId;
     private Long rating;
+<<<<<<< HEAD
     private String replyYn;
+=======
+    private Long replyYn;
+>>>>>>> branch 'develop' of https://github.com/rikik99/Foodrawing.git
     private String message;
     private LocalDateTime createdDate;
     private LocalDateTime uploadDate;
