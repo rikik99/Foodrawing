@@ -5,18 +5,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-<<<<<<< HEAD
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-=======
-import org.springframework.security.web.firewall.HttpFirewall;
-import org.springframework.security.web.firewall.StrictHttpFirewall;
->>>>>>> branch 'develop' of https://github.com/rikik99/Foodrawing.git
 
 import com.food.domain.user.service.CustomOAuth2UserService;
 import com.food.domain.user.service.CustomUserDetailsService;
@@ -108,7 +102,7 @@ public class SecurityConfig {
                     "/findUsername", "/verify-id-code", "/showUsername", "/findPassword", "/sendPasswordResetCode", 
                     "/verify-password-code", "/passwordReset", "/best", "/ProductDetail", "/cart/checkStock", "/cart/addToCart", 
                     "/cart", "/cart/deleteCartItem", "/order/prepareCheckout", "/checkoutPage", "/order/prepareCheckoutAll", 
-                    "/cart/updateCartItem", "/cart/deleteSelectedItems", "/payment/result", "/payment/restoreStock").permitAll()
+                    "/cart/updateCartItem", "/cart/deleteSelectedItems", "/payment/result", "/payment/restoreStock", "/mainpage").permitAll()
                 .anyRequest().authenticated())
             .formLogin(formLogin -> formLogin
                 .loginPage("/login")
@@ -140,49 +134,7 @@ public class SecurityConfig {
         // X-Frame-Options SAMEORIGIN 설정 추가
         http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
-<<<<<<< HEAD
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-=======
-        return http.build();
-    }
-
-	@Bean
-	public SecurityFilterChain userSecurityFilterChain(HttpSecurity http) throws Exception {
-		http.csrf(csrf -> csrf.disable())
-				.authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/", "/login",
-						"/loginFail", "/signup", "/WEB-INF/views/**", "/css/**", "/js/**", "/images/**",
-						"/sendVerificationEmail", "/verify", "/signupInfo", "/main/custompage", "/main/mainpage",
-						"/nutrition", "/verificationSuccess", "/verificationFail", "/checkDuplicateUsername",
-						"/invalidateSession", "/linkAccount", "/findUsername", "/verify-id-code", "/showUsername",
-						"/findPassword", "/sendPasswordResetCode", "/verify-password-code", "/passwordReset", "/best",
-						"/ProductDetail", "/cart/checkStock", "/cart/addToCart", "/cart", "/cart/deleteCartItem",
-						"/order/prepareCheckout", "/checkoutPage", "/order/prepareCheckoutAll", "/cart/updateCartItem",
-						"/cart/deleteSelectedItems", "/payment/result", "/payment/restoreStock", "/buy/checkoutPage",
-						"/wishlist/add", "/wishlist/remove").permitAll()
-						.anyRequest().authenticated())
-				.formLogin(formLogin -> formLogin.loginPage("/login").defaultSuccessUrl("/", true)
-						.successHandler(customAuthenticationSuccessHandler)
-						.failureHandler(customAuthenticationFailureHandler).permitAll())
-				.oauth2Login(oauth2Login -> oauth2Login.loginPage("/login")
-						.userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
-						.successHandler(customOAuth2SuccessHandler).failureHandler(customOAuth2FailureHandler))
-				.logout(logout -> logout.logoutUrl("/logout")
-						.logoutSuccessHandler((request, response, authentication) -> {
-							Cookie cookie = new Cookie("jwt", null);
-							cookie.setHttpOnly(true);
-							cookie.setSecure(false); // HTTP 환경에서는 false로 설정
-							cookie.setPath("/");
-							cookie.setMaxAge(0); // 쿠키 삭제
-							response.addCookie(cookie);
-							request.getSession().invalidate(); // 세션 무효화
-							response.sendRedirect("/login");
-						}).permitAll())
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // 세션을 필요할 때만 생성하도록 설정
-				.userDetailsService(customUserDetailsService);
-
-        // X-Frame-Options SAMEORIGIN 설정 추가
-        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
->>>>>>> branch 'develop' of https://github.com/rikik99/Foodrawing.git
 
         return http.build();
     }
@@ -192,15 +144,9 @@ public class SecurityConfig {
         return customUserDetailsService;
     }
 
-<<<<<<< HEAD
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-=======
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
->>>>>>> branch 'develop' of https://github.com/rikik99/Foodrawing.git
 }

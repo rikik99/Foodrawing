@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import com.food.domain.product.dto.ProductDTO;
-import com.food.domain.support.dto.ResponseDTO;
 import com.food.domain.user.dto.CustomerDTO;
 
 import lombok.AllArgsConstructor;
@@ -21,11 +20,7 @@ public class ReviewDTO {
     private Long salesPostId;
     private Long customerId;
     private Long rating;
-<<<<<<< HEAD
     private String replyYn;
-=======
-    private Long replyYn;
->>>>>>> branch 'develop' of https://github.com/rikik99/Foodrawing.git
     private String message;
     private LocalDateTime createdDate;
     private LocalDateTime uploadDate;

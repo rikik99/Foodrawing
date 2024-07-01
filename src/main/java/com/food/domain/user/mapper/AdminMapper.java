@@ -115,4 +115,6 @@ public interface AdminMapper {
 	List<DiscountDTO> findDiscountsWithSearch(Map<String, String> allParams);
 
 	void updateDiscount(Map<String, Object> params);
+
+	void insertDiscount(Map<String, Object> allParams);
 }

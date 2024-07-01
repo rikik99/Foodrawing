@@ -617,18 +617,26 @@
 		</if>
 	</select>
 	<update id="updateDiscount" parameterType="map">
-	 UPDATE DISCOUNT_TB
-        SET 
-            NAME = #{name},
-            DESCRIPTION = #{description},
-            DISCOUNT_TYPE = #{discountType},
-            TYPE = #{type},
-            DISCOUNT_VALUE = #{discountValue},
-            MIN_PRICE = #{minPrice},
-            MAX_DISCOUNT = #{maxDiscount},
-            START_DATE = #{startDate},
-            END_DATE = #{endDate},
-            ONSALE_YN = #{onsaleYn}
-        WHERE ID = #{id}
+		UPDATE DISCOUNT_TB
+		SET
+		NAME = #{name},
+		DESCRIPTION = #{description},
+		DISCOUNT_TYPE = #{discountType},
+		TYPE = #{type},
+		DISCOUNT_VALUE = #{discountValue},
+		MIN_PRICE = #{minPrice},
+		MAX_DISCOUNT = #{maxDiscount},
+		START_DATE = #{startDate},
+		END_DATE = #{endDate},
+		ONSALE_YN = #{onsaleYn}
+		WHERE ID = #{id}
 	</update>
+<insert id="insertDiscount" parameterType="map">
+    INSERT INTO DISCOUNT_TB
+    (ONSALE_YN, NAME, TYPE, START_DATE, END_DATE,
+    DISCOUNT_TYPE, DISCOUNT_VALUE, MAX_DISCOUNT, DESCRIPTION, MIN_PRICE)
+    VALUES (#{onsaleYn}, #{name}, #{type}, #{startDate}, #{endDate},
+    #{discountType}, #{discountValue}, #{maxDiscount}, #{description}, #{minPrice})
+</insert>
+
 </mapper>
