@@ -103,7 +103,7 @@
 				<div>
 					<button type="button" id="addDiscountTarget" class="primary">할인 대상
 						추가</button>
-					<button type="button" id="editDiscount" class="primary">할인
+					<button type="button" id="editDiscountTarget" class="primary">할인
 						수정</button>
 					<button id="deleteSelectedButton" class="danger"
 						data-url="/admin/discountTarget" data-pageType="discountTarget">선택삭제</button>

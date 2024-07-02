@@ -443,6 +443,13 @@ public class AdminController {
 		return ResponseEntity.ok("선택된 항목이 성공적으로 삭제되었습니다.");
 	}
 	
+	@GetMapping("/updateTarget")
+	public ModelAndView updateTarget(@RequestParam Map<String, String> allParams) {
+		ModelAndView mv = new ModelAndView();
+		
+		mv.setViewName("admin/updateDiscountTarget");
+		return mv;
+	}
 	@PostMapping("/discountUpdate")
 	@ResponseBody
 	public ResponseEntity<?> discountUpdate(@RequestBody List<Map<String, Object>> allParams) {
