@@ -26,7 +26,7 @@
 
 <div class="sidebar">
     <div class="list-group">
-        <a href="/Users/Info?user_id=${ sessionScope.plogin.user_id }"
+        <a href="myPageInfo"
             class="list-group-item shadow">개인정보</a> 
         <a href="/Users/ResumeForm?user_id=${ sessionScope.plogin.user_id }"
             class="list-group-item shadow">주문/배송조회</a> 

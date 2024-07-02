@@ -365,7 +365,20 @@ public class UserController {
     @GetMapping("/myPage")
     public String myPage(Model model, HttpSession session) {
         CustomerDTO loginUser = (CustomerDTO) session.getAttribute("plogin");
-        model.addAttribute("customer", loginUser);
-        return "user/myPage"; 
+        if (loginUser != null) {
+            model.addAttribute("customer", loginUser);
+            return "user/myPage";
+        }
+        return "redirect:/login"; // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
+    }
+
+    @GetMapping("/myPageInfo")
+    public String myPageInfo(Model model, HttpSession session) {
+        CustomerDTO loginUser = (CustomerDTO) session.getAttribute("plogin");
+        if (loginUser != null) {
+            model.addAttribute("customer", loginUser);
+            return "user/myPageInfo"; // JSP 파일 이름
+        }
+        return "redirect:/login"; // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
     }
 }

@@ -363,9 +363,6 @@
                 </div>
             </div>
         </div>
-        <a href="/main/custompage">test</a>
-        <a href="/main/bestpage">best</a>
-        <a href="/user/myPage">mypage</a>
     </main>
     <%@ include file="/WEB-INF/include/footer.jsp" %>
     <script>

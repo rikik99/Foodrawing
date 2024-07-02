@@ -97,14 +97,14 @@ public class SecurityConfig {
 		http.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/", "/login",
 						"/loginFail", "/signup", "/WEB-INF/views/**", "/css/**", "/js/**", "/images/**",
-						"/sendVerificationEmail", "/verify", "/signupInfo", "/main/custompage", "/main/mainpage",
+						"/sendVerificationEmail", "/verify", "/signupInfo", "/main/custompage", "/main/mainpage", "/mainpage",
 						"/nutrition", "/verificationSuccess", "/verificationFail", "/checkDuplicateUsername",
 						"/invalidateSession", "/linkAccount", "/findUsername", "/verify-id-code", "/showUsername",
 						"/findPassword", "/sendPasswordResetCode", "/verify-password-code", "/passwordReset", "/best",
 						"/ProductDetail", "/cart/checkStock", "/cart/addToCart", "/cart", "/cart/deleteCartItem",
 						"/order/prepareCheckout", "/checkoutPage", "/order/prepareCheckoutAll", "/cart/updateCartItem",
 						"/cart/deleteSelectedItems", "/payment/result", "/payment/restoreStock", "/buy/checkoutPage",
-						"/wishlist/add", "/wishlist/remove").permitAll()
+						"/wishlist/add", "/wishlist/remove" ,"/myPage","/myPageInfo").permitAll()
 						.anyRequest().authenticated())
 				.formLogin(formLogin -> formLogin.loginPage("/login").defaultSuccessUrl("/", true)
 						.successHandler(customAuthenticationSuccessHandler)

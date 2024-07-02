@@ -12,4 +12,8 @@ public interface CustomerMapper {
 	CustomerDTO findCustomerByEmail(String email);
 
 	CustomerDTO findCustomerById(Long userId);
+
+	void updateCustomer(CustomerDTO customerDTO);
+	
+	void deleteCustomer(Long id);
 }

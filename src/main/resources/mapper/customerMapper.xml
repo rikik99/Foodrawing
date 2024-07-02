@@ -7,8 +7,8 @@
     </select>
 
     <insert id="insertCustomer" parameterType="com.food.domain.user.dto.CustomerDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
-        INSERT INTO CUSTOMER_TB (USER_ID, NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE, ADDRESS, ADDRESS_DETAIL, ZIPCODE)
-        VALUES (#{userId}, #{nickname}, #{name}, #{gender}, #{phone}, #{email}, #{birthDate}, #{address}, #{addressDetail}, #{zipcode})
+        INSERT INTO CUSTOMER_TB (USER_ID, NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE, ADDRESS, ADDRESS_DETAIL, ZIPCODE, REFUND_ACCOUNT, REFUND_BANK)
+        VALUES (#{userId}, #{nickname}, #{name}, #{gender}, #{phone}, #{email}, #{birthDate}, #{address}, #{addressDetail}, #{zipcode}, #{refundAccount}, #{refundBank})
     </insert>
 
     <select id="findCustomerByEmail" parameterType="String" resultType="com.food.domain.user.dto.CustomerDTO">
@@ -18,4 +18,24 @@
     <select id="findCustomerById" parameterType="Long" resultType="com.food.domain.user.dto.CustomerDTO">
         SELECT * FROM CUSTOMER_TB WHERE ID = #{userId}
     </select>
+    
+    <update id="updateCustomer" parameterType="com.food.domain.user.dto.CustomerDTO">
+        UPDATE CUSTOMER_TB
+        SET NICKNAME = #{nickname},
+            NAME = #{name},
+            GENDER = #{gender},
+            PHONE = #{phone},
+            EMAIL = #{email},
+            BIRTHDATE = #{birthDate},
+            ADDRESS = #{address},
+            ADDRESS_DETAIL = #{addressDetail},
+            ZIPCODE = #{zipcode},
+            REFUND_ACCOUNT = #{refundAccount},
+            REFUND_BANK = #{refundBank}
+        WHERE ID = #{id}
+    </update>
+
+    <delete id="deleteCustomer" parameterType="Long">
+        DELETE FROM CUSTOMER_TB WHERE ID = #{id}
+    </delete>
 </mapper>

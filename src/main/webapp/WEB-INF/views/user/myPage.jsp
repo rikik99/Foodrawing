@@ -96,7 +96,7 @@
 <div style="position: relative;">
     <!-- 페이지 내용 -->
     <div class="main-content">
-        <h1>${customer.name}님 반갑습니다</h1>
+        <h1 style="text-align:center">${customer.name}님 반갑습니다</h1>
         <section>
             <div class="box">
                 <div class="three-box-container">
