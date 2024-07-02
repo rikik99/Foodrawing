@@ -280,32 +280,6 @@ button.editButton:hover {
 	margin-bottom: 10px;
 }
 
-.star-rating {
-	display: inline-block;
-}
-
-.star {
-	font-size: 24px;
-	cursor: pointer;
-	color: #ccc;
-}
-
-.star.selected, .star.hover {
-	color: gold;
-}
-
-.star:has( ~ .star.selected)::after {
-	color: gold;
-}
-
-.star:has( ~ .star:hover)::after {
-	color: gold;
-}
-.table-input {
-    max-width: 100px; /* 원하는 최대 너비 설정 */
-    width: 100%; /* 셀 크기에 맞게 조정 */
-    box-sizing: border-box; /* 패딩과 테두리를 포함한 너비 계산 */
-}
 /* Pagination styles */
 .pagination {
     display: flex;
@@ -345,22 +319,28 @@ button.editButton:hover {
     background-color: #e9ecef;
     border-color: #dee2e6;
 }
-.inquiryToggleMenu {
-	display: none;
-	background-color: #081028;
-	list-style: none;
-	padding: 0;
-	transition: all 0.3s ease;
-	overflow: hidden;
-	max-height: 0;
-}
-
-.inquiryToggleMenu.visible {
-	display: table-row;
-	max-height: 500px;
-	opacity: 1;
-}
-.responseTitle {
+.between {
 	display: flex;
 	justify-content: space-between;
 }
+    .discount-table td {
+        padding: 8px;
+        vertical-align: middle;
+    }
+    
+    .discount-table input, .discount-table button {
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .discount-table .table-input {
+        width: 100%;
+    }
+    
+    .discount-table .discount-button, 
+    .discount-table .type-button, 
+    .discount-table .status-button {
+        width: 100%;
+        padding: 8px;
+        font-size: 14px;
+    }

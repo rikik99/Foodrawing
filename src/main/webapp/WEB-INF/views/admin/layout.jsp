@@ -46,6 +46,7 @@
 			</ul>
 			<ul class="dropdown-menu">
 				<li><a data-target="discountList">할인 관리</a></li>
+				<li><a data-target="discountTarget">할인 대상 관리</a></li>
 				<li><a data-target="couponList">쿠폰 관리</a></li>
 			</ul>
 		</li>

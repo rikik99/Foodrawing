@@ -235,13 +235,13 @@ button.editButton:hover {
 	width: 100px;
 }
 
-.product-list .inquiry-content-column {
+.product-list .review-content-column {
 	width: 300px;
 	word-wrap: break-word;
 	white-space: normal;
 }
 
-.product-list .inquiry-date-column {
+.product-list .review-date-column {
 	width: 150px;
 }
 
@@ -263,18 +263,18 @@ button.editButton:hover {
 	text-decoration: underline;
 }
 
-.response-textarea {
+.reply-textarea {
 	width: 100%;
 	height: 150px;
 }
 
-.response-form {
+.reply-form {
 	padding: 10px;
 	border: 1px solid #ccc;
 	background-color: #070F25;
 }
 
-.response-form label, .response-form textarea, .response-form button {
+.reply-form label, .reply-form textarea, .reply-form button {
 	display: block;
 	width: 100%;
 	margin-bottom: 10px;
@@ -345,22 +345,23 @@ button.editButton:hover {
     background-color: #e9ecef;
     border-color: #dee2e6;
 }
-.inquiryToggleMenu {
-	display: none;
-	background-color: #081028;
-	list-style: none;
-	padding: 0;
-	transition: all 0.3s ease;
-	overflow: hidden;
-	max-height: 0;
+.reviewToggleMenu {
+    display: none;
+    background-color: #081028;
+    list-style: none;
+    padding: 0;
+    transition: all 0.3s ease;
+    overflow-y: auto; /* 세로 스크롤 추가 */
+    max-height: 500px; /* 최대 높이 설정 */
 }
 
-.inquiryToggleMenu.visible {
-	display: table-row;
-	max-height: 500px;
-	opacity: 1;
+.reviewToggleMenu.visible {
+    display: table-row;
+    max-height: 500px;
+    opacity: 1;
 }
-.responseTitle {
+
+.replyTitle {
 	display: flex;
 	justify-content: space-between;
 }

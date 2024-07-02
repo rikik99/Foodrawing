@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	setupCheckboxEventListeners();
 	setupPaginationLinks();
 	initializeCKEditor();
-	inquiryToggleFunction();
 	// 초기 로드 설정
 	const pathSegments = window.location.pathname.split('/');
 	const initialPage = pathSegments[pathSegments.length - 1];
@@ -25,10 +24,12 @@ document.addEventListener('DOMContentLoaded', function() {
 		loadContent('/admin/mainContent', 'mainContent', false);
 	}
 });
+
 window.addEventListener('beforeunload', function() {
 	// 로컬 저장소에서 fileDTOList 항목 삭제
 	localStorage.removeItem('fileDTOList');
 });
+
 // popstate 이벤트 리스너를 전역 범위에서 한 번만 추가
 window.addEventListener('popstate', function(event) {
 	if (event.state && event.state.url) {
@@ -37,6 +38,7 @@ window.addEventListener('popstate', function(event) {
 });
 
 document.addEventListener('click', function(e) {
+
 	if (e.target.classList.contains('date-range-btn')) {
 		const range = e.target.getAttribute('data-range');
 		const group = e.target.getAttribute('data-group');
@@ -56,7 +58,8 @@ document.addEventListener('click', function(e) {
 	}
 	if (e.target.id === 'deleteSelectedButton') {
 		const urlPath = e.target.getAttribute('data-url');
-		deleteSelectedProducts(urlPath);
+		const pageType = e.target.getAttribute('data-pageType');
+		deleteSelectedProducts(urlPath, pageType);
 	}
 	if (e.target.classList.contains('stock-range-btn')) {
 		const stockType = e.target.getAttribute('data-stock');
@@ -81,41 +84,97 @@ document.addEventListener('click', function(e) {
 				break;
 		}
 	}
- if (e.target.classList.contains('stock-update-btn')) {
-                const container = e.target.closest('.stock-update-container');
-                const productNumber = container.getAttribute('data-product-number');
-                const stockAction = container.querySelector('.stock-action').value;
-                const stockQuantity = container.querySelector('.stock-quantity').value;
-                const expirationDate = container.querySelector('.expirationDate').value;
+	if (e.target.classList.contains('stock-update-btn')) {
+		const container = e.target.closest('.stock-update-container');
+		const productNumber = container.getAttribute('data-product-number');
+		const stockAction = container.querySelector('.stock-action').value;
+		const stockQuantity = container.querySelector('.stock-quantity').value;
+		const expirationDate = container.querySelector('.expirationDate').value;
 
-                const stockData = {
-                    productNumber: productNumber,
-                    type: stockAction,
-                    quantity: stockQuantity,
-                    expirationDate: expirationDate
-                };
+		const stockData = {
+			productNumber: productNumber,
+			type: stockAction,
+			quantity: stockQuantity,
+			expirationDate: expirationDate
+		};
 
-                fetch('/admin/updateStock', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(stockData),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        loadContent('/admin/stockManagement', 'stockManagement', true);
-                    } else {
-                        alert('재고 업데이트에 실패했습니다.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('재고 업데이트 중 오류가 발생했습니다.');
-                });
-            }
+		fetch('/admin/updateStock', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(stockData),
+		})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					alert(data.message);
+					loadContent('/admin/stockManagement', 'stockManagement', true);
+				} else {
+					alert('재고 업데이트에 실패했습니다.');
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				alert('재고 업데이트 중 오류가 발생했습니다.');
+			});
+	}
+	if (e.target.classList.contains(('responseBtn'))) {
+		const inquiriesId = e.target.getAttribute('data-inquiriesId');
+		const message = e.target.closest('tr').querySelector('.response-textarea').value;
+		const responseData = {
+			inquiriesId: inquiriesId,
+			message: message
+		};
+		fetch('/admin/salesResponse', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(responseData),
+		})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					alert(data.message);
+					loadContent('/admin/salesInquiry', 'salesInquiry', true);
+				} else {
+					alert('답변 작성에 실패했습니다.');
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				alert('답변 작성 중 오류가 발생했습니다.');
+			});
+	}
+	if (e.target.classList.contains(('replyBtn'))) {
+		const reviewId = e.target.getAttribute('data-reviewsId');
+		const message = e.target.closest('tr').querySelector('.reply-textarea').value;
+		const replyData = {
+			reviewId: reviewId,
+			message: message
+		};
+		fetch('/admin/reviewReply', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(replyData),
+		})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					alert(data.message);
+					loadContent('/admin/salesReview', 'salesReview', true);
+				} else {
+					alert('답변 작성에 실패했습니다.');
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				alert('답변 작성 중 오류가 발생했습니다.');
+			});
+	}
 });
 
 document.addEventListener('click', async function(event) {
@@ -166,9 +225,6 @@ document.addEventListener('click', async function(event) {
 	}
 });
 
-
-
-
 document.addEventListener('change', function(e) {
 	if (e.target && e.target.id === 'productList') {
 		console.log("상품명 선택했어요");
@@ -192,7 +248,10 @@ function performSearch(urlPath) {
 		{ id: 'last_to_date', name: 'last_to_date' },
 		{ id: 'register_fr_date', name: 'register_fr_date' },
 		{ id: 'register_to_date', name: 'register_to_date' },
-		{ id: 'sale_status', name: 'sale_status' }
+		{ id: 'fr_min', name: 'fr_min' },
+		{ id: 'to_min', name: 'to_min' },
+		{ id: 'fr_max', name: 'fr_max' },
+		{ id: 'to_max', name: 'to_max' }
 	];
 
 	fields.forEach(field => {
@@ -205,15 +264,38 @@ function performSearch(urlPath) {
 		}
 	});
 
-	const radioButtons = document.getElementsByName('sale_status');
-	let selectedValue = '';
-	for (const radioButton of radioButtons) {
-		if (radioButton.checked) {
-			selectedValue = radioButton.value;
+	const radioButtonGroups = [
+		{ name: 'resolvedYn', paramName: 'resolvedYn' },
+		{ name: 'replyYn', paramName: 'replyYn' },
+		{ name: 'discountType', paramName: 'discountType' },
+		{ name: 'sale_status', paramName: 'sale_status' },
+		{ name: 'onsaleYn', paramName:'onsaleYn'},
+		{ name: 'type', paramName:'type'},
+		{ name:'targetType', paramName:'targetType'}
+	];
+
+	radioButtonGroups.forEach(group => {
+		const radioButtons = document.getElementsByName(group.name);
+		let selectedValue = '';
+		for (const radioButton of radioButtons) {
+			if (radioButton.checked) {
+				selectedValue = radioButton.value;
+				break;
+			}
+		}
+		if (selectedValue) params.append(group.paramName, selectedValue);
+	});
+
+	// Adding rating parameter
+	const ratingButtons = document.querySelectorAll('.star-rating .star');
+	let ratingValue = '';
+	for (const radioButton of ratingButtons) {
+		if (radioButton.classList.contains('checked')) {
+			ratingValue = radioButton.getAttribute('data-value');
 			break;
 		}
 	}
-	if (selectedValue) params.append('sale_status', selectedValue);
+	if (ratingValue) params.append('rating', ratingValue);
 
 	params.append('page', '0'); // 검색 시 첫 페이지로 이동
 	params.append('size', '5'); // 기본 페이지 크기 설정
@@ -229,10 +311,12 @@ function performSearch(urlPath) {
 			setupPaginationLinks();
 			setupCheckboxEventListeners();
 			initializeCKEditor();
-			history.pushState({ url: url, target: 'productManagement' }, '', url);
+			history.pushState({ url: url, target: urlPath.split('/').pop() }, '', url);
 		})
 		.catch(error => console.error('Error:', error));
 }
+
+
 
 function loadPage(page, size, urlPath) {
 	const params = new URLSearchParams(window.location.search);
@@ -275,26 +359,12 @@ function setupNavigation() {
 	});
 
 	const links = document.querySelectorAll('.sidebar ul li a');
-
 	links.forEach(link => {
 		link.removeEventListener('click', handleLinkClick);
 		link.addEventListener('click', handleLinkClick);
 	});
 }
-function inquiryToggleFunction() {
-	const inquiryToggles = document.querySelectorAll('.inquiryToggle');
-	inquiryToggles.forEach(inquiryToggle => {
-		inquiryToggle.removeEventListener('click', handleInquiryToggleClick);
-		inquiryToggle.addEventListener('click', handleInquiryToggleClick);
-	});
-}
-function handleInquiryToggleClick(event) {
-	event.preventDefault();
-	const inquiryToggleNenu = this.parentElement.parentElement.nextElementSibling;
-	if(inquiryToggleNenu) {
-		inquiryToggleNenu.classList.toggle('visible');
-	}
-}
+
 function handleDropdownClick(event) {
 	event.preventDefault();
 	const dropdownMenu = this.parentElement.parentElement.nextElementSibling;
@@ -325,6 +395,7 @@ function highlightMenu(target) {
 		activeLink.parentElement.classList.add('active');
 	}
 }
+
 function loadContent(url, target, pushState = true) {
 	const mainContent = document.querySelector('.main-content');
 	localStorage.removeItem('fileDTOList');
@@ -373,7 +444,6 @@ function loadContent(url, target, pushState = true) {
 		.catch(error => console.error('Error loading content:', error));
 }
 
-
 function setupCheckboxEventListeners() {
 	const selectAllCheckbox = document.getElementById('selectAll');
 	const productCheckboxes = document.querySelectorAll('.selectProduct');
@@ -398,30 +468,46 @@ function setupCheckboxEventListeners() {
 	});
 }
 
-function deleteSelectedProducts(urlPath) {
-	const productCheckboxes = document.querySelectorAll('.selectProduct:checked');
-	const selectedProducts = Array.from(productCheckboxes).map(checkbox => {
-		return checkbox.closest('tr').querySelector('td:nth-child(3) p').textContent;
-	});
+function deleteSelectedProducts(urlPath, pageType) {
+    const productCheckboxes = document.querySelectorAll('.selectProduct:checked');
+    let selectedItems;
+    let bodyContent;
 
-	if (selectedProducts.length > 0) {
-		fetch('/admin/deleteProducts', {
-			method: 'DELETE',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ productNumbers: selectedProducts })
-		})
-			.then(response => response.ok ? response.text() : Promise.reject('Failed to delete products'))
-			.then(message => {
-				alert(message);
-				loadContent(urlPath, urlPath.split('/').pop(), false);
-			})
-			.catch(error => console.error('Error:', error));
-	} else {
-		alert('삭제할 항목을 선택해주세요.');
-	}
+    if (pageType === 'productManagement') {
+        const selectedProductNumbers = Array.from(productCheckboxes).map(checkbox => {
+            return checkbox.closest('tr').querySelector('td:nth-child(3) p').textContent;
+        });
+        selectedItems = selectedProductNumbers;
+        bodyContent = { productNumbers: selectedItems };
+    } else if (pageType === 'discountList') {
+        const selectedDiscountIds = Array.from(productCheckboxes).map(checkbox => {
+            return checkbox.closest('tr').getAttribute('data-discountId');
+        });
+        selectedItems = selectedDiscountIds;
+        bodyContent = { discountIds: selectedItems };
+    }
+
+    if (selectedItems.length > 0) {
+        const endpoint = pageType === 'productManagement' ? '/admin/deleteProducts' : '/admin/deleteDiscounts';
+
+        fetch(endpoint, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(bodyContent)
+        })
+            .then(response => response.ok ? response.text() : Promise.reject('Failed to delete items'))
+            .then(message => {
+                alert(message);
+                loadContent(urlPath, urlPath.split('/').pop(), false);
+            })
+            .catch(error => console.error('Error:', error));
+    } else {
+        alert('삭제할 항목을 선택해주세요.');
+    }
 }
+
 
 function setDateRange(range, group) {
 	const today = new Date();
@@ -489,3 +575,20 @@ function initializeCKEditor() {
 }
 
 document.addEventListener('DOMContentLoaded', initializeCKEditor);
+
+function handleInquiryToggleClick(event) {
+	event.preventDefault();
+	const inquiryToggle = event.target.closest('.inquiryToggle');
+	const inquiryToggleMenu = inquiryToggle.nextElementSibling;
+	if (inquiryToggleMenu && inquiryToggleMenu.classList.contains('inquiryToggleMenu')) {
+		inquiryToggleMenu.classList.toggle('visible');
+	}
+}
+function handleReviewToggleClick(event) {
+	event.preventDefault();
+	const reviewToggle = event.target.closest('.reviewToggle');
+	const reviewToggleMenu = reviewToggle.nextElementSibling;
+	if (reviewToggleMenu && reviewToggleMenu.classList.contains('reviewToggleMenu')) {
+		reviewToggleMenu.classList.toggle('visible');
+	}
+}
