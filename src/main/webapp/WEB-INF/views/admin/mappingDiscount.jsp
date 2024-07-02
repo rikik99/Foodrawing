@@ -8,7 +8,7 @@
 </head>
 <body class="dark-mode">
     <div class="discount-form-container">
-        <form id="insertDiscountForm" method="post" action="/admin/addDiscountTargets" class="discount-form">
+        <form id="insertDiscountForm" method="post" action="/admin/insertDiscountTarget" class="discount-form">
             <h1>할인 매핑</h1>
             <table class="form-table">
                 <tr>
@@ -38,7 +38,7 @@
                 <tr id="targetIdRow" style="display: none;">
                     <td><label for="targetId">대상 선택</label></td>
                     <td>
-                        <input type="text" id="targetId" name="targetId" placeholder="검색어를 입력하세요">
+                        <select id="targetId" name="targetId"></select>
                     </td>
                 </tr>
                 <tr>
@@ -73,20 +73,73 @@
         const targetTypeSelect = document.getElementById('targetType');
         const targetIdRow = document.getElementById('targetIdRow');
         const targetIdInput = document.getElementById('targetId');
+        const targetIdSelect = document.getElementById('targetId');
         const suggestionsDiv = document.getElementById('suggestions');
         const selectedTargetsList = document.getElementById('selectedTargets');
         const pagination = document.querySelector('.pagination');
+
+        const memberRatingOptions = [
+            { value: '1', text: '일반' },
+            { value: '2', text: '우수' },
+            { value: '3', text: '프리미엄' },
+            { value: '4', text: 'VIP' },
+            { value: '6', text: 'VVIP' }
+        ];
+
+        const categoryOptions = [
+            { value: '1', text: '국,탕,찌개' },
+            { value: '2', text: '닭고기' },
+            { value: '3', text: '돼지고기' },
+            { value: '4', text: '면요리' },
+            { value: '5', text: '볶음밥,죽' },
+            { value: '6', text: '분식,스낵류' },
+            { value: '7', text: '소고기' },
+            { value: '8', text: '야채' },
+            { value: '9', text: '어패류' }
+        ];
 
         targetTypeSelect.addEventListener('change', function() {
             const targetType = targetTypeSelect.value;
             if (targetType === 'PRODUCT' || targetType === 'CUSTOMER') {
                 targetIdRow.style.display = '';
+                targetIdInput.style.display = 'block';
+                targetIdSelect.style.display = 'none';
                 fetchTargets(targetType, 0, 5); // 초기 페이지는 0, 페이지 크기는 5로 설정
+            } else if (targetType === 'MEMBER_RATING') {
+                targetIdRow.style.display = '';
+                targetIdInput.style.display = 'none';
+                targetIdSelect.style.display = 'block';
+                populateOptions(memberRatingOptions);
+            } else if (targetType === 'CATEGORY') {
+                targetIdRow.style.display = '';
+                targetIdInput.style.display = 'none';
+                targetIdSelect.style.display = 'block';
+                populateOptions(categoryOptions);
+            } else if (targetType === 'ALL') {
+                targetIdRow.style.display = '';
+                targetIdInput.style.display = 'none';
+                targetIdSelect.style.display = 'none';
+                addSelectedTarget('ALL', '전체', '0');
             } else {
                 targetIdRow.style.display = 'none';
                 suggestionsDiv.innerHTML = '';
                 selectedTargetsList.innerHTML = '';
             }
+        });
+
+        function populateOptions(options) {
+            targetIdSelect.innerHTML = '';
+            options.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option.value;
+                opt.text = option.text;
+                targetIdSelect.appendChild(opt);
+            });
+        }
+
+        targetIdSelect.addEventListener('change', function() {
+            const selectedOption = targetIdSelect.options[targetIdSelect.selectedIndex];
+            addSelectedTarget(targetTypeSelect.value, selectedOption.text, selectedOption.value);
         });
 
         targetIdInput.addEventListener('input', function() {
@@ -98,6 +151,27 @@
                 fetchTargets(targetType, 0, 5); // 검색어가 없을 때
             }
         });
+
+        function addSelectedTarget(type, name, id) {
+            const listItem = document.createElement('li');
+            listItem.className = 'selected-target';
+            listItem.dataset.id = id;
+            listItem.dataset.type = type;
+            listItem.innerHTML = `
+                <div class="target-info">
+                    <strong>\${type} 번호:</strong> \${id} <br>
+                    <strong>이름:</strong> \${name}
+                </div>
+            `;
+            const removeButton = document.createElement('button');
+            removeButton.className = 'removeTarget';
+            removeButton.textContent = 'Remove';
+            removeButton.addEventListener('click', function() {
+                listItem.remove();
+            });
+            listItem.appendChild(removeButton);
+            selectedTargetsList.appendChild(listItem);
+        }
 
         function fetchTargets(targetType, page, size, query = '') {
             fetch(`/admin/getTargets?targetType=\${targetType}&keyword=\${query}&page=\${page}&size=\${size}`)
@@ -189,9 +263,9 @@
                 pagination.appendChild(li);
             }
         }
-
         const form = document.getElementById('insertDiscountForm');
-        form.addEventListener('submit', function(event) {
+
+        form.addEventListener('submit', async function(event) {
             event.preventDefault();
 
             const selectedTargets = [];
@@ -202,26 +276,37 @@
                 });
             });
 
-            fetch('/admin/addDiscountTargets', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ discountId: document.getElementById('discountId').value, targets: selectedTargets })
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert('Discount targets added successfully');
-                form.reset();
-                selectedTargetsList.innerHTML = '';
-                suggestionsDiv.innerHTML = '';
-                targetIdRow.style.display = 'none';
-            })
-            .catch(error => {
-                alert('Error adding discount targets');
-            });
+            const requestBody = { discountId: document.getElementById('discountId').value, targets: selectedTargets };
+
+            try {
+                console.log(JSON.stringify(requestBody)); // 요청 본문을 로그로 출력
+
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (response.ok) {
+                    const message = await response.text();
+                    alert(message);
+
+                    if (window.opener) {
+                        window.opener.loadContent('/admin/discountTarget', 'discountTarget', true);
+                        window.close();
+                    }
+                } else {
+                    console.error('Failed to submit form');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
         });
+
     });
 </script>
+
 </body>
 </html>

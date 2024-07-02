@@ -270,7 +270,8 @@ function performSearch(urlPath) {
 		{ name: 'discountType', paramName: 'discountType' },
 		{ name: 'sale_status', paramName: 'sale_status' },
 		{ name: 'onsaleYn', paramName:'onsaleYn'},
-		{name:'targetType', paramName:'targetType'}
+		{ name: 'type', paramName:'type'},
+		{ name:'targetType', paramName:'targetType'}
 	];
 
 	radioButtonGroups.forEach(group => {

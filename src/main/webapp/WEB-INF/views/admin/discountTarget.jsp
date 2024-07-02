@@ -128,48 +128,48 @@
 					<c:forEach items="${discounts.content}" var="discounts">
 						<tr data-discountId=${discounts.id }>
 							<td><input type="checkbox" class="selectProduct secondary"></td>
-							<td class="discount-name-column">${discounts.name}</td>
+							<td class="discount-name-column">${discounts.discountDTO.name}</td>
 							<td class="discount-type-column"><c:choose>
-									<c:when test="${discounts.discountType == 'P'}">퍼센트</c:when>
-									<c:when test="${discounts.discountType == 'A'}">금액</c:when>
+									<c:when test="${discounts.discountDTO.discountType == 'P'}">퍼센트</c:when>
+									<c:when test="${discounts.discountDTO.discountType == 'A'}">금액</c:when>
 									<c:otherwise>오류</c:otherwise>
 								</c:choose></td>
-							<td class="discount-category-column">${discounts.type}</td>
+							<td class="discount-category-column">${discounts.discountDTO.type}</td>
 							<td class="discount-value-column"><c:choose>
-									<c:when test="${discounts.discountType == 'P'}">${discounts.discountValue}%</c:when>
-									<c:when test="${discounts.discountType == 'A'}">&#8361;${discounts.discountValue}</c:when>
+									<c:when test="${discounts.discountDTO.discountType == 'P'}">${discounts.discountDTO.discountValue}%</c:when>
+									<c:when test="${discounts.discountDTO.discountType == 'A'}">&#8361;${discounts.discountDTO.discountValue}</c:when>
 									<c:otherwise>오류</c:otherwise>
 								</c:choose></td>
 							<td class="discount-target-column"><c:choose>
 									<c:when
-										test="${discounts.discountTargetDTO.targetType == 'ALL'}">
+										test="${discounts.targetType == 'ALL'}">
 								전체 할인
 								</c:when>
 									<c:when
-										test="${discounts.discountTargetDTO.targetType == 'PRODUCT'}">
+										test="${discounts.targetType == 'PRODUCT'}">
 								상품 할인
 								</c:when>
 									<c:when
-										test="${discounts.discountTargetDTO.targetType == 'MEMBER_RATING'}">
+										test="${discounts.targetType == 'MEMBER_RATING'}">
 								등급 할인
 								</c:when>
 									<c:when
-										test="${discounts.discountTargetDTO.targetType == 'CUSTOMER'}">
+										test="${discounts.targetType == 'CUSTOMER'}">
 								개별 할인
 								</c:when>
 									<c:when
-										test="${discounts.discountTargetDTO.targetType == 'CATEGORY'}">
+										test="${discounts.targetType == 'CATEGORY'}">
 								카테고리 할인
 								</c:when>
 								</c:choose></td>
-							<td class="discount-targetName-column">${discounts.discountTargetDTO.targetName}</td>
-							<td class="start-date-column">${discounts.formattedStartDate}</td>
-							<td class="end-date-column">${discounts.formattedEndDate}</td>
+							<td class="discount-targetName-column">${discounts.targetName}</td>
+							<td class="start-date-column">${discounts.discountDTO.formattedStartDate}</td>
+							<td class="end-date-column">${discounts.discountDTO.formattedEndDate}</td>
 							<td class="status-column"><c:choose>
-									<c:when test="${discounts.onsaleYn == 'N'}">
+									<c:when test="${discounts.discountDTO.onsaleYn == 'N'}">
 								종료
 								</c:when>
-									<c:when test="${discounts.onsaleYn == 'Y'}">
+									<c:when test="${discounts.discountDTO.onsaleYn == 'Y'}">
 								진행 중
 								</c:when>
 								</c:choose></td>

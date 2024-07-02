@@ -16,4 +16,5 @@ public class DiscountTargetDTO {
     private String targetId;
     private String targetName;
     private Object target;
+    private DiscountDTO discountDTO;
 }

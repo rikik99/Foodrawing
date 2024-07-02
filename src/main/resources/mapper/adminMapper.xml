@@ -647,11 +647,21 @@
 		DELETE FROM DISCOUNT_TB WHERE ID =
 		#{discountId}
 	</delete>
-	<select id="findDiscountTargetByDiscountId">
-		SELECT ID, DISCOUNT_ID, TARGET_TYPE, TARGET_ID
-		FROM
-		DISCOUNT_TARGET_TB
-		WHERE DISCOUNT_ID = #{discountId}
+	<select id="findDiscountTargets"
+		resultType="com.food.domain.sales.dto.DiscountTargetDTO">
+		SELECT * FROM discount_target_tb
+	</select>
+	<select id="findDiscountById"
+		resultType="com.food.domain.sales.dto.DiscountDTO">
+		SELECT * FROM
+		discount_tb WHERE id = #{discountId}
+	</select>
+	<select id="findDiscountTargetById">
+		SELECT * FROM discount_target_tb WHERE id = #{id}
+	</select>
+	<select id="findDiscountTargetByDiscountId"
+		resultType="com.food.domain.sales.dto.DiscountTargetDTO">
+		SELECT * FROM DISCOUNT_TARGET_TB WHERE DISCOUNT_ID = #{discountId}
 	</select>
 	<select id="findMemberRatingById">
 		SELECT ID, RATING, MIN_AMOUNT, MAX_AMOUNT
@@ -671,106 +681,130 @@
 		WHERE ID = #{categoryId}
 	</select>
 	<select id="findDiscountTargetListWithSearch"
-		parameterType="map">
+		parameterType="map"
+		resultType="com.food.domain.sales.dto.DiscountTargetDTO">
 		SELECT
-		D.ID, D.ONSALE_YN, D.NAME, D.TYPE, D.START_DATE, D.END_DATE,
-		D.DISCOUNT_TYPE, D.DISCOUNT_VALUE, D.MAX_DISCOUNT, D.DESCRIPTION,
-		D.MIN_PRICE
-		FROM DISCOUNT_TB D
+		DT.ID, DT.DISCOUNT_ID, DT.TARGET_TYPE, DT.TARGET_ID
+		FROM
+		DISCOUNT_TARGET_TB DT
 		WHERE 1=1
 		<if
 			test="register_fr_date != null and register_fr_date != '' and register_to_date != null and register_to_date != ''">
-			AND TRUNC(D.START_DATE) &lt;=
-			TO_DATE(#{register_to_date},
-			'YYYY-MM-DD')
-			AND TRUNC(D.END_DATE) &gt;=
-			TO_DATE(#{register_fr_date},
-			'YYYY-MM-DD')
-		</if>
-		<if test="onsaleYn != null and onsaleYn != ''">
-			AND D.ONSALE_YN = #{onsaleYn}
-		</if>
-		<if test="discountType != null and discountType != ''">
-			AND D.DISCOUNT_TYPE = #{discountType}
-		</if>
-		<if test="type != null and type != ''">
-			AND D.TYPE = #{type}
-		</if>
-		<if test="targetType != null and targetType != ''">
-			AND D.ID IN (
-			SELECT T.DISCOUNT_ID
-			FROM
-			DISCOUNT_TARGET_TB T
-			JOIN
-			DISCOUNT_TB D ON
-			D.ID = T.DISCOUNT_ID
-			WHERE UPPER(T.TARGET_TYPE) =
-			#{targetType}
+			AND DT.DISCOUNT_ID IN (
+			SELECT D.ID
+			FROM DISCOUNT_TB D
+			WHERE
+			TRUNC(D.START_DATE) &lt;= TO_DATE(#{register_to_date}, 'YYYY-MM-DD')
+			AND TRUNC(D.END_DATE) &gt;= TO_DATE(#{register_fr_date}, 'YYYY-MM-DD')
 			)
 		</if>
+		<if test="onsaleYn != null and onsaleYn != ''">
+			AND DT.DISCOUNT_ID IN (
+			SELECT D.ID
+			FROM DISCOUNT_TB D
+			WHERE D.ONSALE_YN = #{onsaleYn}
+			)
+		</if>
+		<if test="discountType != null and discountType != ''">
+			AND DT.DISCOUNT_ID IN (
+			SELECT D.ID
+			FROM DISCOUNT_TB D
+			WHERE D.DISCOUNT_TYPE = #{discountType}
+			)
+		</if>
+		<if test="type != null and type != ''">
+			AND DT.DISCOUNT_ID IN (
+			SELECT D.ID
+			FROM DISCOUNT_TB D
+			WHERE D.TYPE = #{type}
+			)
+		</if>
+		<if test="targetType != null and targetType != ''">
+			AND UPPER(DT.TARGET_TYPE) = #{targetType}
+		</if>
 	</select>
- <!-- Product 관련 쿼리 -->
-    <select id="findProductsByQuery" resultType="com.food.domain.product.dto.ProductDTO">
-        SELECT * FROM (
-            SELECT
-                PRODUCT_NUMBER AS productNumber,
-                NAME AS name,
-                PRICE AS price,
-                QUANTITY AS quantity,
-                ROWNUM AS rnum
-            FROM PRODUCT_TB
-            WHERE NAME LIKE #{keyword}
-            ORDER BY PRODUCT_NUMBER
-        )
-        WHERE rnum BETWEEN #{pageable.offset} + 1 AND #{pageable.offset} + #{pageable.pageSize}
-    </select>
+	<!-- Product 관련 쿼리 -->
+	<select id="findProductsByQuery"
+		resultType="com.food.domain.product.dto.ProductDTO">
+		SELECT * FROM (
+		SELECT
+		PRODUCT_NUMBER AS productNumber,
+		NAME
+		AS name,
+		PRICE AS price,
+		QUANTITY AS quantity,
+		ROWNUM AS rnum
+		FROM
+		PRODUCT_TB
+		WHERE NAME LIKE #{keyword}
+		ORDER BY PRODUCT_NUMBER
+		)
+		WHERE rnum
+		BETWEEN #{pageable.offset} + 1 AND #{pageable.offset} +
+		#{pageable.pageSize}
+	</select>
 
-    <select id="countProductsByQuery" resultType="java.lang.Long">
-        SELECT COUNT(*)
-        FROM PRODUCT_TB
-        WHERE NAME LIKE #{keyword}
-    </select>
+	<select id="countProductsByQuery" resultType="java.lang.Long">
+		SELECT COUNT(*)
+		FROM PRODUCT_TB
+		WHERE NAME LIKE #{keyword}
+	</select>
 
-    <!-- Customer 관련 쿼리 -->
-    <select id="findCustomersByQuery" resultType="com.food.domain.user.dto.CustomerDTO">
-        SELECT * FROM (
-            SELECT
-                ID AS id,
-                USER_ID AS userId,
-                NICKNAME AS nickname,
-                NAME AS name,
-                GENDER AS gender,
-                PHONE AS phone,
-                EMAIL AS email,
-                BIRTHDATE AS birthDate,
-                ADDRESS AS address,
-                ADDRESS_DETAIL AS addressDetail,
-                ZIPCODE AS zipcode,
-                ROWNUM AS rnum
-            FROM CUSTOMER_TB
-            WHERE NAME LIKE #{keyword}
-            ORDER BY ID
-        )
-        WHERE rnum BETWEEN #{pageable.offset} + 1 AND #{pageable.offset} + #{pageable.pageSize}
-    </select>
+	<!-- Customer 관련 쿼리 -->
+	<select id="findCustomersByQuery"
+		resultType="com.food.domain.user.dto.CustomerDTO">
+		SELECT * FROM (
+		SELECT
+		ID AS id,
+		USER_ID AS userId,
+		NICKNAME AS
+		nickname,
+		NAME AS name,
+		GENDER AS gender,
+		PHONE AS phone,
+		EMAIL AS email,
+		BIRTHDATE AS birthDate,
+		ADDRESS AS address,
+		ADDRESS_DETAIL AS
+		addressDetail,
+		ZIPCODE AS zipcode,
+		ROWNUM AS rnum
+		FROM CUSTOMER_TB
+		WHERE
+		NAME LIKE #{keyword}
+		ORDER BY ID
+		)
+		WHERE rnum BETWEEN #{pageable.offset}
+		+ 1 AND #{pageable.offset} +
+		#{pageable.pageSize}
+	</select>
 
-    <select id="countCustomersByQuery" resultType="java.lang.Long">
-        SELECT COUNT(*)
-        FROM CUSTOMER_TB
-        WHERE NAME LIKE #{keyword}
-    </select>
+	<select id="countCustomersByQuery" resultType="java.lang.Long">
+		SELECT COUNT(*)
+		FROM CUSTOMER_TB
+		WHERE NAME LIKE #{keyword}
+	</select>
 
-    <!-- User 조회 쿼리 -->
-    <select id="findUserById" resultType="com.food.domain.user.dto.UserDTO">
-        SELECT
-            ID AS id,
-            USERNAME AS username,
-            PASSWORD AS password,
-            ROLE AS role,
-            CREATED_DATE AS createdDate,
-            DELETED_YN AS deletedYn
-        FROM USER_TB
-        WHERE ID = #{userId}
-    </select>
-
+	<!-- User 조회 쿼리 -->
+	<select id="findUserById"
+		resultType="com.food.domain.user.dto.UserDTO">
+		SELECT
+		ID AS id,
+		USERNAME AS username,
+		PASSWORD AS password,
+		ROLE AS role,
+		CREATED_DATE AS createdDate,
+		DELETED_YN AS deletedYn
+		FROM
+		USER_TB
+		WHERE ID = #{userId}
+	</select>
+	<insert id="insertDiscountTarget"
+		parameterType="com.food.domain.sales.dto.DiscountTargetDTO">
+		INSERT INTO DISCOUNT_TARGET_TB
+		(DISCOUNT_ID, TARGET_TYPE,
+		TARGET_ID)
+		VALUES
+		(#{discountId}, #{targetType}, #{targetId})
+	</insert>
 </mapper>

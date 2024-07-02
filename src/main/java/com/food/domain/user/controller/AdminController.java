@@ -398,37 +398,33 @@ public class AdminController {
 
 	@GetMapping("/discountTarget")
 	public ModelAndView discountTarget(@RequestParam Map<String, String> allParams) {
-		ModelAndView mv = new ModelAndView();
-		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
-		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+	    ModelAndView mv = new ModelAndView();
+	    int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+	    int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
 
-		// 페이지 정보와 사이즈 정보를 allParams에 추가
-		allParams.put("page", String.valueOf(page));
-		allParams.put("size", String.valueOf(size));
-		Pageable pageable = PageRequest.of(page, size);
-		Page<DiscountDTO> discounts;
-		log.info("reviews Params ={}", allParams);
-		// 검색 조건이 있는지 확인
-		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
-				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
+	    allParams.put("page", String.valueOf(page));
+	    allParams.put("size", String.valueOf(size));
+	    Pageable pageable = PageRequest.of(page, size);
+	    Page<DiscountTargetDTO> discountTargets;
 
-		if (hasSearchParams) {
-			// 검색 조건이 있을 경우
-			discounts = adminService.findDiscountTargetListWithSearch(pageable, allParams);
+	    boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
+	            && allParams.get(key) != null && !allParams.get(key).isEmpty());
 
-		} else {
-			// 검색 조건이 없을 경우
-			discounts = adminService.findDiscountTargetList(pageable, allParams);
-		}
-		mv.addObject("discounts", discounts);
-		log.info("discounts = {}", discounts.getContent());
-		mv.addObject("currentPage", discounts.getNumber());
-		mv.addObject("pageCount", discounts.getTotalPages());
-		mv.addObject("totalElements", discounts.getTotalElements());
-		mv.addObject("size", size);
-		mv.setViewName("admin/discountTarget");
-		return mv;
+	    if (hasSearchParams) {
+	        discountTargets = adminService.findDiscountTargetListWithSearch(pageable, allParams);
+	    } else {
+	        discountTargets = adminService.findDiscountTargetList(pageable, allParams);
+	    }
+
+	    mv.addObject("discounts", discountTargets);
+	    mv.addObject("currentPage", discountTargets.getNumber());
+	    mv.addObject("pageCount", discountTargets.getTotalPages());
+	    mv.addObject("totalElements", discountTargets.getTotalElements());
+	    mv.addObject("size", size);
+	    mv.setViewName("admin/discountTarget");
+	    return mv;
 	}
+
 
 	@PostMapping("/discountUpdate")
 	@ResponseBody
@@ -453,6 +449,16 @@ public class AdminController {
 		mv.addObject("discounts", discounts);
 		return mv;
 	}
+
+    @PostMapping("/insertDiscountTarget")
+    @ResponseBody
+    public ResponseEntity<String> insertDiscountTarget(@RequestBody Map<String, Object> allParams) {
+        // 디버깅 로그 추가
+        System.out.println("Request Parameters: " + allParams);
+
+        adminService.insertDiscountTarget(allParams);
+        return ResponseEntity.ok("Discount targets added successfully");
+    }
 
 	@GetMapping("/getTargets")
 	public ResponseEntity<Page<?>> getTargets(@RequestParam String targetType,

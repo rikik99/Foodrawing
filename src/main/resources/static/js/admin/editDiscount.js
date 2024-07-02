@@ -8,7 +8,7 @@ function setupEditDiscount() {
 					let value = cell.innerText.trim();
 					cell.innerHTML = '';
 
-					if (index === 2) { // 할인 종류
+					if (index === 3) { // 할인 종류
 						const button = document.createElement('button');
 						button.type = 'button';
 						button.innerText = value === '퍼센트' ? '%' : '₩';
@@ -17,7 +17,7 @@ function setupEditDiscount() {
 							button.innerText = button.innerText === '%' ? '₩' : '%';
 						});
 						cell.appendChild(button);
-					} else if (index === 3) { // 할인 유형
+					} else if (index === 4) { // 할인 유형
 						const button = document.createElement('button');
 						button.type = 'button';
 						button.innerText = value;
@@ -26,7 +26,7 @@ function setupEditDiscount() {
 							button.innerText = button.innerText === '이벤트' ? '쿠폰' : '이벤트';
 						});
 						cell.appendChild(button);
-					} else if (index === 9) { // 진행 여부
+					} else if (index === 10) { // 진행 여부
 						const button = document.createElement('button');
 						button.type = 'button';
 						button.innerText = value;
@@ -37,7 +37,7 @@ function setupEditDiscount() {
 						cell.appendChild(button);
 					} else {
 						const input = document.createElement('input');
-						if (index === 7 || index === 8) { // 시작 날짜 또는 종료 날짜
+						if (index === 8 || index === 9) { // 시작 날짜 또는 종료 날짜
 							input.type = 'date';
 							if (value) {
 								const dateParts = value.split('.');

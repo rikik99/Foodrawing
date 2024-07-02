@@ -125,15 +125,13 @@ public interface AdminMapper {
 
 	void deleteDiscountsById(Long discountId);
 
-	DiscountTargetDTO findDiscountTargetByDiscountId(Long discountId);
-
 	MemberRatingDTO findMemberRatingById(Long memberId);
 
 	String findUserNameById(Long userId);
 
 	ProductCategoryDTO findProductCategoryById(Long categoryId);
 
-	List<DiscountDTO> findDiscountTargetListWithSearch(Map<String, String> allParams);
+	List<DiscountTargetDTO> findDiscountTargetListWithSearch(Map<String, String> allParams);
 
 	List<ProductDTO> findProductsByQuery(String keyword, Pageable pageable);
 
@@ -144,6 +142,14 @@ public interface AdminMapper {
 	UserDTO findUserById(Long userId);
 
 	long countCustomersByQuery(String keyword);
+
+	void insertDiscountTarget(DiscountTargetDTO discountTargetDTO);
+
+	DiscountDTO findDiscountById(Long discountId);
+
+	List<DiscountTargetDTO> findDiscountTargets();
+
+	List<DiscountTargetDTO> findDiscountTargetById(Long discountId);
 
 
 }
