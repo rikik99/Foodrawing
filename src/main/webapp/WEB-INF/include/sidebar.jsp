@@ -28,6 +28,14 @@
 </div>
 
 <script>
+function atobUtf8(base64) {
+    // Base64 문자열 디코딩
+    var binaryString = atob(base64);
+    // 바이너리 문자열을 UTF-8로 변환
+    var utf8String = decodeURIComponent(escape(binaryString));
+    return utf8String;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const recentViewedProducts = JSON.parse(atobUtf8(getCookie('recentViewedProducts') || 'W10=')); // Base64 디코딩
     const slidesContainer = document.querySelector('.recent-view-carousel .carousel-slides');
@@ -38,11 +46,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const slide = document.createElement('div');
             slide.classList.add('recent-product');
             slide.innerHTML = `
-                <a href="/ProductDetail/\${product.salesPostId}">
-                    <img class="recent-product-image" src="\${product.filePath}" alt="\${product.name}">
+                <a href="/ProductDetail/${product.salesPostId}">
+                    <img class="recent-product-image" src="${product.filePath}" alt="${product.name}">
                     <div class="product-info">
-                        <p>\${product.name}</p>
-                        <p>\${product.price}원</p>
+                        <p>${product.name}</p>
+                        <p>${product.price}원</p>
                     </div>
                 </a>
             `;
@@ -75,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function updateSlider() {
         const totalSlides = slidesContainer.children.length;
-        slidesContainer.style.transform = `translateY(-${currentIndex * 120}px)`; // Adjust for height of each slide
+        slidesContainer.style.transform = `translateY(-${currentIndex * 120}px)`; // 슬라이드의 높이에 맞게 조정
     }
 
     document.querySelector('.carousel-prev').addEventListener('click', function () {
@@ -117,14 +125,14 @@ document.addEventListener('DOMContentLoaded', function () {
     var navLinks = document.querySelectorAll('.nav-tabs .nav-link');
     navLinks.forEach(function (link) {
         link.addEventListener('click', function (event) {
-            event.preventDefault(); // Prevent default anchor behavior
+            event.preventDefault(); // 기본 앵커 동작 방지
             navLinks.forEach(function (navLink) {
-                navLink.classList.remove('active'); // Remove active class from all tabs
+                navLink.classList.remove('active'); // 모든 탭에서 active 클래스 제거
             });
-            link.classList.add('active'); // Add active class to clicked tab
-            var targetId = link.getAttribute('href').substring(1); // Get the target content ID
+            link.classList.add('active'); // 클릭된 탭에 active 클래스 추가
+            var targetId = link.getAttribute('href').substring(1); // 대상 콘텐츠 ID 가져오기
             var targetElement = document.getElementById(targetId);
-            var offset = document.querySelector('.sticky-wrap').offsetHeight; // Adjust scroll position by sticky-wrap height
+            var offset = document.querySelector('.sticky-wrap').offsetHeight; // sticky-wrap 높이만큼 스크롤 위치 조정
             window.scrollTo({
                 top: targetElement.offsetTop - offset,
                 behavior: 'smooth'
@@ -132,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Scroll to top on page load and replace URL without hash
+    // 페이지 로드 시 맨 위로 스크롤하고 URL에서 해시 제거
     if (window.location.hash) {
         history.replaceState(null, null, 'http://localhost:9086/ProductDetail');
         window.scrollTo(0, 0);
@@ -141,11 +149,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// Ensure page scrolls to top on refresh
+// 새로고침 시 페이지 맨 위로 스크롤
 window.addEventListener('beforeunload', function () {
     history.replaceState(null, null, 'http://localhost:9086/ProductDetail');
 });
 </script>
+
 
 
 <style>

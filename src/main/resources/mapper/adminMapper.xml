@@ -807,4 +807,8 @@
 		VALUES
 		(#{discountId}, #{targetType}, #{targetId})
 	</insert>
+		<delete id="deleteDiscountTargetById">
+		DELETE FROM DISCOUNT_TARGET_TB WHERE ID =
+		#{discountTargetId}
+	</delete>
 </mapper>

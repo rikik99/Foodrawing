@@ -425,7 +425,24 @@ public class AdminController {
 	    return mv;
 	}
 
+	@DeleteMapping("/discountTarget")
+	@ResponseBody
+	public ResponseEntity<String> deleteDiscountTarget(@RequestBody Map<String, List<Long>> requestBody) {
+		List<Long> discountTargetIds = requestBody.get("discountTargetIds");
+		log.info("discountTargetIds = {}",discountTargetIds);
+		if (discountTargetIds == null || discountTargetIds.isEmpty()) {
+			return ResponseEntity.badRequest().body("삭제할 대상 정보가 없습니다.");
+		}
 
+		try {
+			adminService.deleteDiscountTargetById(discountTargetIds);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ResponseEntity.ok("선택된 항목이 성공적으로 삭제되었습니다.");
+	}
+	
 	@PostMapping("/discountUpdate")
 	@ResponseBody
 	public ResponseEntity<?> discountUpdate(@RequestBody List<Map<String, Object>> allParams) {

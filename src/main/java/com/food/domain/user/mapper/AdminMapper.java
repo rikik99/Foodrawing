@@ -151,5 +151,7 @@ public interface AdminMapper {
 
 	List<DiscountTargetDTO> findDiscountTargetById(Long discountId);
 
+	void deleteDiscountTargetById(Long discountTargetId);
+
 
 }

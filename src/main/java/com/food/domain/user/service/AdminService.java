@@ -671,4 +671,13 @@ public class AdminService {
             System.out.println("Targets is null");
         }
     }
+
+	public void deleteDiscountTargetById(List<Long> discountTargetIds) {
+		for (Long discountTargetId : discountTargetIds) {
+			System.out.println("discountTargetIds = " + discountTargetIds);
+			System.out.println("discountTargetId = " + discountTargetId);
+			
+			adminMapper.deleteDiscountTargetById(discountTargetId);
+		}
+	}
 }

@@ -106,7 +106,7 @@
 					<button type="button" id="editDiscount" class="primary">할인
 						수정</button>
 					<button id="deleteSelectedButton" class="danger"
-						data-url="/admin/discountList" data-pageType="discountList">선택삭제</button>
+						data-url="/admin/discountTarget" data-pageType="discountTarget">선택삭제</button>
 				</div>
 			</div>
 			<table class="discount-table product-list dark-mode">

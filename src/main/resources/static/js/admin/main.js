@@ -485,10 +485,17 @@ function deleteSelectedProducts(urlPath, pageType) {
         });
         selectedItems = selectedDiscountIds;
         bodyContent = { discountIds: selectedItems };
+    } else if (pageType === 'discountTarget') {
+        const selectedDiscountTargetIds = Array.from(productCheckboxes).map(checkbox => {
+            return checkbox.closest('tr').getAttribute('data-discountId');
+        });
+        selectedItems = selectedDiscountTargetIds;
+        bodyContent = { discountTargetIds: selectedItems };
     }
 
     if (selectedItems.length > 0) {
-        const endpoint = pageType === 'productManagement' ? '/admin/deleteProducts' : '/admin/deleteDiscounts';
+        const endpoint = pageType === 'productManagement' ? '/admin/deleteProducts' :
+                         pageType === 'discountList' ? '/admin/deleteDiscounts' : '/admin/discountTarget';
 
         fetch(endpoint, {
             method: 'DELETE',
@@ -507,6 +514,7 @@ function deleteSelectedProducts(urlPath, pageType) {
         alert('삭제할 항목을 선택해주세요.');
     }
 }
+
 
 
 function setDateRange(range, group) {

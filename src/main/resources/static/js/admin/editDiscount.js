@@ -71,38 +71,38 @@ function setupEditDiscount() {
 					const button = cell.querySelector('button');
 
 					switch (index) {
-						case 0:
+						case 1:
 							rowData.name = input ? input.value : cell.innerText;
 							break;
-						case 1:
+						case 2:
 							rowData.description = input ? input.value : cell.innerText;
 							break;
-						case 2:
+						case 3:
 							rowData.discountType = button ? (button.innerText === '%' ? 'P' : 'A') : cell.innerText;
 							break;
-						case 3:
+						case 4:
 							rowData.type = button ? button.innerText : cell.innerText;
 							break;
-						case 4:
+						case 5:
 							rowData.discountValue = input ? parseFloat(input.value.replace('%', '').replace('₩', '')) : parseFloat(cell.innerText.replace('%', '').replace('₩', ''));
 							if (rowData.discountType === 'P' && rowData.discountValue > 100) {
 								alert('할인율은 100 이하로 설정해야 합니다.');
 								isValid = false;
 							}
 							break;
-						case 5:
+						case 6:
 							rowData.minPrice = input ? parseFloat(input.value.replace('₩', '')) : parseFloat(cell.innerText.replace('₩', ''));
 							break;
-						case 6:
+						case 7:
 							rowData.maxDiscount = input ? parseFloat(input.value.replace('₩', '')) : parseFloat(cell.innerText.replace('₩', ''));
 							break;
-						case 7:
+						case 8:
 							rowData.startDate = input ? input.value : cell.innerText;
 							break;
-						case 8:
+						case 9:
 							rowData.endDate = input ? input.value : cell.innerText;
 							break;
-						case 9:
+						case 10:
 							rowData.onsaleYn = button ? (button.innerText === '진행 중' ? 'Y' : 'N') : cell.innerText;
 							break;
 					}
