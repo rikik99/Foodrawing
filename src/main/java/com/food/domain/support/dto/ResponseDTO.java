@@ -17,6 +17,4 @@ public class ResponseDTO {
     private Long adminId;
     private String message;
     private LocalDateTime createdDate;
-    private String resolvedYn;
-    private LocalDateTime resolvedDate;
 }

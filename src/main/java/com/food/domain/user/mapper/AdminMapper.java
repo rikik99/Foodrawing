@@ -4,17 +4,27 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.food.domain.product.dto.ProductCategoryDTO;
 import com.food.domain.product.dto.ProductDTO;
 import com.food.domain.product.dto.ProductFileDTO;
 import com.food.domain.product.dto.StockDTO;
 import com.food.domain.product.dto.StockTransactionDTO;
+import com.food.domain.sales.dto.DiscountDTO;
+import com.food.domain.sales.dto.DiscountTargetDTO;
+import com.food.domain.sales.dto.ReviewDTO;
+import com.food.domain.sales.dto.ReviewFileDTO;
+import com.food.domain.sales.dto.ReviewsReplyDTO;
 import com.food.domain.sales.dto.SalesPostDTO;
 import com.food.domain.sales.dto.SalesPostFileDTO;
 import com.food.domain.support.dto.InquiriesDTO;
+import com.food.domain.support.dto.ResponseDTO;
 import com.food.domain.user.dto.AdminDTO;
 import com.food.domain.user.dto.CustomerDTO;
+import com.food.domain.user.dto.MemberRatingDTO;
+import com.food.domain.user.dto.UserDTO;
 @Mapper
 public interface AdminMapper {
 
@@ -86,4 +96,60 @@ public interface AdminMapper {
 	List<InquiriesDTO> findSalesInquiriesWithSearch(Map<String, String> allParams);
 
 	CustomerDTO findCustomerByCustomerId(Long customerId);
+
+	void insertResponse(Map<String, Object> allParams);
+
+	ResponseDTO findResponseByInquiryId(Long inquiryId);
+
+	void updateResolvedYn(Map<String, Object> allParams);
+
+	List<ReviewDTO> findReviews();
+
+	ReviewsReplyDTO findReplyByReviewId(Long reviewId);
+
+	ReviewFileDTO findReviewFileByReviewId(Long reviewId);
+
+	List<ReviewDTO> findReviewsWithSearch(Map<String, String> allParams);
+
+	void insertReply(Map<String, Object> allParams);
+
+	void updateReplyYn(Map<String, Object> allParams);
+
+	List<DiscountDTO> findDisconts();
+
+	List<DiscountDTO> findDiscountsWithSearch(Map<String, String> allParams);
+
+	void updateDiscount(Map<String, Object> params);
+
+	void insertDiscount(Map<String, Object> allParams);
+
+	void deleteDiscountsById(Long discountId);
+
+	MemberRatingDTO findMemberRatingById(Long memberId);
+
+	String findUserNameById(Long userId);
+
+	ProductCategoryDTO findProductCategoryById(Long categoryId);
+
+	List<DiscountTargetDTO> findDiscountTargetListWithSearch(Map<String, String> allParams);
+
+	List<ProductDTO> findProductsByQuery(String keyword, Pageable pageable);
+
+	long countProductsByQuery(String keyword);
+
+	List<CustomerDTO> findCustomersByQuery(String keyword, Pageable pageable);
+
+	UserDTO findUserById(Long userId);
+
+	long countCustomersByQuery(String keyword);
+
+	void insertDiscountTarget(DiscountTargetDTO discountTargetDTO);
+
+	DiscountDTO findDiscountById(Long discountId);
+
+	List<DiscountTargetDTO> findDiscountTargets();
+
+	List<DiscountTargetDTO> findDiscountTargetById(Long discountId);
+
+
 }

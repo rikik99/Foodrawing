@@ -6,10 +6,30 @@
 <head>
 <link rel="stylesheet" href="/css/admin/common.css" />
 <link rel="stylesheet" href="/css/admin/discountAdd.css" />
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const discountTypeElement = document.getElementById("discountType");
+        const discountValueElement = document.getElementById("discountValue");
+
+        discountTypeElement.addEventListener("change", function() {
+            if (this.value === "P") {
+                discountValueElement.setAttribute("max", "100");
+                discountValueElement.setAttribute("min", "1");
+                discountValueElement.setAttribute("placeholder", "1 - 100%");
+                discountValueElement.type = "number";
+            } else if (this.value === "A") {
+                discountValueElement.removeAttribute("max");
+                discountValueElement.removeAttribute("min");
+                discountValueElement.setAttribute("placeholder", "₩");
+                discountValueElement.type = "number";
+            }
+        });
+    });
+</script>
 </head>
 <body class="dark-mode">
     <div class="discount-form-container">
-        <form id="discountForm" method="post" action="/admin/discountManagement" class="discount-form">
+        <form id="insertDiscountForm" method="post" action="/admin/insertDiscount" class="discount-form">
             <h1>할인 등록</h1>
             <table class="form-table">
                 <tr>
@@ -36,7 +56,7 @@
                 </tr>
                 <tr>
                     <td><label for="discountValue">할인 값</label></td>
-                    <td><input type="number" id="discountValue" name="discountValue" required></td>
+                    <td><input type="number" id="discountValue" name="discountValue" placeholder="1 - 100%" required></td>
                 </tr>
                 <tr>
                     <td><label for="minPrice">최소 구매 금액</label></td>
@@ -67,5 +87,6 @@
             </table>
         </form>
     </div>
+   <script src="<c:url value='/js/admin/productNumber.js'/>"></script>
 </body>
 </html>
