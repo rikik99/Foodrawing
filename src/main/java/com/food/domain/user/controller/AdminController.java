@@ -398,38 +398,38 @@ public class AdminController {
 
 	@GetMapping("/discountTarget")
 	public ModelAndView discountTarget(@RequestParam Map<String, String> allParams) {
-	    ModelAndView mv = new ModelAndView();
-	    int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
-	    int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
 
-	    allParams.put("page", String.valueOf(page));
-	    allParams.put("size", String.valueOf(size));
-	    Pageable pageable = PageRequest.of(page, size);
-	    Page<DiscountTargetDTO> discountTargets;
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		Page<DiscountTargetDTO> discountTargets;
 
-	    boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
-	            && allParams.get(key) != null && !allParams.get(key).isEmpty());
+		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
+				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
 
-	    if (hasSearchParams) {
-	        discountTargets = adminService.findDiscountTargetListWithSearch(pageable, allParams);
-	    } else {
-	        discountTargets = adminService.findDiscountTargetList(pageable, allParams);
-	    }
+		if (hasSearchParams) {
+			discountTargets = adminService.findDiscountTargetListWithSearch(pageable, allParams);
+		} else {
+			discountTargets = adminService.findDiscountTargetList(pageable, allParams);
+		}
 
-	    mv.addObject("discounts", discountTargets);
-	    mv.addObject("currentPage", discountTargets.getNumber());
-	    mv.addObject("pageCount", discountTargets.getTotalPages());
-	    mv.addObject("totalElements", discountTargets.getTotalElements());
-	    mv.addObject("size", size);
-	    mv.setViewName("admin/discountTarget");
-	    return mv;
+		mv.addObject("discounts", discountTargets);
+		mv.addObject("currentPage", discountTargets.getNumber());
+		mv.addObject("pageCount", discountTargets.getTotalPages());
+		mv.addObject("totalElements", discountTargets.getTotalElements());
+		mv.addObject("size", size);
+		mv.setViewName("admin/discountTarget");
+		return mv;
 	}
 
 	@DeleteMapping("/discountTarget")
 	@ResponseBody
 	public ResponseEntity<String> deleteDiscountTarget(@RequestBody Map<String, List<Long>> requestBody) {
 		List<Long> discountTargetIds = requestBody.get("discountTargetIds");
-		log.info("discountTargetIds = {}",discountTargetIds);
+		log.info("discountTargetIds = {}", discountTargetIds);
 		if (discountTargetIds == null || discountTargetIds.isEmpty()) {
 			return ResponseEntity.badRequest().body("삭제할 대상 정보가 없습니다.");
 		}
@@ -442,14 +442,73 @@ public class AdminController {
 		}
 		return ResponseEntity.ok("선택된 항목이 성공적으로 삭제되었습니다.");
 	}
-	
+
 	@GetMapping("/updateTarget")
-	public ModelAndView updateTarget(@RequestParam Map<String, String> allParams) {
+	public ModelAndView updateTargetForm(@RequestParam Map<String, String> allParams) {
 		ModelAndView mv = new ModelAndView();
-		
+
 		mv.setViewName("admin/updateDiscountTarget");
 		return mv;
 	}
+	@PostMapping("/updateTarget")
+	@ResponseBody
+	public ResponseEntity<Map<String, String>> updateTarget(@RequestBody Map<String, Object> allParams) {
+	    System.out.println("Request Parameters: " + allParams);
+	    
+	    String targetType = (String) allParams.get("targetType");
+	    List<Map<String, Object>> discountData = (List<Map<String, Object>>) allParams.get("discountData");
+	    
+	    for (Map<String, Object> discount : discountData) {
+	        Long discountId = Long.valueOf((String) discount.get("discountId"));
+	        String discountTargetType = (String) discount.get("targetType");
+	        Object targetIdObj = discount.get("targetId");
+	        String targetId;
+
+	        if (targetIdObj instanceof Integer) {
+	            targetId = String.valueOf(targetIdObj);
+	        } else {
+	            targetId = (String) targetIdObj;
+	        }
+
+	        adminService.updateDiscountTarget(discountId, discountTargetType, targetId);
+	    }
+	    
+	    Map<String, String> response = new HashMap<>();
+	    response.put("message", "Discount targets added successfully");
+	    return ResponseEntity.ok(response);
+	}
+
+
+	
+	@GetMapping("/getDiscountTargets")
+	@ResponseBody
+	public List<DiscountTargetDTO> getDiscountTargets(@RequestParam String targetType) {
+		return adminService.getDiscountTargetsByType(targetType);
+	}
+
+	@GetMapping("/getTargetOptions")
+	@ResponseBody
+	public List<Map<String, String>> getTargetOptions(@RequestParam String targetType) {
+	    List<Map<String, String>> options = new ArrayList<>();
+	    
+	    switch (targetType) {
+	        case "PRODUCT":
+	            options = adminService.getAllProducts();
+	            break;
+	        case "CATEGORY":
+	            options = adminService.getAllCategories();
+	            break;
+	        case "MEMBER_RATING":
+	            options = adminService.getAllMemberRatings();
+	            break;
+	        default:
+	            break;
+	    }
+	    log.info("getTargetOptions = {}",options);
+	    return options;
+	}
+
+
 	@PostMapping("/discountUpdate")
 	@ResponseBody
 	public ResponseEntity<?> discountUpdate(@RequestBody List<Map<String, Object>> allParams) {
@@ -474,25 +533,23 @@ public class AdminController {
 		return mv;
 	}
 
-    @PostMapping("/insertDiscountTarget")
-    @ResponseBody
-    public ResponseEntity<String> insertDiscountTarget(@RequestBody Map<String, Object> allParams) {
-        // 디버깅 로그 추가
-        System.out.println("Request Parameters: " + allParams);
+	@PostMapping("/insertDiscountTarget")
+	@ResponseBody
+	public ResponseEntity<String> insertDiscountTarget(@RequestBody Map<String, Object> allParams) {
+		// 디버깅 로그 추가
+		System.out.println("Request Parameters: " + allParams);
 
-        adminService.insertDiscountTarget(allParams);
-        return ResponseEntity.ok("Discount targets added successfully");
-    }
+		adminService.insertDiscountTarget(allParams);
+		return ResponseEntity.ok("Discount targets added successfully");
+	}
 
 	@GetMapping("/getTargets")
 	public ResponseEntity<Page<?>> getTargets(@RequestParam String targetType,
-	                                          @RequestParam(required = false) String keyword,
-	                                          @RequestParam int page,
-	                                          @RequestParam int size) {
-	    Pageable pageable = PageRequest.of(page, size);
-	    Page<?> targets = adminService.findTargetsByTypeAndQuery(targetType, keyword, pageable);
-	    log.info("targets = {}",targets.getContent());
-	    return ResponseEntity.ok(targets);
+			@RequestParam(required = false) String keyword, @RequestParam int page, @RequestParam int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<?> targets = adminService.findTargetsByTypeAndQuery(targetType, keyword, pageable);
+		log.info("targets = {}", targets.getContent());
+		return ResponseEntity.ok(targets);
 	}
 
 	@PostMapping("/insertDiscount")

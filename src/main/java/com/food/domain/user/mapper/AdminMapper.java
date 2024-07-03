@@ -153,5 +153,11 @@ public interface AdminMapper {
 
 	void deleteDiscountTargetById(Long discountTargetId);
 
+	List<DiscountTargetDTO> findDiscountTargetByType(String targetType);
+
+	List<MemberRatingDTO> findAllMemberRatings();
+
+	void updateDiscountTarget(Map<String, Object> params);
+
 
 }

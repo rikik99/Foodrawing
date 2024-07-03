@@ -587,27 +587,44 @@ public class AdminService {
 	            break;
 	        case "PRODUCT":
 	            ProductDTO product = adminMapper.findProductByProductNumber(targetId);
-	            targetName = product.getName();
+	            if (product != null) {
+	                targetName = product.getName();
+	            } else {
+	                targetName = "Unknown Product";
+	            }
 	            break;
 	        case "MEMBER_RATING":
 	            Long memberId = Long.valueOf(targetId);
 	            MemberRatingDTO member = adminMapper.findMemberRatingById(memberId);
-	            targetName = member.getRating();
+	            if (member != null) {
+	                targetName = member.getRating();
+	            } else {
+	                targetName = "Unknown Member Rating";
+	            }
 	            break;
 	        case "CUSTOMER":
 	            Long customerId = Long.valueOf(targetId);
 	            CustomerDTO customer = adminMapper.findCustomerByCustomerId(customerId);
-	            String userName = adminMapper.findUserNameById(customer.getUserId());
-	            targetName = userName;
+	            if (customer != null) {
+	                String userName = adminMapper.findUserNameById(customer.getUserId());
+	                targetName = userName != null ? userName : "Unknown User";
+	            } else {
+	                targetName = "Unknown Customer";
+	            }
 	            break;
 	        case "CATEGORY":
 	            Long categoryId = Long.valueOf(targetId);
 	            ProductCategoryDTO category = adminMapper.findProductCategoryById(categoryId);
-	            targetName = category.getName();
+	            if (category != null) {
+	                targetName = category.getName();
+	            } else {
+	                targetName = "Unknown Category";
+	            }
 	            break;
 	    }
 	    return targetName;
 	}
+
 
 	private Page<DiscountTargetDTO> getPage(List<DiscountTargetDTO> list, Pageable pageable) {
 	    int start = (int) pageable.getOffset();
@@ -680,4 +697,73 @@ public class AdminService {
 			adminMapper.deleteDiscountTargetById(discountTargetId);
 		}
 	}
+
+	public List<DiscountTargetDTO> getDiscountTargetsByType(String targetType) {
+
+		List<DiscountTargetDTO> targets = new ArrayList<>();
+		System.out.println("targetType = "+targetType);
+		targets = adminMapper.findDiscountTargetByType(targetType);
+		System.out.println("targets = "+targets);
+		for(DiscountTargetDTO target : targets) {
+			Long discountId = target.getDiscountId();
+			DiscountDTO discount = adminMapper.findDiscountById(discountId);
+			System.out.println("discount = " + discount);
+			target.setDiscountDTO(discount);
+		}
+
+		return targets;
+	}
+	public List<Map<String, String>> getAllProducts() {
+	    return adminMapper.findProductList().stream()
+	            .map(product -> {
+	                Map<String, String> map = new HashMap<>();
+	                map.put("id", product.getProductNumber());
+	                map.put("name", product.getName());
+	                return map;
+	            }).collect(Collectors.toList());
+	}
+
+	public List<Map<String, String>> getAllCategories() {
+	    return adminMapper.findCategoryList().stream()
+	            .map(category -> {
+	                Map<String, String> map = new HashMap<>();
+	                map.put("id", String.valueOf(category.getId()));
+	                map.put("name", category.getName());
+	                return map;
+	            }).collect(Collectors.toList());
+	}
+
+	public List<Map<String, String>> getAllMemberRatings() {
+	    return adminMapper.findAllMemberRatings().stream()
+	            .map(rating -> {
+	                Map<String, String> map = new HashMap<>();
+	                map.put("id", rating.getId().toString());
+	                map.put("name", rating.getRating());
+	                return map;
+	            }).collect(Collectors.toList());
+	}
+
+	public List<?> getTargetOptionsByType(String targetType) {
+	    switch (targetType) {
+	        case "PRODUCT":
+	            return adminMapper.findProductList();
+	        case "MEMBER_RATING":
+	            return adminMapper.findAllMemberRatings();
+	        case "CATEGORY":
+	            return adminMapper.findCategoryList();
+	        default:
+	            return Collections.emptyList();
+	    }
+	}
+
+	public void updateDiscountTarget(Long discountId, String targetType, String targetId) {
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("id", discountId);
+	    params.put("targetType", targetType);
+	    params.put("targetId", targetType.equals("PRODUCT") ? targetId : Long.valueOf(targetId));
+
+	    adminMapper.updateDiscountTarget(params);
+	}
+
+
 }

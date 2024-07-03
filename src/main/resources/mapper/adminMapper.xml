@@ -661,7 +661,8 @@
 	</select>
 	<select id="findDiscountTargetByDiscountId"
 		resultType="com.food.domain.sales.dto.DiscountTargetDTO">
-		SELECT * FROM DISCOUNT_TARGET_TB WHERE DISCOUNT_ID = #{discountId}
+		SELECT * FROM DISCOUNT_TARGET_TB WHERE DISCOUNT_ID =
+		#{discountId}
 	</select>
 	<select id="findMemberRatingById">
 		SELECT ID, RATING, MIN_AMOUNT, MAX_AMOUNT
@@ -695,28 +696,32 @@
 			FROM DISCOUNT_TB D
 			WHERE
 			TRUNC(D.START_DATE) &lt;= TO_DATE(#{register_to_date}, 'YYYY-MM-DD')
-			AND TRUNC(D.END_DATE) &gt;= TO_DATE(#{register_fr_date}, 'YYYY-MM-DD')
+			AND TRUNC(D.END_DATE) &gt;= TO_DATE(#{register_fr_date},
+			'YYYY-MM-DD')
 			)
 		</if>
 		<if test="onsaleYn != null and onsaleYn != ''">
 			AND DT.DISCOUNT_ID IN (
 			SELECT D.ID
 			FROM DISCOUNT_TB D
-			WHERE D.ONSALE_YN = #{onsaleYn}
+			WHERE
+			D.ONSALE_YN = #{onsaleYn}
 			)
 		</if>
 		<if test="discountType != null and discountType != ''">
 			AND DT.DISCOUNT_ID IN (
 			SELECT D.ID
 			FROM DISCOUNT_TB D
-			WHERE D.DISCOUNT_TYPE = #{discountType}
+			WHERE
+			D.DISCOUNT_TYPE = #{discountType}
 			)
 		</if>
 		<if test="type != null and type != ''">
 			AND DT.DISCOUNT_ID IN (
 			SELECT D.ID
 			FROM DISCOUNT_TB D
-			WHERE D.TYPE = #{type}
+			WHERE
+			D.TYPE = #{type}
 			)
 		</if>
 		<if test="targetType != null and targetType != ''">
@@ -807,8 +812,23 @@
 		VALUES
 		(#{discountId}, #{targetType}, #{targetId})
 	</insert>
-		<delete id="deleteDiscountTargetById">
+	<delete id="deleteDiscountTargetById">
 		DELETE FROM DISCOUNT_TARGET_TB WHERE ID =
 		#{discountTargetId}
 	</delete>
+	<select id="findDiscountTargetByType">
+		SELECT *
+		FROM DISCOUNT_TARGET_TB
+		WHERE TARGET_TYPE = #{targetType}
+	</select>
+	<select id="findAllMemberRatings"
+		resultType="com.food.domain.user.dto.MemberRatingDTO">
+		select * from MEMBER_RATING_TB
+	</select>
+	<update id="updateDiscountTarget" parameterType="map">
+		UPDATE
+		DISCOUNT_TARGET_TB
+		SET TARGET_TYPE = #{targetType}, TARGET_ID = #{targetId}
+		WHERE id = #{id}
+	</update>
 </mapper>

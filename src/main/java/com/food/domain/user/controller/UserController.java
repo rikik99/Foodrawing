@@ -101,27 +101,29 @@ public class UserController {
 
 	@PostMapping("/signup")
 	public ModelAndView signupProcess(@ModelAttribute UserDTO userDTO, @RequestParam String birthYear,
-			@RequestParam String birthMonth, @RequestParam String birthDay, @ModelAttribute CustomerDTO customerDTO,
-			@RequestParam String provider, @RequestParam String providerId, 
-			HttpServletRequest request) {
-		ModelAndView mv = new ModelAndView();
+	                                  @RequestParam String birthMonth, @RequestParam String birthDay, @ModelAttribute CustomerDTO customerDTO,
+	                                  @RequestParam(required = false) String provider, @RequestParam(required = false) String providerId, 
+	                                  HttpServletRequest request) {
+	    ModelAndView mv = new ModelAndView();
 
-		// 생년월일 설정
-		String birthDateString = birthYear + "-" + birthMonth + "-" + birthDay;
-		customerDTO.setBirthDate(Date.valueOf(birthDateString));
+	    // 생년월일 설정
+	    String birthDateString = birthYear + "-" + birthMonth + "-" + birthDay;
+	    customerDTO.setBirthDate(Date.valueOf(birthDateString));
 
-		// 서비스 호출하여 사용자 저장
-		userService.signup(userDTO, customerDTO);
-		OTM.authenticateUserAndSetSession(userDTO, request);
-		
-        if (provider != null && providerId != null) {
-            // 소셜 로그인인 경우에만 USER_SOCIAL_LINKS에 데이터 추가
-            userService.linkSocialAccount(customerDTO.getUserId(), provider, providerId);
-        }
-		
-		mv.setViewName("redirect:/login");
-		return mv;
+	    // 서비스 호출하여 사용자 저장
+	    userService.signup(userDTO, customerDTO);
+	    OTM.authenticateUserAndSetSession(userDTO, request);
+
+	    if (provider != null && !provider.isEmpty() && providerId != null && !providerId.isEmpty()) {
+	        // 소셜 로그인인 경우에만 USER_SOCIAL_LINKS에 데이터 추가
+	        userService.linkSocialAccount(customerDTO.getUserId(), provider, providerId);
+	    }
+
+	    mv.setViewName("redirect:/login");
+	    return mv;
 	}
+
+
 
 	@GetMapping("/linkAccount")
 	public ModelAndView linkAccount(HttpServletRequest request) {
