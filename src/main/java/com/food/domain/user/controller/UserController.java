@@ -362,5 +362,10 @@ public class UserController {
         userService.updatePasswordByEmail(email, newPassword);
         return "redirect:/login";
     }
-    
+    @GetMapping("/myPage")
+    public String myPage(Model model, HttpSession session) {
+        CustomerDTO loginUser = (CustomerDTO) session.getAttribute("plogin");
+        model.addAttribute("customer", loginUser);
+        return "user/myPage"; 
+    }
 }

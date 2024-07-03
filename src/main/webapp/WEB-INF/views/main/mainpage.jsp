@@ -1,4 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
@@ -22,10 +23,7 @@
             display: grid;
             grid-template-columns: repeat(2, 6fr);
             grid-gap: 20px;
-        }
-
-        .section.grid {
-            text-align: right;
+            text-align: left;
         }
 
         .btn-group-vertical {
@@ -138,10 +136,42 @@
 
         .product-card {
             height: 600px;
+            position: relative;
         }
 
         .slick-slider {
             margin: 0 auto;
+        }
+
+        .badge {
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .product-card-href {
+            position: relative;
+        }
+
+        .box {
+            position: relative;
+        }
+
+        .box_list_title {
+            font-weight: bold;
+        }
+
+        .box_list_sub {
+            color: #b4b4b4;
+        }
+
+        .box_list_price {
+            color: #333;
         }
     </style>
 </head>
@@ -194,7 +224,7 @@
             <div class="container" >
                 <div class="product-slider" >
                     <c:forEach var="product" items="${recommendedProducts}">
-                        <div class="product-card" style="height:500px;">
+                        <div class="product-card">
                             <div class="product-top">
                                 <a class="product-card-href" href="/ProductDetail?productNumber=${product.productNumber}">
                                     <img src="${product.productFileDTO.filePath}" alt="${product.name}">
@@ -230,20 +260,20 @@
                     <div class="box">
                         <a href="#" class="item-link">
                             <img src="${firstProduct.productFileDTO.filePath}" style="margin: 10px; min-width: 230px; max-width: 400px; width: 100%;">
-                            <div class="box_list_title" style="text-align: left;">${firstProduct.name}</div>
+                            <div class="box_list_title">${firstProduct.name}</div>
                         </a>
-                        <div class="box_list_sub" style="text-align: left;">${firstProduct.description}</div>
-                        <div class="box_list_price" style="text-align: left;">${firstProduct.price}원</div>
+                        <div class="box_list_sub">${firstProduct.description}</div>
+                        <div class="box_list_price">${firstProduct.price}원</div>
                     </div>
                 </div>
             </div>
-            <div class="grid-item" style="display: flex; flex-direction: column; align-items: left; padding-left: 20px;">
+            <div class="grid-item">
                 <div class="slick_slider">
                     <c:forEach var="product" items="${products}">
                         <div class="slide_div">
-                            <div class="content-wrapper" style="display: flex; align-items: center;">
+                            <div class="content-wrapper">
                                 <a href="#" class="item-link"><img src="${product.productFileDTO.filePath}" alt="${product.name}"></a>
-                                <div style="text-align: left;">
+                                <div>
                                     <h4>${product.name}</h4>
                                     <p>${product.price}원</p>
                                     <p>${product.description}</p>
@@ -255,7 +285,42 @@
             </div>
         </div>
 
-        <div class="section">베스트 상품</div>
+        <div class="section grid" style="border: 1px solid #ccc; padding: 20px; margin-top: 20px;">
+            <div class="grid-item">
+                <h3 style="text-align: center; font-weight: bold">
+                    베스트 상품
+                </h3>
+                <div class="now-top item-area" id="bestMainArea">
+                    <c:set var="firstBestProduct" value="${bestSellingProducts[0]}" />
+                    <div class="box">
+                        <a href="#" class="item-link">
+                            <img src="${firstBestProduct.filePath}" style="margin: 10px; min-width: 230px; max-width: 400px; width: 100%;">
+                            <div class="badge">BEST</div>
+                            <div class="box_list_title">${firstBestProduct.salesPostTitle}</div>
+                        </a>
+                        <div class="box_list_sub">${firstBestProduct.salesPostDescription}</div>
+                        <div class="box_list_price">${firstBestProduct.unitPrice}원</div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid-item">
+                <div class="slick_slider">
+                    <c:forEach var="product" items="${bestSellingProducts}">
+                        <div class="slide_div">
+                            <div class="content-wrapper">
+                                <a href="#" class="item-link"><img src="${product.filePath}" alt="${product.salesPostTitle}"></a>
+                                <div>
+                                    <div class="badge">BEST</div>
+                                    <h4>${product.salesPostTitle}</h4>
+                                    <p>${product.unitPrice}원</p>
+                                    <p>${product.salesPostDescription}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </c:forEach>
+                </div>
+            </div>
+        </div>
 
         <div class="section">
             <h1 style="text-align: center;">메인 품목</h1>
@@ -266,7 +331,6 @@
                             <div class="product-card">
                                 <div class="product-top">
                                     <a class="product-card-href" href="/ProductDetail">
-                                        <div class="badge">BEST</div>
                                         <img src="${product.productFileDTO.filePath}" alt="${product.name}">
                                     </a>
                                     <a class="product-card-cart-href" href="#">

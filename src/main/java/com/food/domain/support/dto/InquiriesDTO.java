@@ -28,4 +28,5 @@ public class InquiriesDTO {
     private SalesPostDTO salesPotDTO;
     private ProductDTO productDTO;
     private CustomerDTO customerDTO;
+    private ResponseDTO responseDTO;
 }

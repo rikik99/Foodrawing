@@ -13,7 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +31,9 @@ import org.springframework.web.servlet.ModelAndView;
 import com.food.domain.product.dto.ProductCategoryDTO;
 import com.food.domain.product.dto.ProductDTO;
 import com.food.domain.product.dto.StockTransactionDTO;
+import com.food.domain.sales.dto.DiscountDTO;
+import com.food.domain.sales.dto.DiscountTargetDTO;
+import com.food.domain.sales.dto.ReviewDTO;
 import com.food.domain.sales.dto.SalesPostDTO;
 import com.food.domain.sales.dto.SalesPostFileDTO;
 import com.food.domain.support.dto.InquiriesDTO;
@@ -50,25 +55,26 @@ public class AdminController {
 
 	@GetMapping("/login")
 	public ModelAndView login(Authentication authentication) {
-		// 로그인된 사용자가 로그인 페이지로 접근할 경우 메인 페이지로 리다이렉트
-		if (authentication != null && authentication.isAuthenticated()) {
-			return new ModelAndView("redirect:/admin/mainContent");
+		ModelAndView mv = new ModelAndView();
+		// 익명 인증이 아닌 경우 메인 페이지로 리다이렉트
+		if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
+			mv.setViewName("redirect:/admin/mainContent");
+			return mv;
 		}
-		ModelAndView mv = new ModelAndView();
 		mv.setViewName("admin/login");
-		return mv;
-	}
-
-	@GetMapping("/main")
-	public ModelAndView admindashboard() {
-		ModelAndView mv = new ModelAndView();
-		mv.setViewName("admin/adminMain");
 		return mv;
 	}
 
 	@GetMapping("/mainContent")
 	public ModelAndView adminMain() {
 		ModelAndView mv = new ModelAndView();
+		// 익명 인증이거나 인증되지 않은 경우 로그인 페이지로 리다이렉트
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !authentication.isAuthenticated()
+				|| authentication instanceof AnonymousAuthenticationToken) {
+			mv.setViewName("redirect:/admin/login");
+			return mv;
+		}
 		mv.setViewName("admin/mainContent");
 		return mv;
 	}
@@ -150,6 +156,23 @@ public class AdminController {
 			e.printStackTrace();
 		}
 		return ResponseEntity.ok("선택된 제품이 성공적으로 삭제되었습니다.");
+	}
+
+	@DeleteMapping("/deleteDiscounts")
+	@ResponseBody
+	public ResponseEntity<String> deleteDiscounts(@RequestBody Map<String, List<Long>> requestBody) {
+		List<Long> discountIds = requestBody.get("discountIds");
+		if (discountIds == null || discountIds.isEmpty()) {
+			return ResponseEntity.badRequest().body("삭제할 할인 정보가 없습니다.");
+		}
+
+		try {
+			adminService.deleteDiscountsById(discountIds);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ResponseEntity.ok("선택된 항목이 성공적으로 삭제되었습니다.");
 	}
 
 	@GetMapping("/stockManagement")
@@ -269,6 +292,7 @@ public class AdminController {
 		allParams.put("size", String.valueOf(size));
 		Pageable pageable = PageRequest.of(page, size);
 		Page<InquiriesDTO> inquiries;
+		log.info("salesInquiry Params ={}", allParams);
 		// 검색 조건이 있는지 확인
 		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
 				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
@@ -276,6 +300,7 @@ public class AdminController {
 		if (hasSearchParams) {
 			// 검색 조건이 있을 경우
 			inquiries = adminService.findInquiriesWithSearch(pageable, allParams);
+
 		} else {
 			// 검색 조건이 없을 경우
 			inquiries = adminService.findInquiries(pageable, allParams);
@@ -289,25 +314,174 @@ public class AdminController {
 		return mv;
 	}
 
+	@PostMapping("/salesResponse")
+	@ResponseBody
+	public ResponseEntity<?> salesResponse(@RequestBody Map<String, Object> allParams) {
+		adminService.salesResponse(allParams);
+		return ResponseEntity.ok(Map.of("success", true, "message", "답변이 성공적으로 작성되었습니다."));
+	}
+
 	@GetMapping("/salesReview")
-	public ModelAndView salesReview() {
+	public ModelAndView salesReview(@RequestParam Map<String, String> allParams) {
 		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+
+		// 페이지 정보와 사이즈 정보를 allParams에 추가
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		Page<ReviewDTO> reviews;
+		log.info("reviews Params ={}", allParams);
+		// 검색 조건이 있는지 확인
+		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
+				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
+
+		if (hasSearchParams) {
+			// 검색 조건이 있을 경우
+			reviews = adminService.findReviewsWithSearch(pageable, allParams);
+
+		} else {
+			// 검색 조건이 없을 경우
+			reviews = adminService.findReviews(pageable, allParams);
+		}
+		mv.addObject("reviews", reviews);
+		log.info("reviews = {}", reviews.getContent());
+		mv.addObject("currentPage", reviews.getNumber());
+		mv.addObject("pageCount", reviews.getTotalPages());
+		mv.addObject("totalElements", reviews.getTotalElements());
+		mv.addObject("size", size);
 		mv.setViewName("admin/salesReview");
 		return mv;
 	}
 
+	@PostMapping("/reviewReply")
+	@ResponseBody
+	public ResponseEntity<?> reviewReply(@RequestBody Map<String, Object> allParams) {
+		adminService.reviewReply(allParams);
+		return ResponseEntity.ok(Map.of("success", true, "message", "답변이 성공적으로 작성되었습니다."));
+	}
+
 	@GetMapping("/discountList")
-	public ModelAndView discountList() {
+	public ModelAndView discountList(@RequestParam Map<String, String> allParams) {
 		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+
+		// 페이지 정보와 사이즈 정보를 allParams에 추가
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		Page<DiscountDTO> discounts;
+		log.info("reviews Params ={}", allParams);
+		// 검색 조건이 있는지 확인
+		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
+				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
+
+		if (hasSearchParams) {
+			// 검색 조건이 있을 경우
+			discounts = adminService.findDiscountsWithSearch(pageable, allParams);
+
+		} else {
+			// 검색 조건이 없을 경우
+			discounts = adminService.findDiscounts(pageable, allParams);
+		}
+		mv.addObject("discounts", discounts);
+		log.info("discounts = {}", discounts.getContent());
+		mv.addObject("currentPage", discounts.getNumber());
+		mv.addObject("pageCount", discounts.getTotalPages());
+		mv.addObject("totalElements", discounts.getTotalElements());
+		mv.addObject("size", size);
 		mv.setViewName("admin/discountList");
 		return mv;
 	}
 
-	@GetMapping("/discountManagement")
-	public ModelAndView discountManagement() {
+	@GetMapping("/discountTarget")
+	public ModelAndView discountTarget(@RequestParam Map<String, String> allParams) {
+	    ModelAndView mv = new ModelAndView();
+	    int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+	    int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+
+	    allParams.put("page", String.valueOf(page));
+	    allParams.put("size", String.valueOf(size));
+	    Pageable pageable = PageRequest.of(page, size);
+	    Page<DiscountTargetDTO> discountTargets;
+
+	    boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
+	            && allParams.get(key) != null && !allParams.get(key).isEmpty());
+
+	    if (hasSearchParams) {
+	        discountTargets = adminService.findDiscountTargetListWithSearch(pageable, allParams);
+	    } else {
+	        discountTargets = adminService.findDiscountTargetList(pageable, allParams);
+	    }
+
+	    mv.addObject("discounts", discountTargets);
+	    mv.addObject("currentPage", discountTargets.getNumber());
+	    mv.addObject("pageCount", discountTargets.getTotalPages());
+	    mv.addObject("totalElements", discountTargets.getTotalElements());
+	    mv.addObject("size", size);
+	    mv.setViewName("admin/discountTarget");
+	    return mv;
+	}
+
+
+	@PostMapping("/discountUpdate")
+	@ResponseBody
+	public ResponseEntity<?> discountUpdate(@RequestBody List<Map<String, Object>> allParams) {
+		log.info("discountUpdate allParams = {}", allParams);
+		adminService.discountUpdate(allParams);
+		return ResponseEntity.ok(Map.of("success", true, "message", "할인 정보가 성공적으로 수정되었습니다."));
+	}
+
+	@GetMapping("/insertDiscount")
+	public ModelAndView insertDiscountForm() {
 		ModelAndView mv = new ModelAndView();
-		mv.setViewName("admin/discountManagement");
+		mv.setViewName("admin/insertDiscount");
 		return mv;
+	}
+
+	@GetMapping("/insertDiscountTarget")
+	public ModelAndView insertDiscountTargetForm() {
+		ModelAndView mv = new ModelAndView();
+		mv.setViewName("admin/mappingDiscount");
+		List<DiscountDTO> discounts = adminService.findDiscountList();
+		mv.addObject("discounts", discounts);
+		return mv;
+	}
+
+    @PostMapping("/insertDiscountTarget")
+    @ResponseBody
+    public ResponseEntity<String> insertDiscountTarget(@RequestBody Map<String, Object> allParams) {
+        // 디버깅 로그 추가
+        System.out.println("Request Parameters: " + allParams);
+
+        adminService.insertDiscountTarget(allParams);
+        return ResponseEntity.ok("Discount targets added successfully");
+    }
+
+	@GetMapping("/getTargets")
+	public ResponseEntity<Page<?>> getTargets(@RequestParam String targetType,
+	                                          @RequestParam(required = false) String keyword,
+	                                          @RequestParam int page,
+	                                          @RequestParam int size) {
+	    Pageable pageable = PageRequest.of(page, size);
+	    Page<?> targets = adminService.findTargetsByTypeAndQuery(targetType, keyword, pageable);
+	    log.info("targets = {}",targets.getContent());
+	    return ResponseEntity.ok(targets);
+	}
+
+	@PostMapping("/insertDiscount")
+	@ResponseBody
+	public ResponseEntity<?> insertDiscount(@RequestBody Map<String, Object> allParams) {
+		try {
+
+			adminService.insertDiscount(allParams);
+			return ResponseEntity.ok("할인이 성공적으로 등록되었습니다.");
+		} catch (Exception e) {
+			e.printStackTrace(); // Print the stack trace to see the error
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("할인 등록에 실패했습니다.");
+		}
 	}
 
 	@GetMapping("/couponList")
@@ -346,7 +520,7 @@ public class AdminController {
 		// JWT 쿠키 삭제
 		Cookie cookie = new Cookie("jwt", null);
 		cookie.setHttpOnly(true);
-		cookie.setSecure(true);
+		cookie.setSecure(false); // HTTPS가 아닌 경우 false로 설정
 		cookie.setPath("/");
 		cookie.setMaxAge(0); // 쿠키 삭제
 		response.addCookie(cookie);

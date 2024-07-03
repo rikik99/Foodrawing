@@ -1,25 +1,23 @@
 function setupEditDiscount() {
 	document.addEventListener('click', function(e) {
-		if (e.target && e.target.id === 'editDiscount') {
-			console.log("clicked");
-
-			const rows = document.querySelectorAll('#discountTable tbody tr');
+		if (e.target.id === 'editDiscount') {
+			const rows = document.querySelectorAll('.discount-table tbody tr');
 			rows.forEach(row => {
 				const cells = row.querySelectorAll('td');
 				cells.forEach((cell, index) => {
-					let value = cell.innerText;
+					let value = cell.innerText.trim();
 					cell.innerHTML = '';
 
 					if (index === 3) { // 할인 종류
 						const button = document.createElement('button');
 						button.type = 'button';
-						button.innerText = value;
+						button.innerText = value === '퍼센트' ? '%' : '₩';
 						button.className = 'discount-button primary';
 						button.addEventListener('click', function() {
 							button.innerText = button.innerText === '%' ? '₩' : '%';
 						});
 						cell.appendChild(button);
-					} else if (index === 2) { // 할인 유형
+					} else if (index === 4) { // 할인 유형
 						const button = document.createElement('button');
 						button.type = 'button';
 						button.innerText = value;
@@ -28,7 +26,7 @@ function setupEditDiscount() {
 							button.innerText = button.innerText === '이벤트' ? '쿠폰' : '이벤트';
 						});
 						cell.appendChild(button);
-					} else if (index === 9) { // 진행 여부
+					} else if (index === 10) { // 진행 여부
 						const button = document.createElement('button');
 						button.type = 'button';
 						button.innerText = value;
@@ -39,8 +37,17 @@ function setupEditDiscount() {
 						cell.appendChild(button);
 					} else {
 						const input = document.createElement('input');
-						input.type = 'text';
-						input.value = value;
+						if (index === 8 || index === 9) { // 시작 날짜 또는 종료 날짜
+							input.type = 'date';
+							if (value) {
+								const dateParts = value.split('.');
+								const formattedDate = `20${dateParts[0]}-${dateParts[1]}-${dateParts[2].split(' ')[0]}`;
+								input.value = formattedDate;
+							}
+						} else {
+							input.type = 'text';
+							input.value = value;
+						}
 						input.className = 'table-input';
 						cell.appendChild(input);
 					}
@@ -50,14 +57,14 @@ function setupEditDiscount() {
 			e.target.id = 'saveDiscount';
 			e.target.innerText = '수정 완료';
 		} else if (e.target && e.target.id === 'saveDiscount') {
-			console.log("saving changes");
-
-			const rows = document.querySelectorAll('#discountTable tbody tr');
+			const rows = document.querySelectorAll('.discount-table tbody tr');
 			const data = [];
+			let isValid = true;
 
 			rows.forEach(row => {
 				const cells = row.querySelectorAll('td');
 				const rowData = {};
+				rowData.id = row.getAttribute('data-discountId');
 
 				cells.forEach((cell, index) => {
 					const input = cell.querySelector('input');
@@ -65,25 +72,29 @@ function setupEditDiscount() {
 
 					switch (index) {
 						case 0:
-							rowData.discountName = input ? input.value : cell.innerText;
+							rowData.name = input ? input.value : cell.innerText;
 							break;
 						case 1:
-							rowData.discountDescription = input ? input.value : cell.innerText;
+							rowData.description = input ? input.value : cell.innerText;
 							break;
 						case 2:
-							rowData.discountType = button ? button.innerText : cell.innerText;
+							rowData.discountType = button ? (button.innerText === '%' ? 'P' : 'A') : cell.innerText;
 							break;
 						case 3:
-							rowData.discountCategory = button ? button.innerText : cell.innerText;
+							rowData.type = button ? button.innerText : cell.innerText;
 							break;
 						case 4:
-							rowData.discountValue = input ? input.value : cell.innerText;
+							rowData.discountValue = input ? parseFloat(input.value.replace('%', '').replace('₩', '')) : parseFloat(cell.innerText.replace('%', '').replace('₩', ''));
+							if (rowData.discountType === 'P' && rowData.discountValue > 100) {
+								alert('할인율은 100 이하로 설정해야 합니다.');
+								isValid = false;
+							}
 							break;
 						case 5:
-							rowData.minPurchaseValue = input ? input.value : cell.innerText;
+							rowData.minPrice = input ? parseFloat(input.value.replace('₩', '')) : parseFloat(cell.innerText.replace('₩', ''));
 							break;
 						case 6:
-							rowData.maxDiscountValue = input ? input.value : cell.innerText;
+							rowData.maxDiscount = input ? parseFloat(input.value.replace('₩', '')) : parseFloat(cell.innerText.replace('₩', ''));
 							break;
 						case 7:
 							rowData.startDate = input ? input.value : cell.innerText;
@@ -92,7 +103,7 @@ function setupEditDiscount() {
 							rowData.endDate = input ? input.value : cell.innerText;
 							break;
 						case 9:
-							rowData.status = button ? button.innerText : cell.innerText;
+							rowData.onsaleYn = button ? (button.innerText === '진행 중' ? 'Y' : 'N') : cell.innerText;
 							break;
 					}
 				});
@@ -100,9 +111,13 @@ function setupEditDiscount() {
 				data.push(rowData);
 			});
 
+			if (!isValid) {
+				return;
+			}
+
 			console.log(data);
 
-			fetch('/your-server-endpoint', {
+			fetch('/admin/discountUpdate', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -112,54 +127,8 @@ function setupEditDiscount() {
 				.then(response => response.json())
 				.then(result => {
 					console.log('Success:', result);
-
-					rows.forEach((row, rowIndex) => {
-						const cells = row.querySelectorAll('td');
-						const rowData = result[rowIndex];
-
-						cells.forEach((cell, index) => {
-							cell.innerHTML = '';
-
-							let value;
-							switch (index) {
-								case 0:
-									value = rowData.discountName;
-									break;
-								case 1:
-									value = rowData.discountDescription;
-									break;
-								case 2:
-									value = rowData.discountType;
-									break;
-								case 3:
-									value = rowData.discountCategory;
-									break;
-								case 4:
-									value = rowData.discountValue;
-									break;
-								case 5:
-									value = rowData.minPurchaseValue;
-									break;
-								case 6:
-									value = rowData.maxDiscountValue;
-									break;
-								case 7:
-									value = rowData.startDate;
-									break;
-								case 8:
-									value = rowData.endDate;
-									break;
-								case 9:
-									value = rowData.status;
-									break;
-							}
-
-							cell.innerText = value;
-						});
-					});
-
-					e.target.id = 'editDiscount';
-					e.target.innerText = '할인 수정';
+					alert(result.message);
+					loadContent('/admin/discountList', 'discountList', true);
 				})
 				.catch(error => {
 					console.error('Error:', error);

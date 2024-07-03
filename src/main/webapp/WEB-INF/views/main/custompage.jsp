@@ -271,7 +271,7 @@ padding-top:50px;}
     <button class="btn6 transfat-btn" onclick="togglePreference('transFat', 100, this)">트랜스지방이 적은 음식</button>
     <button class="btn6 saturatedfat-btn" onclick="togglePreference('saturatedFat', 100, this)">포화지방이 적은 음식</button>
     <button class="btn6 sugar-btn" onclick="togglePreference('sugar', 50, this)">당 낮은 함량</button>
-    <button class="btn6 sodium-btn" onclick="togglePreference('sodium', 100, this)">나트륨이 적은 음식</button>
+    <button class="btn6 sodium-btn" onclick="togglePreference('sodium', 50, this)">나트륨이 적은 음식</button>
     <button class="btn6 carbohydrate-btn" onclick="togglePreference('carbohydrate', 20, this)">탄수화물이 많은 음식</button>
   </div>
   <button class="btn6" onclick="fetchData()">데이터 불러오기</button>
@@ -446,7 +446,7 @@ function drawGraph(nutrition) {
     nutrition.transFat,
     nutrition.saturatedFat,
     nutrition.sugar,
-    nutrition.sodium / 10,  // 나트륨 값을 10으로 나눔
+    nutrition.sodium,  
     nutrition.carbohydrate
   ];
 

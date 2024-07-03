@@ -1,7 +1,7 @@
 /* 공통 스타일 */
 body {
 	font-family: 'Poppins', sans-serif;
-	height: 100vh;
+	height: 100%;
 	margin: 0;
 	padding: 0;
 	display: flex;
@@ -125,7 +125,6 @@ body.dark-mode {
 .main-content {
 	flex-grow: 1;
 	padding: 20px;
-	overflow-y: auto;
 	transition: background-color 0.3s, color 0.3s;
 }
 

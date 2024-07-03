@@ -7,28 +7,24 @@
 
   <select id="selectBestSellingProducts" resultType="com.food.domain.product.dto.BestDTO">
     SELECT 
-        OD.ORDER_ID,
         OD.SALES_POST_ID,
-        OD.UNIT_PRICE,
-        OD.DISCOUNT_PRICE,
-        OD.QUANTITY AS ORDER_QUANTITY,
         SP.TITLE AS SALES_POST_TITLE,
         SP.DESCRIPTION AS SALES_POST_DESCRIPTION,
-        SP.ID AS SALES_POST_ID,
-        SPF.FILE_PATH,
-        SPF.FILE_TYPE
+        PF.FILE_PATH,
+        P.PRICE AS UNIT_PRICE, -- 단일 제품 가격
+        SUM(OD.QUANTITY) AS ORDER_QUANTITY
     FROM 
-        ORDER_STATUS_TB OS
-    JOIN 
-        ORDER_DETAIL_TB OD ON OS.ORDER_ID = OD.ORDER_ID
+        ORDER_DETAIL_TB OD
     JOIN 
         SALES_POST_TB SP ON OD.SALES_POST_ID = SP.ID
     JOIN 
-        SALES_POST_FILE_TB SPF ON SP.ID = SPF.SALES_POST_ID
-    WHERE 
-        OS.ORDER_STATUS = '배송완료'
+        SALES_POST_FILE_TB PF ON SP.ID = PF.SALES_POST_ID
+    JOIN 
+        PRODUCT_TB P ON SP.PRODUCT_NUMBER = P.PRODUCT_NUMBER
+    GROUP BY 
+        OD.SALES_POST_ID, SP.TITLE, SP.DESCRIPTION, PF.FILE_PATH, P.PRICE
     ORDER BY 
-        OD.QUANTITY DESC
+        ORDER_QUANTITY DESC
   </select>
 
 </mapper>
