@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.food.domain.sales.mapper.InquiryMapper">
+
+    <!-- 상품 문의 리스트 가져오기 -->
+    <select id="getInquiries" resultType="com.food.domain.sales.dto.ProductInquiryDTO">
+        SELECT * FROM (
+            SELECT ROWNUM AS rnum, a.* FROM (
+                SELECT *
+                FROM INQUIRIES_TB
+                WHERE SALES_POST_ID = #{salesPostId}
+                ORDER BY CREATED_DATE DESC
+            ) a
+            WHERE ROWNUM &lt;= #{offset} + #{limit}
+        )
+        WHERE rnum &gt; #{offset}
+    </select>
+
+    <!-- 상품 문의 개수 가져오기 -->
+    <select id="countInquiries" resultType="int">
+        SELECT COUNT(*)
+        FROM INQUIRIES_TB
+        WHERE SALES_POST_ID = #{salesPostId}
+    </select>
+    
+    <!-- 문의 답글 -->
+    <select id="getResponseByInquiriesId">
+    	SELECT ID, INQUIRIES_ID, ADMIN_ID, MESSAGE, CREATED_DATE
+    	FROM RESPONSE_TB
+    	WHERE INQUIRIES_ID = #{inquiriesId}
+    </select>
+    
+    <select id="getCustomer">
+    	SELECT ID, USER_ID, SUBSTR(NICKNAME, 1, 4) || '****' AS NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE, ADDRESS, ADDRESS_DETAIL, ZIPCODE
+    	FROM CUSTOMER_TB
+    	WHERE ID = #{customerId}
+    </select>
+
+</mapper>

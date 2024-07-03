@@ -1,6 +1,11 @@
 package com.food.domain.product.controller;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -13,9 +18,9 @@ import com.food.domain.product.dto.ProductCategoryDTO;
 import com.food.domain.product.dto.ProductDTO;
 import com.food.domain.product.dto.ProductFileDTO;
 import com.food.domain.product.mapper.ProductDetailMapper;
-import com.food.domain.sales.dto.DiscountDTO;
 import com.food.domain.sales.dto.DiscountInfoDTO;
 import com.food.domain.sales.dto.SalesPostDTO;
+import com.food.domain.sales.mapper.ReviewMapper;
 import com.food.domain.sales.mapper.SalesMapper;
 
 @Controller
@@ -26,6 +31,9 @@ public class ProductBController {
 
 	@Autowired
 	SalesMapper salesMapper;
+	
+	@Autowired
+	ReviewMapper reviewMapper;
 	
     @RequestMapping("/best")
     public ModelAndView main() {
@@ -44,7 +52,7 @@ public class ProductBController {
 	   ModelAndView mv = new ModelAndView();
 	   
 	   //salesPost 고정
-	   salesPost.setId(3L);
+	   salesPost.setId(1L);
 	   
 	   //SalesPostTb productNumber 가져오기
 	   salesPost.setProductNumber(salesMapper.getIdByProductNumber(salesPost));
@@ -103,7 +111,30 @@ public class ProductBController {
 		   
 		   discountPrice = (a > b) ? a : b;
 	   }
+	   
 	   mv.addObject("discountPrice", discountPrice);
+	   
+	   //리뷰 사전 정보 가져오기
+	   //리뷰 개수
+	   int totalReviews = (reviewMapper.countReviews(salesPost.getId()) > 0 ? reviewMapper.countReviews(salesPost.getId()) : 0);
+	   mv.addObject("totalReviews", totalReviews);
+	   
+	   // 리뷰 평균 점수
+       double averageRating = reviewMapper.getAverageRating(salesPost.getId());
+       mv.addObject("averageRating", averageRating);
+       int floorRating = (int) Math.floor(averageRating);
+       mv.addObject("floorRating", floorRating);
+
+       // 점수별 리뷰 비율
+       int[] ratingPercentageArray = new int[5];
+       
+       for (int i = 5; i > 0; i--) {
+    	   ratingPercentageArray[i - 1] = reviewMapper.getRatingPercentages(salesPost.getId(), i);
+       }   		   
+       System.out.println("ratingPercentageArray : " + ratingPercentageArray.toString());
+       
+       
+       mv.addObject("ratingPercentages", ratingPercentageArray);
 	   
 	   Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
        boolean isLoggedIn = authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal());

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.food.domain.sales.mapper.ReviewMapper">
+
+    <select id="getReviews" resultType="com.food.domain.sales.dto.SalesReviewDTO">
+        SELECT * FROM (
+            SELECT ROWNUM AS rnum, a.* FROM (
+                SELECT *
+                FROM REVIEW_TB
+                WHERE SALES_POST_ID = #{salesPostId}
+                ORDER BY CREATED_DATE DESC
+            ) a
+            WHERE ROWNUM &lt;= #{offset} + #{limit}
+        )
+        WHERE rnum &gt; #{offset}
+    </select>
+
+    <select id="countReviews" resultType="int">
+        SELECT COUNT(*)
+        FROM REVIEW_TB
+        WHERE SALES_POST_ID = #{salesPostId}
+    </select>
+    
+    <select id="getFileBySalesPostId">
+    	SELECT ID, REVIEW_ID, ORIGINAL_NAME, FILE_PATH, FILE_TYPE, UPLOAD_DATE
+    	FROM REVIEW_FILE_TB
+    	WHERE REVIEW_ID = #{reviewId}
+    </select>
+    
+    <select id="getReplyBySalesPostId">
+    	SELECT ID, REVIEW_ID, ADMIN_ID, MESSAGE, CREATED_DATE, UPLOAD_DATE
+    	FROM REVIEWS_REPLY_TB
+    	WHERE REVIEW_ID = #{reviewId}
+    </select>
+    
+    <select id="getCustomer">
+    	SELECT ID, USER_ID, SUBSTR(NICKNAME, 1, 4) || '****' AS NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE, ADDRESS, ADDRESS_DETAIL, ZIPCODE
+    	FROM CUSTOMER_TB
+    	WHERE ID = #{customerId}
+    </select>
+
+		<select id="getAverageRating" parameterType="Long" resultType="double">
+        SELECT AVG(RATING) FROM REVIEW_TB WHERE SALES_POST_ID = #{salesPostId}
+    </select>
+    
+    <!-- 점수별 리뷰 개수를 가져오는 쿼리 -->
+    <select id="getRatingPercentages" resultType="int">
+		    SELECT CASE 
+		      WHEN (SELECT COUNT(*) FROM REVIEW_TB WHERE SALES_POST_ID=#{salesPostId}) = 0 THEN 0 
+		      ELSE (SELECT COUNT(*) FROM REVIEW_TB WHERE RATING = #{i} AND SALES_POST_ID=#{salesPostId}) / (SELECT COUNT(*) FROM REVIEW_TB WHERE SALES_POST_ID=#{salesPostId})*100 
+		   END AS RATIO
+		   FROM DUAL
+		</select>
+
+</mapper>

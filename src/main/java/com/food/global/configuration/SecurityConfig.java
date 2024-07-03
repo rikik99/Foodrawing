@@ -36,11 +36,12 @@ public class SecurityConfig {
     private final JwtUtil jwtUtil;
 
     public SecurityConfig(@Lazy CustomUserDetailsService customUserDetailsService,
-            CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler,
-            CustomAuthenticationFailureHandler customAuthenticationFailureHandler,
-            @Lazy CustomOAuth2UserService customOAuth2UserService,
-            CustomOAuth2SuccessHandler customOAuth2SuccessHandler,
-            CustomOAuth2FailureHandler customOAuth2FailureHandler, JwtUtil jwtUtil) {
+                          CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler,
+                          CustomAuthenticationFailureHandler customAuthenticationFailureHandler,
+                          @Lazy CustomOAuth2UserService customOAuth2UserService,
+                          CustomOAuth2SuccessHandler customOAuth2SuccessHandler,
+                          CustomOAuth2FailureHandler customOAuth2FailureHandler,
+                          JwtUtil jwtUtil) {
         this.customUserDetailsService = customUserDetailsService;
         this.customAuthenticationSuccessHandler = customAuthenticationSuccessHandler;
         this.customAuthenticationFailureHandler = customAuthenticationFailureHandler;
@@ -57,9 +58,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()).securityMatcher("/admin/**")
+        http.csrf(csrf -> csrf.disable())
+            .securityMatcher("/admin/**")
             .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                .requestMatchers("/admin/login", "/admin/loginFail").permitAll()
+                .requestMatchers("/admin/login").permitAll()
                 .anyRequest().hasAuthority("ROLE_ADMIN"))
             .formLogin(formLogin -> formLogin
                 .loginPage("/admin/login")
@@ -96,14 +98,22 @@ public class SecurityConfig {
     public SecurityFilterChain userSecurityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                .requestMatchers("/", "/login", "/loginFail", "/signup", "/WEB-INF/views/**", "/css/**", "/js/**", "/images/**", 
-                    "/sendVerificationEmail", "/verify", "/signupInfo", "/main/custompage", "/main/mainpage", "/nutrition", 
-                    "/verificationSuccess", "/verificationFail", "/checkDuplicateUsername", "/invalidateSession", "/linkAccount", 
-                    "/findUsername", "/verify-id-code", "/showUsername", "/findPassword", "/sendPasswordResetCode", 
-                    "/verify-password-code", "/passwordReset", "/best", "/ProductDetail", "/cart/checkStock", "/cart/addToCart", 
-                    "/cart", "/cart/deleteCartItem", "/order/prepareCheckout", "/checkoutPage", "/order/prepareCheckoutAll", 
-                    "/cart/updateCartItem", "/cart/deleteSelectedItems", "/payment/result", "/payment/restoreStock", "/mainpage").permitAll()
-                .anyRequest().authenticated())
+                .requestMatchers("/", "/login", "/loginFail", "/signup", "/WEB-INF/views/**", 
+                                 "/css/**", "/js/**", "/images/**", "/sendVerificationEmail", 
+                                 "/verify", "/signupInfo", "/main/custompage", "/mainpage", 
+                                 "/nutrition", "/verificationSuccess", "/verificationFail", 
+                                 "/checkDuplicateUsername", "/invalidateSession", "/linkAccount", 
+                                 "/findUsername", "/verify-id-code", "/showUsername", 
+                                 "/findPassword", "/sendPasswordResetCode", "/verify-password-code", 
+                                 "/passwordReset", "/main/best", "/ProductDetail", 
+                                 "/cart/checkStock", "/cart/addToCart", "/cart", 
+                                 "/cart/deleteCartItem", "/order/prepareCheckout", 
+                                 "/checkoutPage", "/order/prepareCheckoutAll", 
+                                 "/cart/updateCartItem", "/cart/deleteSelectedItems", 
+                                 "/payment/result", "/payment/restoreStock", "/buy/checkoutPage", 
+                                 "/wishlist/add", "/wishlist/remove", "/reviews/**", "/inquiries/**").permitAll()
+                .anyRequest().hasAuthority("ROLE_USER"))
+            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
             .formLogin(formLogin -> formLogin
                 .loginPage("/login")
                 .defaultSuccessUrl("/", true)
@@ -134,8 +144,6 @@ public class SecurityConfig {
         // X-Frame-Options SAMEORIGIN 설정 추가
         http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 
@@ -143,7 +151,6 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService() {
         return customUserDetailsService;
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
