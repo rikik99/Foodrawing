@@ -2,6 +2,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const wishIcon = document.getElementById('wish-icon');
     const salesPostId = document.getElementById('salesPostId').value;
     const customerId = 1; // 설정해 줘야함
+    
+    // 처음 로드 시 위시리스트 상태를 확인하여 아이콘 업데이트
+    fetch('/wishlist/check', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            salesPostId: salesPostId,
+            customerId: customerId
+        })
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.isWished) {
+                wishIcon.src = '/images/svg/iconUtilWishOn.svg';
+                wishIcon.setAttribute('data-wished', 'true');
+            } else {
+                wishIcon.src = '/images/svg/iconUtilWish.svg';
+                wishIcon.setAttribute('data-wished', 'false');
+            }
+        })
+        .catch(error => {
+            console.error('Error checking wishlist status:', error);
+        });
 
     wishIcon.addEventListener('click', function() {
         const isWished = wishIcon.getAttribute('data-wished') === 'true';

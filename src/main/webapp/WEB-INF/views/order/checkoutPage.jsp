@@ -294,18 +294,16 @@
                     <div class="payment-method" data-method="kakaopay">카카오페이</div>
                 </div>
                 <div class="form-group">
-                    <label for="cardType">카드 종류</label>
+                    <label for="cardType">쿠폰</label>
                     <select id="cardType" name="cardType">
                         <option value="">카드 선택</option>
                         <!-- 카드 종류 옵션 추가 -->
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="installment">할부 선택</label>
-                    <select id="installment" name="installment">
-                        <option value="0">일시불</option>
-                        <!-- 할부 옵션 추가 -->
-                    </select>
+                    <label for="installment">적립금</label>
+                    <input type="number">
+                    <div>적립금: </div>
                 </div>
             </div>
         </div>

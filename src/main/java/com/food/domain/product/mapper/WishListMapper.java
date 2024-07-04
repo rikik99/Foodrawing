@@ -9,4 +9,6 @@ public interface WishListMapper {
 
 	boolean deleteWish(Long customerId, Long salesPostId);
 
+	boolean isWished(Long salesPostId, Long customerId);
+
 }
