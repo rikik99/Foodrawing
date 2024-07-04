@@ -364,3 +364,8 @@ button.editButton:hover {
 	display: flex;
 	justify-content: space-between;
 }
+.couponCnD {
+	display: flex;
+		width: 100%;
+	gap: 10px;
+}

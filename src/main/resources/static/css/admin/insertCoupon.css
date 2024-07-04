@@ -1,0 +1,130 @@
+/* CSS */
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #333;
+}
+
+.coupon-form-container {
+    width: 100%;
+    max-width: 600px;
+    padding: 20px;
+    background-color: #1c2331;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+}
+
+.coupon-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    background-color: #1c2331;
+}
+
+.coupon-form h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+.form-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.form-table td {
+    padding: 10px;
+    vertical-align: middle;
+    color: #ffffff;
+}
+
+.form-table label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #ffffff;
+}
+
+.form-table input[type="text"],
+.form-table select {
+    width: calc(100% - 20px);
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background: #ffffff;
+    color: #000000;
+}
+
+.form-table textarea {
+    resize: none;
+}
+
+.customer-list-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.customer-list-table th, 
+.customer-list-table td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    color: #ffffff;
+    vertical-align: middle;
+}
+
+.customer-list-table th {
+    background-color: #2a3b4c;
+    font-weight: bold;
+}
+
+.customer-list-table tr:nth-child(odd) {
+    background-color: #1c2331;
+}
+
+.customer-list-table tr:nth-child(even) {
+    background-color: #2a3b4c;
+}
+
+button.primary {
+    display: block;
+    width: 100%;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    margin-top: 20px;
+}
+
+button.primary:hover {
+    background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+    .coupon-form {
+        width: 90%;
+        padding: 10px;
+    }
+    .form-table td,
+    .customer-list-table th,
+    .customer-list-table td {
+        display: block;
+        width: 100%;
+    }
+    .form-table td:first-child,
+    .customer-list-table th:first-child,
+    .customer-list-table td:first-child {
+        margin-top: 10px;
+    }
+}

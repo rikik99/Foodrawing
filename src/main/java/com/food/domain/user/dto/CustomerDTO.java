@@ -1,5 +1,6 @@
 package com.food.domain.user.dto;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import lombok.AllArgsConstructor;
@@ -22,4 +23,10 @@ public class CustomerDTO {
 	private String addressDetail;
 	private String zipcode;
 	private UserDTO userDTO;
+	private MemberRatingDTO member;
+
+    public String getFormattedBirthDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 MM월 dd일");
+        return birthDate != null ? sdf.format(birthDate) : "";
+    }
 }

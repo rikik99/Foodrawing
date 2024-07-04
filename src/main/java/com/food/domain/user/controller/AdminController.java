@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,15 +30,21 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.food.domain.product.dto.ProductCategoryDTO;
 import com.food.domain.product.dto.ProductDTO;
 import com.food.domain.product.dto.StockTransactionDTO;
+import com.food.domain.sales.dto.CouponIssuanceDTO;
 import com.food.domain.sales.dto.DiscountDTO;
 import com.food.domain.sales.dto.DiscountTargetDTO;
 import com.food.domain.sales.dto.ReviewDTO;
 import com.food.domain.sales.dto.SalesPostDTO;
 import com.food.domain.sales.dto.SalesPostFileDTO;
 import com.food.domain.support.dto.InquiriesDTO;
+import com.food.domain.user.dto.CustomerDTO;
 import com.food.domain.user.service.AdminService;
 
 import jakarta.servlet.http.Cookie;
@@ -566,18 +574,96 @@ public class AdminController {
 	}
 
 	@GetMapping("/couponList")
-	public ModelAndView couponList() {
+	public ModelAndView couponList(@RequestParam Map<String, String> allParams) {
 		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+		log.info("couponList allParams = {}",allParams);
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		Page<CouponIssuanceDTO> couponIssuances;
+
+		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
+				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
+
+		if (hasSearchParams) {
+			couponIssuances = adminService.findCouponIssuancesWithSearch(pageable, allParams);
+		} else {
+			couponIssuances = adminService.findCouponIssuances(pageable, allParams);
+		}
+
+		mv.addObject("couponIssuances", couponIssuances);
+		mv.addObject("currentPage", couponIssuances.getNumber());
+		mv.addObject("pageCount", couponIssuances.getTotalPages());
+		mv.addObject("totalElements", couponIssuances.getTotalElements());
+		mv.addObject("size", size);
 		mv.setViewName("admin/couponList");
 		return mv;
 	}
 
-	@GetMapping("/couponManagement")
-	public ModelAndView couponManagement() {
-		ModelAndView mv = new ModelAndView();
-		mv.setViewName("admin/couponManagement");
-		return mv;
+	@DeleteMapping("/couponList")
+	@ResponseBody
+	public ResponseEntity<String> deleteCouponList(@RequestBody Map<String, List<Long>> requestBody) {
+		List<Long> couponIssuanceIds = requestBody.get("couponIssuanceIds");
+		if (couponIssuanceIds == null || couponIssuanceIds.isEmpty()) {
+			return ResponseEntity.badRequest().body("삭제할 쿠폰 정보가 없습니다.");
+		}
+
+		try {
+			adminService.deleteCouponIssuancesById(couponIssuanceIds);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ResponseEntity.ok("선택된 항목이 성공적으로 삭제되었습니다.");
 	}
+	
+	@GetMapping("/insertCoupon")
+	public ModelAndView insertCouponForm() {
+	    ModelAndView mv = new ModelAndView();
+	    List<DiscountDTO> couponList = adminService.findDiscountListWithType();
+	    mv.addObject("coupon", couponList);
+
+	    // ObjectMapper에 JavaTimeModule을 추가하여 날짜/시간 형식을 처리
+	    ObjectMapper objectMapper = new ObjectMapper();
+	    objectMapper.registerModule(new JavaTimeModule());
+	    objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+	    String couponDetailsJson = null;
+	    try {
+	        couponDetailsJson = objectMapper.writeValueAsString(
+	            couponList.stream().collect(Collectors.toMap(DiscountDTO::getId, Function.identity()))
+	        );
+	    } catch (JsonProcessingException e) {
+	        e.printStackTrace();
+	    }
+	    List<CustomerDTO> customerList = adminService.findCustomerList();
+	    
+	    mv.addObject("customer", customerList);
+	    mv.addObject("couponDetailsJson", couponDetailsJson);
+	    mv.setViewName("admin/insertCoupon");
+	    return mv;
+	}
+
+    @PostMapping("/insertCoupon")
+    @ResponseBody
+    public ResponseEntity<String> insertCoupon(@RequestBody Map<String, Object> requestData) {
+        try {
+            List<Long> couponIds = ((List<?>) requestData.get("couponIds")).stream()
+                                  .map(id -> Long.parseLong(id.toString())).toList();
+            String targetType = requestData.get("targetType").toString();
+            String customerIds = requestData.get("customerIds").toString();
+            int issueCount = Integer.parseInt(requestData.get("issueCount").toString());
+
+            adminService.issueCoupons(couponIds, targetType, customerIds, issueCount);
+
+            return ResponseEntity.ok("쿠폰 발행 성공");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("쿠폰 발행 실패");
+        }
+    }
 
 	@GetMapping("/orderList")
 	public ModelAndView orderList() {

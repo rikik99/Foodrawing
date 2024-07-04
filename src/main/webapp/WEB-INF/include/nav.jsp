@@ -28,7 +28,6 @@
                     <li class="nav-item"><a class="nav-link" href="/main/bestpage">베스트</a></li>
                     <li class="nav-item"><a class="nav-link" href="/custompage">영양소커스텀</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">할인</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">고객센터</a></li>
                 </ul>
             </div>
             <div>
@@ -41,7 +40,7 @@
                             <li class="nav-item loginli"><a href="/login" class="login">로그인</a></li>
                         </c:otherwise>
                     </c:choose>
-                    <li class="nav-item csli"><a href="#" class="cs">고객센터</a></li>
+                    <li class="nav-item csli"><a href="/csMain" class="cs">고객센터</a></li>
                 </ul>
             </div>
         </div>

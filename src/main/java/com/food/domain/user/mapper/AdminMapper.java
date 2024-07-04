@@ -7,11 +7,13 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.food.domain.order.dto.OrderDTO;
 import com.food.domain.product.dto.ProductCategoryDTO;
 import com.food.domain.product.dto.ProductDTO;
 import com.food.domain.product.dto.ProductFileDTO;
 import com.food.domain.product.dto.StockDTO;
 import com.food.domain.product.dto.StockTransactionDTO;
+import com.food.domain.sales.dto.CouponIssuanceDTO;
 import com.food.domain.sales.dto.DiscountDTO;
 import com.food.domain.sales.dto.DiscountTargetDTO;
 import com.food.domain.sales.dto.ReviewDTO;
@@ -158,6 +160,25 @@ public interface AdminMapper {
 	List<MemberRatingDTO> findAllMemberRatings();
 
 	void updateDiscountTarget(Map<String, Object> params);
+
+	List<CouponIssuanceDTO> findCouponIssuancesWithSearch(Map<String, String> allParams);
+
+	List<CouponIssuanceDTO> findCouponIssuances();
+
+	void deleteCouponIssuancesById(Long couponIssuanceId);
+
+	List<DiscountDTO> findDiscountListWithType();
+
+	List<CustomerDTO> findCustomerList();
+
+	Long getTotalAmountByCustomerId(Long customerId);
+
+	MemberRatingDTO getMemberRatingByTotalAmount(Long totalAmount);
+
+	void insertCouponToCustomer(Long couponId, Long customerId, String couponNumber);
+
+	List<Long> findAllCustomerIds();
+
 
 
 }

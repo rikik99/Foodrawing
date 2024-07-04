@@ -335,6 +335,29 @@
 	border-radius: 5px;
 }
 
+.inquiry-answer-content {
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+.inquiry-answer-content p {
+    margin: 0;
+    line-height: 1.5;
+}
+.inquiry-answer-content strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.lock-icon {
+    font-size: 14px;
+    color: #aaa;
+    margin-right: 5px;
+}
+
 .pagination {
 	display: flex;
 	justify-content: center;
@@ -592,7 +615,7 @@
 						type="hidden" id="productFilePath" name="productFilePath"
 						class="productFilePath" value="${productFileInfo.filePath}">
 					<div class="product-title">
-						<h1 class="product-name">${productInfo.name}1.05kg</h1>
+						<h1 class="product-name">${productInfo.name}</h1>
 						<img id="wish-icon" class="wish-icon"
 							src="/images/svg/iconUtilWish.svg" data-wished="false"
 							alt="위시리스트 아이콘">
@@ -622,11 +645,11 @@
 						</c:choose>
 
 						<p>원산지 : 하단 상품정보 참고</p>
-						<div class="rating">⭐ 4.9 (${totalReviews})</div>
+						<div class="rating">⭐ ${averageRating} (<fmt:formatNumber type="number" value="${totalReviews}" />)</div>
 					</div>
 					<div class="detail-cart-wrap mt-3">
 						<div class="cart-item">
-							<div class="item-info">${productInfo.name}1.05kg</div>
+							<div class="item-info">${productInfo.name}</div>
 							<div class="item-quantity">
 								<button class="decrement">-</button>
 								<input type="text" class="quantity" value="1" readonly>
@@ -735,7 +758,7 @@
 				<ul class="nav nav-tabs">
 					<li class="nav-item"><a class="nav-link active"
 						href="#detail-content">상세정보</a></li>
-					<li class="nav-item"><a class="nav-link" href="#review">리뷰(9,999+)</a>
+					<li class="nav-item"><a class="nav-link" href="#review">리뷰(<fmt:formatNumber type="number" value="${totalReviews}" />)</a>
 					</li>
 					<li class="nav-item"><a class="nav-link" href="#purchase-info">구매정보</a>
 					</li>
@@ -939,7 +962,7 @@
 
         function loadReviews(page) {
             const salesPostId = document.getElementById('salesPostId').value;
-            fetch(`/reviews/\${salesPostId}?page=\${page}`)
+            fetch(`/reviews/\${salesPostId}?page=\${page}&size=5`)
                 .then(response => response.json())
                 .then(data => {
                     displayReviews(data.reviews);
@@ -1046,11 +1069,14 @@
 
 	<script>
 	document.addEventListener('DOMContentLoaded', function () {
+	    //const userId = '${user != null ? user.id : ""}'; // 로그인된 사용자 ID, 없으면 빈 문자열
+	    const customerId = 1;
+
 	    loadInquiries(1);
 
 	    function loadInquiries(page) {
 	        const salesPostId = document.getElementById('salesPostId').value;
-	        fetch(`/inquiries/\${salesPostId}?page=\${page}&size=10`)
+	        fetch(`/inquiries/\${salesPostId}?page=\${page}&size=5`)
 	            .then(response => {
 	                if (!response.ok) {
 	                    throw new Error('Network response was not ok ' + response.statusText);
@@ -1073,21 +1099,49 @@
 	        inquirySection.innerHTML = '';
 
 	        inquiries.forEach((inquiry, index) => {
-	            const reply = inquiry.reply ? inquiry.reply : null;
+	            const reply = inquiry.responses ? inquiry.responses.message : null;
+	            const isSecret = inquiry.secret === '2';
+	            const isOwner = customerId && inquiry.customerId == customerId;
+	            const canView = !isSecret || isOwner;
 	            const inquiryItem = document.createElement('div');
 	            inquiryItem.className = 'inquiry-item';
-	            inquiryItem.innerHTML = `
-	                <div class="inquiry-info" onclick="toggleInquiryAnswer(\${index})">
-	                    \${inquiry.resolvedYn === 'Y' ? '<span class="inquiry-badge text-dark">답변완료</span>' : '<span class="inquiry-badge text-dark">미답변</span>'}
-	                    <span class="inquiry-content">\${inquiry.subject}</span>
-	                    <span class="inquiry-author">\${inquiry.customer.nickname}</span>
-	                    <span class="inquiry-date">\${new Date(inquiry.createdDate).toLocaleDateString()}</span>
-	                </div>
-	                <div id="inquiry-answer-${index}" class="inquiry-answer" style="display: none;">
-	                    \${inquiry.message}
-	                    \${reply ? `<div class="inquiry-response">\${reply.message}</div>` : ''}
-	                </div>
-	            `;
+
+	            if (canView) {
+	                inquiryItem.setAttribute('onclick', `toggleInquiryAnswer(\${index})`);
+	                inquiryItem.innerHTML = `
+	                    <div class="inquiry-info">
+	                        \${inquiry.resolvedYn === 'Y' ? '<span class="inquiry-badge text-dark">답변완료</span>' : '<span class="inquiry-badge text-dark">미답변</span>'}
+	                        \${isSecret ? '<span class="lock-icon">🔒</span>' : ''}
+	                        <span class="inquiry-content">\${inquiry.subject}</span>
+	                    </div>
+	                    <div class="inquiry-meta">
+	                        <span class="inquiry-author">\${inquiry.customer.nickname}</span>
+	                        <span class="inquiry-date">\${new Date(inquiry.createdDate).toLocaleDateString()}</span>
+	                    </div>
+	                    <div id="inquiry-answer-\${index}" class="inquiry-answer" style="display: none;">
+	                        <p>\${inquiry.message}</p>
+	                        \${reply ? `
+	                            <div class="inquiry-answer-content">
+	                                <p><strong>관리자</strong></p>
+	                                <p>\${reply}</p>
+	                            </div>
+	                        ` : ''}
+	                    </div>
+	                `;
+	            } else {
+	                inquiryItem.innerHTML = `
+	                    <div class="inquiry-info">
+	                        \${inquiry.resolvedYn === 'Y' ? '<span class="inquiry-badge text-dark">답변완료</span>' : '<span class="inquiry-badge text-dark">미답변</span>'}
+	                        <span class="lock-icon">🔒</span>
+	                        <span class="inquiry-content">비밀글입니다.</span>
+	                    </div>
+	                    <div class="inquiry-meta">
+	                        <span class="inquiry-author">\${inquiry.customer.nickname}</span>
+	                        <span class="inquiry-date">\${new Date(inquiry.createdDate).toLocaleDateString()}</span>
+	                    </div>
+	                `;
+	            }
+
 	            inquirySection.appendChild(inquiryItem);
 	        });
 	    }
@@ -1119,8 +1173,6 @@
 	        }
 	    };
 	});
-
-
 </script>
 
 	<script src="/js/productDetail/main.js" defer></script>

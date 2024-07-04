@@ -819,7 +819,8 @@
 	<select id="findDiscountTargetByType">
 		SELECT *
 		FROM DISCOUNT_TARGET_TB
-		WHERE TARGET_TYPE = #{targetType}
+		WHERE TARGET_TYPE =
+		#{targetType}
 	</select>
 	<select id="findAllMemberRatings"
 		resultType="com.food.domain.user.dto.MemberRatingDTO">
@@ -828,7 +829,104 @@
 	<update id="updateDiscountTarget" parameterType="map">
 		UPDATE
 		DISCOUNT_TARGET_TB
-		SET TARGET_TYPE = #{targetType}, TARGET_ID = #{targetId}
+		SET TARGET_TYPE = #{targetType}, TARGET_ID =
+		#{targetId}
 		WHERE id = #{id}
 	</update>
+	<select id="findCouponIssuances">
+		select *
+		from COUPON_ISSUANCE_TB
+	</select>
+	<select id="findCouponIssuancesWithSearch" parameterType="map"
+		resultType="com.food.domain.sales.dto.CouponIssuanceDTO">
+		SELECT
+		C.*
+		FROM
+		COUPON_ISSUANCE_TB C
+		JOIN
+		DISCOUNT_TB D ON C.DISCOUNT_ID =
+		D.ID
+		JOIN
+		CUSTOMER_TB CU ON C.CUSTOMER_ID = CU.ID
+		JOIN
+		USER_TB U ON
+		CU.USER_ID = U.ID
+		WHERE
+		1=1
+		<if
+			test="discount_fr_date != null and discount_fr_date != '' and discount_to_date != null and discount_to_date != ''">
+			AND C.DISCOUNT_ID IN (
+			SELECT
+			C.DISCOUNT_ID
+			FROM
+			COUPON_ISSUANCE_TB
+			C
+			JOIN DISCOUNT_TB D ON D.ID = C.DISCOUNT_ID
+			WHERE
+			TRUNC(D.START_DATE)
+			&lt;= TO_DATE(#{discount_to_date}, 'YYYY-MM-DD')
+			AND TRUNC(D.END_DATE)
+			&gt;= TO_DATE(#{discount_fr_date}, 'YYYY-MM-DD')
+			)
+		</if>
+		<if
+			test="register_fr_date != null and register_fr_date != '' and register_to_date != null and register_to_date != ''">
+			AND TRUNC(C.ISSUED_AT) &gt;= TO_DATE(#{register_fr_date},
+			'YYYY-MM-DD')
+			AND TRUNC(C.ISSUED_AT) &lt;=
+			TO_DATE(#{register_to_date},
+			'YYYY-MM-DD')
+		</if>
+		<if test="searchInput != null and searchInput != ''">
+			AND (
+			D.NAME LIKE '%' || #{searchInput} || '%' OR
+			U.USERNAME LIKE '%' || #{searchInput} || '%' OR
+			TO_CHAR(C.COUPON_NUMBER) LIKE '%' || #{searchInput} || '%'
+			)
+		</if>
+		<if test="discountType != null and discountType != ''">
+			AND D.DISCOUNT_TYPE = #{discountType}
+		</if>
+		<if test="usedYn != null and usedYn != ''">
+			AND C.USED_YN = #{usedYn}
+		</if>
+	</select>
+	<delete id="deleteCouponIssuancesById">
+		DELETE FROM COUPON_ISSUANCE_TB WHERE ID =
+		#{couponIssuanceId}
+	</delete>
+	<select id="findDiscountListWithType">
+		SELECT ID, ONSALE_YN, NAME, TYPE, START_DATE,
+		END_DATE, DISCOUNT_TYPE,
+		DISCOUNT_VALUE, MAX_DISCOUNT, DESCRIPTION,
+		MIN_PRICE
+		FROM DISCOUNT_TB
+		WHERE TYPE = '쿠폰'
+	</select>
+	<select id="findCustomerList">
+		select * from CUSTOMER_TB
+	</select>
+	<select id="getTotalAmountByCustomerId"
+		resultType="java.lang.Long">
+		SELECT SUM(TOTAL_AMOUNT)
+		FROM ORDER_TB
+		WHERE IDENTIFIER_ID = #{customerId}
+		AND IDENTIFIER_TYPE = 'CUSTOMER'
+		AND ORDER_DATE >= ADD_MONTHS(SYSDATE, -3)
+	</select>
+	<select id="getMemberRatingByTotalAmount"
+		resultType="com.food.domain.user.dto.MemberRatingDTO">
+		SELECT *
+		FROM MEMBER_RATING_TB
+		WHERE #{totalAmount} BETWEEN MIN_AMOUNT AND MAX_AMOUNT
+	</select>
+    <select id="findAllCustomerIds" resultType="java.lang.Long">
+        SELECT ID
+        FROM CUSTOMER_TB
+    </select>
+
+    <insert id="insertCouponToCustomer">
+        INSERT INTO COUPON_ISSUANCE_TB (CUSTOMER_ID, DISCOUNT_ID, COUPON_NUMBER, ISSUED_AT, USED_YN)
+        VALUES (#{customerId}, #{couponId}, #{couponNumber}, CURRENT_TIMESTAMP, 'N')
+    </insert>
 </mapper>

@@ -246,6 +246,8 @@ function performSearch(urlPath) {
 		{ id: 'price_max', name: 'price_max' },
 		{ id: 'last_fr_date', name: 'last_fr_date' },
 		{ id: 'last_to_date', name: 'last_to_date' },
+		{ id: 'discount_fr_date', name: 'discount_fr_date' },
+		{ id: 'discount_to_date', name: 'discount_to_date' },
 		{ id: 'register_fr_date', name: 'register_fr_date' },
 		{ id: 'register_to_date', name: 'register_to_date' },
 		{ id: 'fr_min', name: 'fr_min' },
@@ -271,6 +273,7 @@ function performSearch(urlPath) {
 		{ name: 'sale_status', paramName: 'sale_status' },
 		{ name: 'onsaleYn', paramName:'onsaleYn'},
 		{ name: 'type', paramName:'type'},
+		{ name: 'usedYn', paramName:'usedYn'},
 		{ name:'targetType', paramName:'targetType'}
 	];
 
@@ -491,11 +494,18 @@ function deleteSelectedProducts(urlPath, pageType) {
         });
         selectedItems = selectedDiscountTargetIds;
         bodyContent = { discountTargetIds: selectedItems };
+    } else if (pageType === 'couponList') {
+        const selectedCouponListtIds = Array.from(productCheckboxes).map(checkbox => {
+            return checkbox.closest('tr').getAttribute('data-issuanceId');
+        });
+        selectedItems = selectedCouponListtIds;
+        bodyContent = { couponIssuanceIds: selectedItems };
     }
 
     if (selectedItems.length > 0) {
         const endpoint = pageType === 'productManagement' ? '/admin/deleteProducts' :
-                         pageType === 'discountList' ? '/admin/deleteDiscounts' : '/admin/discountTarget';
+                         pageType === 'discountList' ? '/admin/deleteDiscounts' : 
+                         pageType === 'discountTarget' ? '/admin/discountTarget' : '/admin/couponList';
 
         fetch(endpoint, {
             method: 'DELETE',
