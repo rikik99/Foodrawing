@@ -1,11 +1,7 @@
 package com.food.domain.product.controller;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -18,8 +14,11 @@ import com.food.domain.product.dto.ProductCategoryDTO;
 import com.food.domain.product.dto.ProductDTO;
 import com.food.domain.product.dto.ProductFileDTO;
 import com.food.domain.product.mapper.ProductDetailMapper;
+import com.food.domain.sales.dto.DiscountDTO;
 import com.food.domain.sales.dto.DiscountInfoDTO;
+import com.food.domain.sales.dto.DiscountTargetDTO;
 import com.food.domain.sales.dto.SalesPostDTO;
+import com.food.domain.sales.mapper.DiscountMapper;
 import com.food.domain.sales.mapper.ReviewMapper;
 import com.food.domain.sales.mapper.SalesMapper;
 
@@ -34,6 +33,9 @@ public class ProductBController {
 	
 	@Autowired
 	ReviewMapper reviewMapper;
+	
+	@Autowired
+	DiscountMapper discountMapper;
 	
     @RequestMapping("/best")
     public ModelAndView main() {
@@ -83,8 +85,30 @@ public class ProductBController {
 	   String categoryCode = productInfo.getProductNumber().substring(0, 2);
 	   ProductCategoryDTO productCategoryInfo = productDetailMapper.getCategoryByCategryCode(categoryCode);
 	   
-	   //상품 할인 정보(카테고리 or 상품 할인)
-	   List<DiscountInfoDTO> discountInfo = productDetailMapper.getDiscount(productCategoryInfo, salesPost.getProductNumber());
+	   // 상품 할인 정보(카테고리 or 상품 할인)
+	   List<DiscountInfoDTO> discountInfo = new ArrayList<>();
+
+	   // 카테고리로 할인 가져오기
+	   DiscountTargetDTO categoryTargetDiscount = discountMapper.getCategroyTargetDiscount(productCategoryInfo.getId());
+	   if (categoryTargetDiscount != null) {
+	       DiscountDTO categoryDiscount = discountMapper.getDiscount(categoryTargetDiscount.getDiscountId());
+	       DiscountInfoDTO categoryDiscountInfo = new DiscountInfoDTO();
+	       categoryDiscountInfo.setDiscountDTO(categoryDiscount);
+	       categoryDiscountInfo.setDiscountTargetDTO(categoryTargetDiscount);
+	       discountInfo.add(categoryDiscountInfo);
+	   }
+
+	   // 상품으로 할인 가져오기
+	   DiscountTargetDTO productTargetDiscount = discountMapper.getProductTargetDiscount(salesPost.getProductNumber());
+	   if (productTargetDiscount != null) {
+	       DiscountDTO productDiscount = discountMapper.getDiscount(productTargetDiscount.getDiscountId());
+	       DiscountInfoDTO productDiscountInfo = new DiscountInfoDTO();
+	       productDiscountInfo.setDiscountDTO(productDiscount);
+	       productDiscountInfo.setDiscountTargetDTO(productTargetDiscount);
+	       discountInfo.add(productDiscountInfo);
+	   }
+	   
+	   //productDetailMapper.getDiscount(productCategoryInfo, salesPost.getProductNumber());
 	   int discountPrice = 0;
 	   
 	   //할인가 계산

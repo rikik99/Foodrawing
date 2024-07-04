@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.food.domain.sales.mapper.DiscountMapper">
+	<select id="getCategroyTargetDiscount">
+		SELECT ID, DISCOUNT_ID, TARGET_TYPE, TARGET_ID
+		FROM DISCOUNT_TARGET_TB
+		WHERE TARGET_TYPE = 'CATEGORY' AND TARGET_ID = #{i}
+	</select>
+	
+	<select id="getProductTargetDiscount">
+		SELECT ID, DISCOUNT_ID, TARGET_TYPE, TARGET_ID
+		FROM DISCOUNT_TARGET_TB
+		WHERE TARGET_TYPE = 'PRODUCT' AND TARGET_ID = #{productNumber}
+	</select>
+	
+	<select id="getDiscount">
+		SELECT ID, ONSALE_YN, NAME, TYPE, START_DATE, END_DATE, DISCOUNT_TYPE, DISCOUNT_VALUE, MAX_DISCOUNT, DESCRIPTION, MIN_PRICE
+		FROM DISCOUNT_TB
+		WHERE ID = #{discountId}
+	</select>
+</mapper>
