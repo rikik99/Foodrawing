@@ -1,5 +1,6 @@
 package com.food.domain.user.mapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.food.domain.order.dto.OrderDTO;
+import com.food.domain.order.dto.OrderDetailDTO;
+import com.food.domain.order.dto.OrderStatusDTO;
 import com.food.domain.product.dto.ProductCategoryDTO;
 import com.food.domain.product.dto.ProductDTO;
 import com.food.domain.product.dto.ProductFileDTO;
@@ -178,6 +181,26 @@ public interface AdminMapper {
 	void insertCouponToCustomer(Long couponId, Long customerId, String couponNumber);
 
 	List<Long> findAllCustomerIds();
+
+	OrderStatusDTO findOrderStatusByOrderId(Long orderId);
+
+	List<OrderDetailDTO> findOrderDetailListByOrderId(Long orderId);
+
+	List<OrderDTO> findOrders();
+
+	List<OrderDTO> findOrdersWithSearch(Map<String, String> allParams);
+
+	List<OrderDTO> findPaymentCompletedOrders();
+
+	List<OrderDTO> findPaymentCompletedOrdersWithSearch(Map<String, String> allParams);
+
+	int updateOrderStatus(Long orderId, String status);
+
+	List<Long> findOrdersToConfirm(LocalDateTime oneWeekAgo);
+
+	void updateSalesPost(SalesPostDTO salesPost);
+
+	void deleteSalesPostFile(Long salesPostId);
 
 
 

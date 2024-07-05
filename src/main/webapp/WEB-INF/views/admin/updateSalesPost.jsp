@@ -13,13 +13,13 @@
     <div class="dashboard-container">
         <jsp:include page="/WEB-INF/views/admin/layout.jsp" />
         <div class="main-content dark-mode" id="mainContent">
-            <div class="insertSalsePostForm dark-mode">
-                <h1>판매글 등록</h1>
+            <div class="updateSalsePostForm dark-mode">
+                <h1>판매글 수정</h1>
                 <div class="full-width dark-mode">
                     <table class="form-table">
                         <tr>
-                            <td><label for="productList">상품</label></td>
-                            <td><select id="productList" name="productList" class="productList">
+                            <td><label for="updateProductList">상품</label></td>
+                            <td><select id="updateProductList" name="updateProductList" class="updateProductList">
                                     <option value="">전체</option>
                                     <c:forEach items="${productList}" var="product">
                                         <option value="${product.name}">${product.name}</option>
@@ -67,9 +67,10 @@
                             <td><textarea name="description" id="description" rows="10" cols="100" required="required"></textarea></td>
                         </tr>
                         <tr>
-                            <td colspan="2" class="submitTd"><button type="button" class="primary salesAddBtn" id="submitBtn">상품 등록</button></td>
+                            <td colspan="2" class="updateTd"><button type="button" class="primary salesUpdateBtn" id="updateBtn">상품 등록</button></td>
                         </tr>
                     </table>
+                    <input type="hidden" id="salesPostId" name="salesPostId" value="">
                 </div>
             </div>
         </div>
@@ -80,38 +81,5 @@
 	<script src="<c:url value='/js/admin/toggleMode.js'/>"></script>
 	<script src="<c:url value='/js/admin/starRating.js'/>"></script>
 	<script src="<c:url value='/js/admin/UploadAdapter.js'/>"></script>
-	<script>
-	document.addEventListener('blur', function(e) {
-	    if (e.target.id === 'lastPostDate' || e.target.id === 'startPostDate') {
-	        adjustDate(e.target);
-	    }
-	}, true); // true를 사용하여 캡처링 단계에서 이벤트를 처리
-
-	// Function to adjust date
-	function adjustDate(input) {
-	    const today = new Date();
-	    let date = new Date(input.value);
-	    const maxYear = 2099;
-
-	    // Check if the date is invalid
-	    if (isNaN(date.getTime())) {
-	        date = new Date();
-	        date.setFullYear(maxYear);
-	    }
-
-	    // Ensure the date is not before today
-	    if (date < today) {
-	        date = today;
-	    }
-
-	    // Ensure the year does not exceed the maximum year
-	    if (date.getFullYear() > maxYear) {
-	        date.setFullYear(maxYear);
-	    }
-
-	    input.value = date.toISOString().split('T')[0];
-	}
-
-    </script>
 </body>
 </html>

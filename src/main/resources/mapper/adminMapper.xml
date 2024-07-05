@@ -910,23 +910,164 @@
 		resultType="java.lang.Long">
 		SELECT SUM(TOTAL_AMOUNT)
 		FROM ORDER_TB
-		WHERE IDENTIFIER_ID = #{customerId}
+		WHERE IDENTIFIER_ID =
+		#{customerId}
 		AND IDENTIFIER_TYPE = 'CUSTOMER'
-		AND ORDER_DATE >= ADD_MONTHS(SYSDATE, -3)
+		AND ORDER_DATE >=
+		ADD_MONTHS(SYSDATE, -3)
 	</select>
 	<select id="getMemberRatingByTotalAmount"
 		resultType="com.food.domain.user.dto.MemberRatingDTO">
 		SELECT *
 		FROM MEMBER_RATING_TB
-		WHERE #{totalAmount} BETWEEN MIN_AMOUNT AND MAX_AMOUNT
+		WHERE #{totalAmount} BETWEEN
+		MIN_AMOUNT AND MAX_AMOUNT
 	</select>
-    <select id="findAllCustomerIds" resultType="java.lang.Long">
-        SELECT ID
-        FROM CUSTOMER_TB
-    </select>
+	<select id="findAllCustomerIds" resultType="java.lang.Long">
+		SELECT ID
+		FROM
+		CUSTOMER_TB
+	</select>
 
-    <insert id="insertCouponToCustomer">
-        INSERT INTO COUPON_ISSUANCE_TB (CUSTOMER_ID, DISCOUNT_ID, COUPON_NUMBER, ISSUED_AT, USED_YN)
-        VALUES (#{customerId}, #{couponId}, #{couponNumber}, CURRENT_TIMESTAMP, 'N')
-    </insert>
+	<insert id="insertCouponToCustomer">
+		INSERT INTO COUPON_ISSUANCE_TB (CUSTOMER_ID,
+		DISCOUNT_ID, COUPON_NUMBER,
+		ISSUED_AT, USED_YN)
+		VALUES (#{customerId},
+		#{couponId}, #{couponNumber}, CURRENT_TIMESTAMP, 'N')
+	</insert>
+
+	<select id="findOrders">
+		SELECT *
+		FROM ORDER_TB
+	</select>
+
+	<select id="findOrderStatusByOrderId" parameterType="Long">
+		SELECT ID,
+		ORDER_ID, ORDER_STATUS, DESCRIPTION, CREATED_DATE, UPDATED_DATE
+		FROM
+		ORDER_STATUS_TB
+		WHERE ORDER_ID = #{orderId}
+	</select>
+
+	<select id="findOrderDetailListByOrderId">
+		SELECT ID, ORDER_ID, SALES_POST_ID, UNIT_PRICE,
+		DISCOUNT_PRICE, QUANTITY
+		FROM ORDER_DETAIL_TB
+		WHERE ORDER_ID =
+		#{orderId}
+	</select>
+	<select id="findOrdersWithSearch" parameterType="map">
+		SELECT DISTINCT O.*
+		FROM ORDER_TB O
+		JOIN ORDER_STATUS_TB T ON T.ORDER_ID
+		= O.ID
+		JOIN ORDER_DETAIL_TB D ON D.ORDER_ID = O.ID
+		JOIN CUSTOMER_TB C ON
+		C.ID = O.IDENTIFIER_ID
+		JOIN USER_TB U ON U.ID = C.USER_ID
+		JOIN
+		SALES_POST_TB S ON S.ID = D.SALES_POST_ID
+		WHERE 1=1
+		<if test="paymentType != null and paymentType != ''">
+			AND O.PAYMENT_TYPE = #{paymentType}
+		</if>
+		<if test="orderStatus != null and orderStatus != ''">
+			AND T.ORDER_STATUS = #{orderStatus}
+		</if>
+		<if
+			test="order_fr_date != null and order_fr_date != '' and order_to_date != null and order_to_date != ''">
+			AND TRUNC(O.ORDER_DATE) &gt;= TO_DATE(#{order_fr_date},
+			'YYYY-MM-DD')
+			AND TRUNC(O.ORDER_DATE) &lt;= TO_DATE(#{order_to_date},
+			'YYYY-MM-DD')
+		</if>
+		<if test="searchInput != null and searchInput != ''">
+			AND (S.TITLE LIKE '%' || #{searchInput} || '%'
+			OR
+			U.USERNAME LIKE '%' || #{searchInput} || '%'
+			OR C.NAME LIKE '%' ||
+			#{searchInput} || '%'
+			OR O.ORDER_NUMBER LIKE '%' || #{searchInput} ||
+			'%')
+		</if>
+	</select>
+	<select id="findPaymentCompletedOrders" parameterType="map">
+		SELECT O.*
+		FROM ORDER_TB O
+		JOIN ORDER_STATUS_TB T ON O.ID = T.ORDER_ID
+		WHERE 1 = 1
+		<if test="status != null and status != ''">
+			AND T.ORDER_STATUS IN
+			<foreach item="stat" index="index"
+				collection="status.split(',')" open="(" separator="," close=")">
+				#{stat}
+			</foreach>
+		</if>
+	</select>
+	<select id="findPaymentCompletedOrdersWithSearch"
+		parameterType="map">
+		SELECT DISTINCT O.*
+		FROM ORDER_TB O
+		JOIN ORDER_STATUS_TB T ON T.ORDER_ID
+		= O.ID
+		JOIN ORDER_DETAIL_TB D ON D.ORDER_ID = O.ID
+		JOIN CUSTOMER_TB C ON
+		C.ID = O.IDENTIFIER_ID
+		JOIN USER_TB U ON U.ID = C.USER_ID
+		JOIN
+		SALES_POST_TB S ON S.ID = D.SALES_POST_ID
+		WHERE 1=1
+		<if test="status != null and status != ''">
+			AND T.ORDER_STATUS IN
+			<foreach item="stat" index="index"
+				collection="status.split(',')" open="(" separator="," close=")">
+				#{stat}
+			</foreach>
+		</if>
+		<if test="paymentType != null and paymentType != ''">
+			AND O.PAYMENT_TYPE = #{paymentType}
+		</if>
+		<if
+			test="order_fr_date != null and order_fr_date != '' and order_to_date != null and order_to_date != ''">
+			AND TRUNC(O.ORDER_DATE) &gt;= TO_DATE(#{order_fr_date},
+			'YYYY-MM-DD')
+			AND TRUNC(O.ORDER_DATE) &lt;= TO_DATE(#{order_to_date},
+			'YYYY-MM-DD')
+		</if>
+		<if test="searchInput != null and searchInput != ''">
+			AND (S.TITLE LIKE '%' || #{searchInput} || '%'
+			OR
+			U.USERNAME LIKE '%' || #{searchInput} || '%'
+			OR C.NAME LIKE '%' ||
+			#{searchInput} || '%'
+			OR O.ORDER_NUMBER LIKE '%' || #{searchInput} ||
+			'%')
+		</if>
+	</select>
+	<update id="updateOrderStatus">
+		UPDATE ORDER_STATUS_TB
+		SET ORDER_STATUS = #{status},
+		UPDATED_DATE = CURRENT_TIMESTAMP
+		WHERE ORDER_ID = #{orderId}
+	</update>
+	<select id="findOrdersToConfirm"
+		parameterType="java.time.LocalDateTime" resultType="Long">
+		SELECT O.ID
+		FROM ORDER_TB O
+		JOIN ORDER_STATUS_TB T ON O.ID = T.ORDER_ID
+		WHERE T.ORDER_STATUS = '구매 확정 대기'
+		AND O.ORDER_DATE &lt;= #{oneWeekAgo}
+	</select>
+	<delete id="deleteSalesPostFile">
+		DELETE FROM SALES_POST_FILE_TB WHERE SALES_POST_ID = #{salesPostId}
+	</delete>
+	<update id="updateSalesPost"
+		parameterType="com.food.domain.sales.dto.SalesPostDTO">
+		UPDATE
+		SALES_POST_TB
+		SET ADMIN_ID = #{adminId}, PRODUCT_NUMBER = #{productNumber}, TITLE = #{title}, DESCRIPTION = #{description}, LAST_POST_DATE = #{lastPostDate}, UPDATED_DATE = CURRENT_TIMESTAMP,
+		START_POST_DATE = #{startPostDate}, STATUS = #{status}
+		WHERE id = #{id}
+	</update>
 </mapper>

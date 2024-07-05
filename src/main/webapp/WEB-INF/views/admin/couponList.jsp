@@ -5,7 +5,7 @@
 <html>
 <head>
 <link rel="stylesheet" href="/css/admin/common.css" />
-<link rel="stylesheet" href="/css/admin/adminSalesInquiries.css" />
+<link rel="stylesheet" href="/css/admin/consolidated.css" />
 </head>
 <body class="dark-mode">
 	<div class="dashboard-container">
@@ -90,10 +90,8 @@
 					<button type="button" class="primary search-btn"
 						data-url="/admin/couponList">검색</button>
 					<button type="reset" class="secondary">초기화</button>
-					<button id="deleteSelectedButton" class="danger"
-						data-url="/admin/couponList" data-pageType="couponList">선택삭제</button>
 				</div>
-				     <div class="couponCnD full-width">
+				     <div class="insertordelete full-width">
                         <button type="button" id="addCounpon" class="primary">쿠폰 발행</button>
                         <button id="deleteSelectedButton" class="danger"
 						data-url="/admin/couponList" data-pageType="couponList">선택삭제</button>
@@ -102,13 +100,13 @@
 
 
 			<!-- 상품 목록 -->
-			<div class="product-list-header">
+			<div class="custom-table-header">
 				<div>
 					<span>조회된 쿠폰 수: <strong>${totalElements}</strong>개
 					</span>
 				</div>
 			</div>
-			<table class="product-list dark-mode" id="discountTable">
+			<table class="custom-table dark-mode" id="discountTable">
 				<thead>
 					<tr>
 						<th><input type="checkbox" id="selectAll" class="secondary"></th>

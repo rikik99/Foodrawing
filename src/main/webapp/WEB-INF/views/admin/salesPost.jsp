@@ -5,7 +5,7 @@
 <html>
 <head>
 <link rel="stylesheet" href="/css/admin/common.css" />
-<link rel="stylesheet" href="/css/admin/adminSales.css" />
+<link rel="stylesheet" href="/css/admin/consolidated.css" />
 </head>
 <body class="dark-mode">
 	<div class="dashboard-container">
@@ -102,16 +102,16 @@
 			</div>
 
 			<!-- 상품 목록 -->
-			<div class="product-list-header">
+			<div class="custom-table-header">
 				<div>
 					<span>조회된 판매글 수 : <strong>${totalElements}</strong>개</span>
 				</div>
 				<div class="search-buttons">
 					<button id="deleteSelectedButton" class="danger">선택 삭제</button>
-					<button id="addSalesButton" class="primary">판매글 등록</button>
+					<button id="addSalesButton" class="primary" data-target="insertSalesPost">판매글 등록</button>
 				</div>
 			</div>
-			<table class="product-list dark-mode">
+			<table class="custom-table dark-mode">
 				<thead>
 					<tr>
 						<th><input type="checkbox" id="selectAll" class="secondary"></th>

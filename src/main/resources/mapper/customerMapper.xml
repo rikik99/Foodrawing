@@ -16,6 +16,6 @@
     </select>
 
     <select id="findCustomerById" parameterType="Long" resultType="com.food.domain.user.dto.CustomerDTO">
-        SELECT * FROM CUSTOMER_TB WHERE ID = #{userId}
+        SELECT * FROM CUSTOMER_TB WHERE USER_ID = #{userId}
     </select>
 </mapper>

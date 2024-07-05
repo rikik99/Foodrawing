@@ -23,6 +23,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.food.domain.order.dto.OrderDTO;
+import com.food.domain.order.dto.OrderDetailDTO;
+import com.food.domain.order.dto.OrderStatusDTO;
 import com.food.domain.product.dto.ProductCategoryDTO;
 import com.food.domain.product.dto.ProductDTO;
 import com.food.domain.product.dto.ProductFileDTO;
@@ -38,6 +41,7 @@ import com.food.domain.sales.dto.SalesPostDTO;
 import com.food.domain.sales.dto.SalesPostFileDTO;
 import com.food.domain.support.dto.InquiriesDTO;
 import com.food.domain.support.dto.ResponseDTO;
+import com.food.domain.user.controller.AdminController;
 import com.food.domain.user.dto.AdminDTO;
 import com.food.domain.user.dto.CustomerDTO;
 import com.food.domain.user.dto.MemberRatingDTO;
@@ -48,7 +52,8 @@ import com.food.global.util.ProductFile;
 import com.food.global.util.SalesPostFile;
 
 import jakarta.transaction.Transactional;
-
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 public class AdminService {
 
@@ -321,6 +326,7 @@ public class AdminService {
 	public Map<String, String> getProductDetails(String name) {
 		Map<String, String> details = new HashMap<>();
 		String productCode = adminMapper.findProductByName(name);
+		System.out.println("getProductDetails productCode = "+productCode);
 		ProductFileDTO productFileDTO = adminMapper.findProductFileByProductNumber(productCode);
 		String filePath = productFileDTO.getFilePath();
 		details.put("productCode", productCode);
@@ -819,6 +825,7 @@ public class AdminService {
 
 	public List<CustomerDTO> findCustomerList() {
 		List<CustomerDTO> customerList = adminMapper.findCustomerList();
+		System.out.println("service customerList = " + customerList);
 		for (CustomerDTO customer : customerList) {
 			Long userId = customer.getUserId();
 			UserDTO user = adminMapper.findUserById(userId);
@@ -834,54 +841,269 @@ public class AdminService {
 		return customerList;
 	}
 
-    @Transactional
-    public void issueCoupons(List<Long> couponIds, String targetType, String customerIds, int issueCount) {
-        List<Long> targetCustomerIds;
+	@Transactional
+	public void issueCoupons(List<Long> couponIds, String targetType, String customerIds, int issueCount) {
+		List<Long> targetCustomerIds;
 
-        switch (targetType) {
-            case "customers":
-                targetCustomerIds = List.of(customerIds.split(",")).stream().map(Long::parseLong).toList();
-                break;
-            case "rating":
-                targetCustomerIds = getCustomersByRatings(List.of(customerIds.split(",")).stream().map(Long::parseLong).toList());
-                break;
-            case "all":
-                targetCustomerIds = adminMapper.findAllCustomerIds();
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid targetType: " + targetType);
-        }
+		switch (targetType) {
+		case "customers":
+			targetCustomerIds = List.of(customerIds.split(",")).stream().map(Long::parseLong).toList();
+			break;
+		case "rating":
+			targetCustomerIds = getCustomersByRatings(
+					List.of(customerIds.split(",")).stream().map(Long::parseLong).toList());
+			break;
+		case "all":
+			targetCustomerIds = adminMapper.findAllCustomerIds();
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid targetType: " + targetType);
+		}
 
-        for (Long customerId : targetCustomerIds) {
-            for (Long couponId : couponIds) {
-                for (int i = 0; i < issueCount; i++) {
-                    String couponNumber = generateCouponNumber();
-                    adminMapper.insertCouponToCustomer(couponId, customerId, couponNumber);
-                }
-            }
-        }
-    }
+		for (Long customerId : targetCustomerIds) {
+			for (Long couponId : couponIds) {
+				for (int i = 0; i < issueCount; i++) {
+					String couponNumber = generateCouponNumber();
+					adminMapper.insertCouponToCustomer(couponId, customerId, couponNumber);
+				}
+			}
+		}
+	}
 
-    public List<Long> getCustomersByRatings(List<Long> ratings) {
-        List<Long> customerIds = new ArrayList<>();
-        List<CustomerDTO> customerList = adminMapper.findCustomerList();
-        for (CustomerDTO customer : customerList) {
-            Long customerId = customer.getId();
-            Long totalAmount = adminMapper.getTotalAmountByCustomerId(customerId);
-            if (totalAmount != null) {
-                MemberRatingDTO member = adminMapper.getMemberRatingByTotalAmount(totalAmount);
-                if (ratings.contains(member.getId())) {
-                    customerIds.add(customerId);
-                }
-            }
-        }
-        return customerIds;
-    }
+	public List<Long> getCustomersByRatings(List<Long> ratings) {
+		List<Long> customerIds = new ArrayList<>();
+		List<CustomerDTO> customerList = adminMapper.findCustomerList();
+		for (CustomerDTO customer : customerList) {
+			Long customerId = customer.getId();
+			Long totalAmount = adminMapper.getTotalAmountByCustomerId(customerId);
+			if (totalAmount != null) {
+				MemberRatingDTO member = adminMapper.getMemberRatingByTotalAmount(totalAmount);
+				if (ratings.contains(member.getId())) {
+					customerIds.add(customerId);
+				}
+			}
+		}
+		return customerIds;
+	}
 
-    public String generateCouponNumber() {
-        UUID uuid = UUID.randomUUID();
-        BigInteger bigInt = new BigInteger(uuid.toString().replace("-", ""), 16);
-        return bigInt.toString().substring(0, 12); // 숫자로 변환 후 원하는 길이로 자르기
-    }
-    
+	public String generateCouponNumber() {
+		UUID uuid = UUID.randomUUID();
+		BigInteger bigInt = new BigInteger(uuid.toString().replace("-", ""), 16);
+		return bigInt.toString().substring(0, 12); // 숫자로 변환 후 원하는 길이로 자르기
+	}
+
+	public Page<OrderDTO> findOrders(Pageable pageable, Map<String, String> allParams) {
+	    boolean hasSearchParams = allParams.keySet().stream()
+	            .anyMatch(key -> !key.equals("page") && !key.equals("size") && allParams.get(key) != null && !allParams.get(key).isEmpty());
+	    List<OrderDTO> orders = new ArrayList<>();
+	    
+	    if (hasSearchParams) {
+	        orders = adminMapper.findOrdersWithSearch(allParams);
+	    } else {
+	        orders = adminMapper.findOrders();
+	    }
+	    
+	    for (OrderDTO order : orders) {
+	        Long identifierId;
+
+	        if ("CUSTOMER".equals(order.getIdentifierType())) {
+	            Long orderId = order.getId();
+	            identifierId = Long.valueOf(order.getIdentifierId());
+	            CustomerDTO customer = adminMapper.findCustomerByCustomerId(identifierId);
+	            Long userId = customer.getUserId();
+	            UserDTO user = adminMapper.findUserById(userId);
+	            customer.setUserDTO(user);
+	            OrderStatusDTO orderStatus = adminMapper.findOrderStatusByOrderId(orderId);
+	            List<OrderDetailDTO> orderDetailList = adminMapper.findOrderDetailListByOrderId(orderId);
+	            
+	            for (OrderDetailDTO orderDetail : orderDetailList) {
+	                Long salesPostId = orderDetail.getSalesPostId();
+	                SalesPostDTO salesPostDto = adminMapper.findSalesPostById(salesPostId);
+	                String productNumber = salesPostDto.getProductNumber();
+	                ProductDTO product = adminMapper.findProductByProductNumber(productNumber);
+	                salesPostDto.setProductDTO(product);
+	                orderDetail.setSales(salesPostDto);
+	            }
+	            
+	            order.setOrderDetailList(orderDetailList);
+	            order.setOrderStatus(orderStatus);
+	            order.setCustomer(customer);
+	        }
+	    }
+	    
+	    int start = (int) pageable.getOffset();
+	    int end = Math.min((start + pageable.getPageSize()), orders.size());
+	    return new PageImpl<>(orders.subList(start, end), pageable, orders.size());
+	}
+
+	public Page<OrderDTO> findPaymentCompletedOrders(Pageable pageable, Map<String, String> allParams) {
+	    boolean hasSearchParams = allParams.keySet().stream()
+	            .anyMatch(key -> !key.equals("page") && !key.equals("size") && allParams.get(key) != null && !allParams.get(key).isEmpty());
+	    List<OrderDTO> orders = new ArrayList<>();
+	    
+	    if (hasSearchParams) {
+	        orders = adminMapper.findPaymentCompletedOrdersWithSearch(allParams);
+	    } else {
+	        orders = adminMapper.findPaymentCompletedOrders();
+	    }
+	    
+	    for (OrderDTO order : orders) {
+	        Long identifierId;
+
+	        if ("CUSTOMER".equals(order.getIdentifierType())) {
+	            Long orderId = order.getId();
+	            identifierId = Long.valueOf(order.getIdentifierId());
+	            CustomerDTO customer = adminMapper.findCustomerByCustomerId(identifierId);
+	            Long userId = customer.getUserId();
+	            UserDTO user = adminMapper.findUserById(userId);
+	            customer.setUserDTO(user);
+	            OrderStatusDTO orderStatus = adminMapper.findOrderStatusByOrderId(orderId);
+	            List<OrderDetailDTO> orderDetailList = adminMapper.findOrderDetailListByOrderId(orderId);
+	            
+	            for (OrderDetailDTO orderDetail : orderDetailList) {
+	                Long salesPostId = orderDetail.getSalesPostId();
+	                SalesPostDTO salesPostDto = adminMapper.findSalesPostById(salesPostId);
+	                String productNumber = salesPostDto.getProductNumber();
+	                ProductDTO product = adminMapper.findProductByProductNumber(productNumber);
+	                salesPostDto.setProductDTO(product);
+	                orderDetail.setSales(salesPostDto);
+	            }
+	            
+	            order.setOrderDetailList(orderDetailList);
+	            order.setOrderStatus(orderStatus);
+	            order.setCustomer(customer);
+	        }
+	    }
+	    
+	    int start = (int) pageable.getOffset();
+	    int end = Math.min((start + pageable.getPageSize()), orders.size());
+	    return new PageImpl<>(orders.subList(start, end), pageable, orders.size());
+	}
+
+	 public boolean updateOrderStatus(List<Long> orderIds, String progress) {
+	        String status;
+	        switch (progress) {
+	            case "결제 완료":
+	                status = "상품 준비";
+	                break;
+	            case "상품 준비":
+	                status = "배송 준비";
+	                break;
+	            case "배송 준비":
+	                status = "배송 중";
+	                break;
+	            case "배송 중":
+	                status = "배송 완료";
+	                break;
+	            case "배송 완료":
+	            	status = "구매 확정 대기";
+	            	break;
+	            case "취소":
+	            	status = "취소 완료";
+	            	break;
+	            case "반품":
+	            	status = "반품 완료";
+	            	break;
+	            case "교환":
+	            	status = "교환 준비";
+	            	break;
+	            case "교환 준비":
+	            	status = "배송 중";
+	            	break;
+	            default:
+	                throw new IllegalArgumentException("Invalid progress: " + progress);
+	        }
+	        
+	        try {
+	            for (Long orderId : orderIds) {
+	                log.info("Updating order ID: {} to status: {}", orderId, status);
+	                int updatedRows = adminMapper.updateOrderStatus(orderId, status);
+	                if (updatedRows == 0) {
+	                    log.error("Failed to update order ID: {}", orderId);
+	                    return false;
+	                }
+	            }
+	            return true;
+	        } catch (Exception e) {
+	            log.error("Exception occurred while updating order status", e);
+	            return false;
+	        }
+	    }
+
+	// AdminService.java
+	 public Map<String, String> getProductInfo(String name) {
+	     Map<String, String> details = new HashMap<>();
+	     String productNumber = adminMapper.findProductByName(name);
+	     
+	     // Check if productNumber is correctly retrieved
+	     if (productNumber == null || productNumber.isEmpty()) {
+	         throw new IllegalArgumentException("Product not found for name: " + name);
+	     }
+	     
+	     SalesPostDTO sales = adminMapper.findSalesPostByProductNumber(productNumber);
+	     String salesPostId = String.valueOf(sales.getId());
+	     String title = sales.getTitle();
+	     String description = sales.getDescription();
+	     
+	     // DateTimeFormatter to format the dates in yyyy-MM-dd
+	     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	     
+	     String lastPostDate = sales.getLastPostDate() != null ? sales.getLastPostDate().format(formatter) : "";
+	     String startPostDate = sales.getStartPostDate() != null ? sales.getStartPostDate().format(formatter) : "";
+
+	     ProductFileDTO productFileDTO = adminMapper.findProductFileByProductNumber(productNumber);
+	     String filePath = productFileDTO.getFilePath();
+	     
+	     details.put("salesPostId", salesPostId);
+	     details.put("productNumber", productNumber);
+	     details.put("imagePath", filePath);
+	     details.put("lastPostDate", lastPostDate);
+	     details.put("startPostDate", startPostDate);
+	     details.put("description", description);
+	     details.put("title", title);
+	     
+	     return details;
+	 }
+
+	public void updateSalesPost(Map<String, Object> allParams, List<SalesPostFileDTO> fileDTOList) {
+		Long userId = null;
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+			CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+			userId = userDetails.getId();
+		}
+		Long adminId = adminMapper.findAdminByUserId(userId);
+
+		SalesPostDTO salesPost = new SalesPostDTO();
+		salesPost.setId(Long.valueOf((String) allParams.get("salesPostId")));
+		salesPost.setAdminId(adminId);
+		salesPost.setProductNumber((String) allParams.get("productNumber"));
+		salesPost.setTitle((String) allParams.get("title"));
+		salesPost.setDescription((String) allParams.get("description"));
+		salesPost.setCreatedDate(LocalDateTime.now());
+		salesPost.setLastPostDate(
+				LocalDate.parse((String) allParams.get("lastPostDate"), DateTimeFormatter.ISO_DATE).atStartOfDay());
+		salesPost.setUpdatedDate(LocalDateTime.now());
+		salesPost.setStartPostDate(
+				LocalDate.parse((String) allParams.get("startPostDate"), DateTimeFormatter.ISO_DATE).atStartOfDay());
+		salesPost.setStatus(Long.parseLong((String) allParams.get("status")));
+
+		// 판매글 저장
+		adminMapper.updateSalesPost(salesPost);
+
+		// 저장된 판매글의 ID 가져오기
+		Long salesPostId = salesPost.getId();
+		if (salesPostId == null) {
+			throw new RuntimeException("Failed to retrieve generated sales post ID");
+		}
+
+		// 파일 정보 업데이트 및 저장
+		for (SalesPostFileDTO fileDTO : fileDTOList) {
+			adminMapper.deleteSalesPostFile(salesPostId);
+			fileDTO.setSalesPostId(salesPostId);
+			adminMapper.insertSalesPostFile(fileDTO);
+		}
+	}
+
+
 }

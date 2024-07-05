@@ -5,7 +5,7 @@
 <html>
 <head>
 <link rel="stylesheet" href="/css/admin/common.css" />
-<link rel="stylesheet" href="/css/admin/adminDiscount.css" />
+<link rel="stylesheet" href="/css/admin/consolidated.css" />
 </head>
 <body class="dark-mode">
 	<div class="dashboard-container">
@@ -94,7 +94,7 @@
 				</div>
 			</div>
 			<div class="full-width dark-mode between">
-				<div class="product-list-header">
+				<div class="custom-table-header">
 					<div>
 						<span>조회된 할인 수: <strong>${totalElements}</strong>개
 						</span>
@@ -109,7 +109,7 @@
 						data-url="/admin/discountTarget" data-pageType="discountTarget">선택삭제</button>
 				</div>
 			</div>
-			<table class="discount-table product-list dark-mode">
+			<table class="discount-table custom-table dark-mode">
 				<thead>
 					<tr>
 						<th><input type="checkbox" id="selectAll" class="secondary"></th>
