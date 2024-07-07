@@ -5,5 +5,5 @@ import com.food.domain.user.entity.Admin;
 
 public interface AdminRepository extends JpaRepository<Admin, Long> {
 
-    
+
 }

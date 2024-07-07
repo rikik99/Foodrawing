@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="/css/common.css">
 <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <%@ include file="/WEB-INF/include/header.jsp"%>
 <%@ include file="/WEB-INF/include/nav.jsp"%>
 <%@ include file="/WEB-INF/include/mypageSidebar.jsp"%>
@@ -74,6 +75,7 @@
     align-items: center;
     font-size: 16px;
     position: relative;
+    cursor: pointer; /* 클릭 가능하도록 커서 추가 */
 }
 
 .three-box-number {
@@ -90,6 +92,19 @@
     margin: 40px 0; /* 위 아래로 여백을 줘서 좀 더 분리된 느낌 */
 }
 </style>
+<script>
+$(document).ready(function() {
+    $('#couponBox').click(function() {
+        var couponDetails = "<table class='table table-bordered'><thead><tr><th>쿠폰 번호</th><th>할인명</th><th>발행일</th></tr></thead><tbody>";
+        <c:forEach var="coupon" items="${availableCoupons}">
+            couponDetails += "<tr><td>${coupon.couponNumber}</td><td>${coupon.discountName}</td><td>${coupon.issuedAt}</td></tr>";
+        </c:forEach>
+        couponDetails += "</tbody></table>";
+        $('#couponModal .modal-body').html(couponDetails);
+        $('#couponModal').modal('show');
+    });
+});
+</script>
 </head>
 <body>
 
@@ -106,11 +121,11 @@
                     </div>
                     <div class="three-box">
                         적립금
-                        <div class="three-box-number">2</div>
+                        <div class="three-box-number">${totalReserves}</div>
                     </div>
-                    <div class="three-box">
+                    <div class="three-box" id="couponBox">
                         쿠폰
-                        <div class="three-box-number">3</div>
+                        <div class="three-box-number">${couponCount}</div>
                     </div>
                 </div>
                 <div class="circle-container">
@@ -144,6 +159,26 @@
             <div style="text-align:center;">여기다 위시리스트</div>
         </section>
     </div>
+</div>
+
+<!-- Bootstrap Modal -->
+<div class="modal fade" id="couponModal" tabindex="-1" role="dialog" aria-labelledby="couponModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="couponModalLabel">사용 가능한 쿠폰</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- 쿠폰 내용이 여기 삽입됩니다 -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 </body>

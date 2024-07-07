@@ -5,5 +5,5 @@ import com.food.domain.sales.entity.DiscountTarget;
 
 public interface DiscountTargetRepository extends JpaRepository<DiscountTarget, Long> {
 
-    
+
 }

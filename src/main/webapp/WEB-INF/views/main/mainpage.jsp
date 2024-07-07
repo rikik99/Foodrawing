@@ -1,17 +1,16 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>Main Page</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/bestpage.css">
     <link rel="stylesheet" href="/css/common.css">
     <link rel="stylesheet" href="/css/sidebar.css">
     <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
     <style>
         .section {
@@ -143,16 +142,7 @@
             margin: 0 auto;
         }
 
-        .badge {
-            background-color: red;
-            color: white;
-            padding: 5px 10px;
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-size: 12px;
-            font-weight: bold;
-        }
+
 
         .product-card-href {
             position: relative;
@@ -221,8 +211,8 @@
                 </c:when>
             </c:choose>
 
-            <div class="container" >
-                <div class="product-slider" >
+            <div class="container">
+                <div class="product-slider">
                     <c:forEach var="product" items="${recommendedProducts}">
                         <div class="product-card">
                             <div class="product-top">
@@ -250,77 +240,90 @@
             </div>
         </section>
 
-        <div class="section grid" style="border: 1px solid #ccc; padding: 20px; margin-top: 20px;">
-            <div class="grid-item" >
-                <h3 style="text-align: center; font-weight: bold">
-                    할인품목<img src="/images/saleicon.png" class="saleicon">
-                </h3>
-                <div class="now-top item-area" id="discountMainArea">
-                    <c:set var="firstProduct" value="${products[0]}" />
-                    <div class="box">
-                        <a href="#" class="item-link">
-                            <img src="${firstProduct.productFileDTO.filePath}" style="margin: 10px; min-width: 230px; max-width: 400px; width: 100%;">
-                            <div class="box_list_title">${firstProduct.name}</div>
-                        </a>
-                        <div class="box_list_sub">${firstProduct.description}</div>
-                        <div class="box_list_price">${firstProduct.price}원</div>
-                    </div>
-                </div>
-            </div>
-            <div class="grid-item">
-                <div class="slick_slider">
-                    <c:forEach var="product" items="${products}">
-                        <div class="slide_div">
-                            <div class="content-wrapper">
-                                <a href="#" class="item-link"><img src="${product.productFileDTO.filePath}" alt="${product.name}"></a>
-                                <div>
-                                    <h4>${product.name}</h4>
-                                    <p>${product.price}원</p>
-                                    <p>${product.description}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </c:forEach>
+<div class="section grid" style="border: 1px solid #ccc; padding: 20px; margin-top: 20px;">
+    <div class="grid-item">
+        <h3 style="text-align: center; font-weight: bold">
+            할인 품목<img src="/images/saleicon.png" class="saleicon">
+        </h3>
+        <div class="now-top item-area" id="discountMainArea">
+            <c:set var="firstDiscountProduct" value="${discountProducts[0]}" />
+            <div class="box">
+                <a href="#" class="item-link">
+                    <img src="${firstDiscountProduct.productFilePath}" style="margin: 10px; min-width: 230px; max-width: 400px; width: 100%;">
+                    <div class="badge">SALE</div>
+                    <div class="box_list_title">${firstDiscountProduct.productName}</div>
+                </a>
+                <div class="box_list_sub">${firstDiscountProduct.productDescription}</div>
+                <div class="box_list_price">
+                    <span class="text-danger">${firstDiscountProduct.discountedPrice}원</span>
+                    <span class="product-old-price">${firstDiscountProduct.originalPrice}원</span>
                 </div>
             </div>
         </div>
+    </div>
+    <div class="grid-item">
+        <div class="slick_slider">
+            <c:forEach var="product" items="${discountProducts}" varStatus="status">
+                <c:if test="${status.index != 0}">
+                    <div class="slide_div">
+                        <div class="content-wrapper">
+                            <a href="#" class="item-link"><img src="${product.productFilePath}" alt="${product.productName}"></a>
+                            <div>
+                                <div class="badge">SALE</div>
+                                <h4>${product.productName}</h4>
+                                <div class="box_list_price">
+                                    <span class="text-danger">${product.discountedPrice}원</span>
+                                    <span class="product-old-price">${product.originalPrice}원</span>
+                                </div>
+                                <p>${product.productDescription}</p>
+                            </div>
+                        </div>
+                    </div>
+                </c:if>
+            </c:forEach>
+        </div>
+    </div>
+</div>
 
-        <div class="section grid" style="border: 1px solid #ccc; padding: 20px; margin-top: 20px;">
-            <div class="grid-item">
-                <h3 style="text-align: center; font-weight: bold">
-                    베스트 상품
-                </h3>
-                <div class="now-top item-area" id="bestMainArea">
-                    <c:set var="firstBestProduct" value="${bestSellingProducts[0]}" />
-                    <div class="box">
-                        <a href="#" class="item-link">
-                            <img src="${firstBestProduct.filePath}" style="margin: 10px; min-width: 230px; max-width: 400px; width: 100%;">
-                            <div class="badge">BEST</div>
-                            <div class="box_list_title">${firstBestProduct.salesPostTitle}</div>
-                        </a>
-                        <div class="box_list_sub">${firstBestProduct.salesPostDescription}</div>
-                        <div class="box_list_price">${firstBestProduct.unitPrice}원</div>
-                    </div>
-                </div>
-            </div>
-            <div class="grid-item">
-                <div class="slick_slider">
-                    <c:forEach var="product" items="${bestSellingProducts}">
-                        <div class="slide_div">
-                            <div class="content-wrapper">
-                                <a href="#" class="item-link"><img src="${product.filePath}" alt="${product.salesPostTitle}"></a>
-                                <div>
-                                    <div class="badge">BEST</div>
-                                    <h4>${product.salesPostTitle}</h4>
-                                    <p>${product.unitPrice}원</p>
-                                    <p>${product.salesPostDescription}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </c:forEach>
-                </div>
+
+<div class="section grid" style="border: 1px solid #ccc; padding: 20px; margin-top: 20px;">
+    <div class="grid-item">
+        <h3 style="text-align: center; font-weight: bold">
+            베스트 상품
+        </h3>
+        <div class="now-top item-area" id="bestMainArea">
+            <c:set var="firstBestProduct" value="${bestSellingProducts[0]}" />
+            <div class="box">
+                <a href="#" class="item-link">
+                    <img src="${firstBestProduct.filePath}" style="margin: 10px; min-width: 230px; max-width: 400px; width: 100%;">
+                    <div class="badge">BEST</div>
+                    <div class="box_list_title">${firstBestProduct.salesPostTitle}</div>
+                </a>
+                <div class="box_list_sub">${firstBestProduct.salesPostDescription}</div>
+                <div class="box_list_price">${firstBestProduct.unitPrice}원</div>
             </div>
         </div>
+    </div>
+    <div class="grid-item">
+        <div class="slick_slider">
+            <c:forEach var="product" items="${bestSellingProducts}" varStatus="status">
+                <c:if test="${status.index != 0}">
+                    <div class="slide_div">
+                        <div class="content-wrapper">
+                            <a href="#" class="item-link"><img src="${product.filePath}" alt="${product.salesPostTitle}"></a>
+                            <div>
+                                <div class="badge">BEST</div>
+                                <h4>${product.salesPostTitle}</h4>
+                                <div class="box_list_price">${product.unitPrice}원</div>
+                                <p>${product.salesPostDescription}</p>
+                            </div>
+                        </div>
+                    </div>
+                </c:if>
+            </c:forEach>
+        </div>
+    </div>
+</div>
 
         <div class="section">
             <h1 style="text-align: center;">메인 품목</h1>

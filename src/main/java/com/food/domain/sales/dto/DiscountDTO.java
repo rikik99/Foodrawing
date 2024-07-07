@@ -23,4 +23,5 @@ public class DiscountDTO {
     private Long maxDiscount;
     private String description;
     private Long minPrice;
+
 }

@@ -3,10 +3,11 @@ package com.food.domain.user.service;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
-import com.food.global.auth.UserNotFoundException;
+
 import com.food.domain.user.dto.CustomerDTO;
 import com.food.domain.user.dto.UserDTO;
 import com.food.global.auth.CustomUserDetails;
+import com.food.global.auth.UserNotFoundException;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {

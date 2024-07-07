@@ -1,20 +1,21 @@
 package com.food.domain.product.controller;
 
-import com.food.domain.product.dto.BestDTO;
-import com.food.domain.product.dto.ProductDTO;
-import com.food.domain.product.dto.ProductFileDTO;
-import com.food.domain.product.dto.ProductCategoryDTO;
-import com.food.domain.product.service.ProductMainService;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
 
-import java.util.List;
+import com.food.domain.product.dto.BestDTO;
+import com.food.domain.product.dto.ProductCategoryDTO;
+import com.food.domain.product.dto.ProductDTO;
+import com.food.domain.product.dto.ProductFileDTO;
+import com.food.domain.product.service.ProductMainService;
+import com.food.domain.sales.dto.Discount2DTO;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
@@ -34,6 +35,7 @@ public class ProductMainController {
         List<ProductFileDTO> productFiles = productMainService.getAllProductFiles();
         List<ProductCategoryDTO> allCategories = productMainService.getAllCategories();
         List<BestDTO> bestSellingProducts = productMainService.getBestSellingProducts();
+        List<Discount2DTO> discountProducts = productMainService.getDiscountProducts(); // 추가된 부분
 
         model.addAttribute("category", category);
         log.info("category = {}", category);
@@ -47,9 +49,8 @@ public class ProductMainController {
         log.info("allCategories = {}", allCategories);
         model.addAttribute("bestSellingProducts", bestSellingProducts);
         log.info("bestSellingProducts = {}", bestSellingProducts);
+        model.addAttribute("discountProducts", discountProducts); // 추가된 부분
+        log.info("discountProducts = {}", discountProducts);
         return "main/mainpage";
     }
-
-
 }
-

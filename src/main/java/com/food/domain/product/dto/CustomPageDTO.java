@@ -23,7 +23,7 @@ public class CustomPageDTO {
     private Long sodium;
     private Long cholesterol;
     private Long weight;
-    
+
     private String name;
     private String description;
     private Long price;

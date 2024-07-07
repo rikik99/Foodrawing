@@ -5,5 +5,5 @@ import com.food.domain.support.entity.Response;
 
 public interface ResponseRepository extends JpaRepository<Response, Long> {
 
-    
+
 }

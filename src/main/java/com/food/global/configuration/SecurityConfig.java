@@ -5,14 +5,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.firewall.HttpFirewall;
-import org.springframework.security.web.firewall.StrictHttpFirewall;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.food.domain.user.service.CustomOAuth2UserService;
 import com.food.domain.user.service.CustomUserDetailsService;
@@ -57,55 +55,57 @@ public class SecurityConfig {
 		return new JwtAuthenticationFilter(jwtUtil, customUserDetailsService);
 	}
 
-    @Bean
-    public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()).securityMatcher("/admin/**")
-            .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                .requestMatchers("/admin/login", "/admin/loginFail").permitAll()
-                .anyRequest().hasAuthority("ROLE_ADMIN"))
-            .formLogin(formLogin -> formLogin
-                .loginPage("/admin/login")
-                .loginProcessingUrl("/admin/login")
-                .defaultSuccessUrl("/admin/mainContent", true)
-                .successHandler(customAuthenticationSuccessHandler)
-                .failureHandler(customAuthenticationFailureHandler)
-                .permitAll())
-            .logout(logout -> logout
-                .logoutUrl("/admin/logout")
-                .logoutSuccessHandler((request, response, authentication) -> {
-                    Cookie cookie = new Cookie("jwt", null);
-                    cookie.setHttpOnly(true);
-                    cookie.setSecure(false); // HTTP 환경에서는 false로 설정
-                    cookie.setPath("/");
-                    cookie.setMaxAge(0); // 쿠키 삭제
-                    response.addCookie(cookie);
-                    request.getSession().invalidate(); // 세션 무효화
-                    response.sendRedirect("/login");
-                })
-                .permitAll())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // 세션을 필요할 때만 생성하도록 설정
-            .userDetailsService(customUserDetailsService);
+	@Bean
+	public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
+		http.csrf(csrf -> csrf.disable()).securityMatcher("/admin/**")
+				.authorizeHttpRequests(authorizeRequests -> authorizeRequests
+						.requestMatchers("/admin/login", "/admin/loginFail").permitAll()
+						.anyRequest().hasAuthority("ROLE_ADMIN"))
+				.formLogin(formLogin -> formLogin.loginPage("/admin/login").loginProcessingUrl("/admin/login")
+						.defaultSuccessUrl("/admin/mainContent", true)
+						.successHandler(customAuthenticationSuccessHandler)
+						.failureHandler(customAuthenticationFailureHandler).permitAll())
+				.logout(logout -> logout.logoutUrl("/admin/logout")
+						.logoutSuccessHandler((request, response, authentication) -> {
+							Cookie cookie = new Cookie("jwt", null);
+							cookie.setHttpOnly(true);
+							cookie.setSecure(false); // HTTP 환경에서는 false로 설정
+							cookie.setPath("/");
+							cookie.setMaxAge(0); // 쿠키 삭제
+							response.addCookie(cookie);
+							request.getSession().invalidate(); // 세션 무효화
+							response.sendRedirect("/login");
+						}).permitAll())
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // 세션을
+																												// 필요할
+																												// 때만
+																												// 생성하도록
+																												// 설정
+				.userDetailsService(customUserDetailsService);
 
-        // X-Frame-Options SAMEORIGIN 설정 추가
-        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
+		// X-Frame-Options SAMEORIGIN 설정 추가
+		http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
-        return http.build();
-    }
+		return http.build();
+	}
 
 	@Bean
 	public SecurityFilterChain userSecurityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(csrf -> csrf.disable())
-				.authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/", "/login",
-						"/loginFail", "/signup", "/WEB-INF/views/**", "/css/**", "/js/**", "/images/**",
-						"/sendVerificationEmail", "/verify", "/signupInfo", "/main/custompage", "/main/mainpage", "/mainpage",
-						"/nutrition", "/verificationSuccess", "/verificationFail", "/checkDuplicateUsername",
-						"/invalidateSession", "/linkAccount", "/findUsername", "/verify-id-code", "/showUsername",
-						"/findPassword", "/sendPasswordResetCode", "/verify-password-code", "/passwordReset", "/best",
-						"/ProductDetail", "/cart/checkStock", "/cart/addToCart", "/cart", "/cart/deleteCartItem",
-						"/order/prepareCheckout", "/checkoutPage", "/order/prepareCheckoutAll", "/cart/updateCartItem",
-						"/cart/deleteSelectedItems", "/payment/result", "/payment/restoreStock", "/buy/checkoutPage",
-						"/wishlist/add", "/wishlist/remove" ,"/myPage","/myPageInfo").permitAll()
-						.anyRequest().authenticated())
+				.authorizeHttpRequests(authorizeRequests -> authorizeRequests
+						.requestMatchers("/", "/login", "/loginFail", "/signup", "/WEB-INF/views/**", "/css/**",
+								"/js/**", "/images/**", "/sendVerificationEmail", "/verify", "/signupInfo",
+								"/main/custompage", "/mainpage", "/nutrition", "/verificationSuccess",
+								"/verificationFail", "/checkDuplicateUsername", "/invalidateSession", "/linkAccount",
+								"/findUsername", "/verify-id-code", "/showUsername", "/findPassword",
+								"/sendPasswordResetCode", "/verify-password-code", "/passwordReset", "/main/best",
+								"/ProductDetail", "/cart/checkStock", "/cart/addToCart", "/cart", "/cart/deleteCartItem",
+								"/order/prepareCheckout", "/checkoutPage", "/order/prepareCheckoutAll",
+								"/cart/updateCartItem", "/cart/deleteSelectedItems", "/payment/result",
+								"/payment/restoreStock", "/buy/checkoutPage", "/wishlist/add", "/wishlist/remove",
+								"/myPageInfo", "/myPage","/user/myPageOrder","/user/updateOrderStatus","/discounts/discountpage").permitAll() // 추가
+						.anyRequest().hasAuthority("ROLE_USER"))
+				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 				.formLogin(formLogin -> formLogin.loginPage("/login").defaultSuccessUrl("/", true)
 						.successHandler(customAuthenticationSuccessHandler)
 						.failureHandler(customAuthenticationFailureHandler).permitAll())
@@ -123,14 +123,18 @@ public class SecurityConfig {
 							request.getSession().invalidate(); // 세션 무효화
 							response.sendRedirect("/login");
 						}).permitAll())
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // 세션을 필요할 때만 생성하도록 설정
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // 세션을
+																												// 필요할
+																												// 때만
+																												// 생성하도록
+																												// 설정
 				.userDetailsService(customUserDetailsService);
 
-        // X-Frame-Options SAMEORIGIN 설정 추가
-        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
+		// X-Frame-Options SAMEORIGIN 설정 추가
+		http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
-        return http.build();
-    }
+		return http.build();
+	}
 
 	@Bean
 	public UserDetailsService userDetailsService() {

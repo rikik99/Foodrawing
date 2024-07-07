@@ -25,8 +25,8 @@ public class ProductDTO {
     private ProductCategoryDTO productCategoryDTO;
     private SalesPostDTO salesPostDTO;
     private StockDTO stockDTO;
-    private StockTransactionDTO stockTransactionDTO; 
-    
+    private StockTransactionDTO stockTransactionDTO;
+
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public String getFormattedCreatedDate() {
@@ -35,5 +35,5 @@ public class ProductDTO {
         }
         return "";
     }
-    
+
 }

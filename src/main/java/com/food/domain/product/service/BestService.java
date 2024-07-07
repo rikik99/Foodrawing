@@ -1,10 +1,12 @@
 package com.food.domain.product.service;
 
-import com.food.domain.product.dto.BestDTO;
-import com.food.domain.product.mapper.BestMapper;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.List;
+
+import com.food.domain.product.dto.BestDTO;
+import com.food.domain.product.mapper.BestMapper;
 
 @Service
 public class BestService {

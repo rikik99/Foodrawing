@@ -51,7 +51,7 @@ public class AdminService {
 
     @Value("${file.upload-dir}")
     private String uploadDir;
-	
+
 	public Page<ProductDTO> findProductList(Pageable pageable) {
 		List<ProductDTO> products = adminMapper.findProductList();
 		List<ProductDTO> productList = new ArrayList<>();
@@ -138,8 +138,8 @@ public class AdminService {
     }
 
 	public Page<ProductDTO> findStockListWithSearch(Map<String, String> allParams) {
-		int page = Integer.parseInt((String) allParams.get("page"));
-		int size = Integer.parseInt((String) allParams.get("size"));
+		int page = Integer.parseInt(allParams.get("page"));
+		int size = Integer.parseInt(allParams.get("size"));
 		Pageable pageable = PageRequest.of(page, size);
 
 		List<ProductDTO> products = adminMapper.finddStockListByKeyword(allParams);
@@ -166,7 +166,7 @@ public class AdminService {
 	}
 
 	public Page<ProductDTO> findStockList(Pageable pageable) {
-		
+
 		List<ProductDTO> products = adminMapper.findProductList();
 		List<ProductDTO> productList = new ArrayList<>();
 
@@ -190,12 +190,12 @@ public class AdminService {
 
 		return page;
 	}
-	
+
 	@Transactional
 	public void stockUpdate(Map<String, Object> allParams) {
 	    String productNumber = (String) allParams.get("productNumber");
 	    String type = (String) allParams.get("type");
-	    Long quantity = Long.valueOf((String) allParams.get("quantity"));
+	    long quantity = Long.parseLong((String) allParams.get("quantity"));
 
 	    // 현재 재고 조회
 	    StockDTO currentStock = adminMapper.findStockByProductNumber(productNumber);
@@ -219,7 +219,7 @@ public class AdminService {
 	    if("OUT".equals(type)) {
 	    	productQuantity += quantity;
 	    	allParams.put("productQuantity", productQuantity);
-	    	adminMapper.updateQuantity(allParams);	    	
+	    	adminMapper.updateQuantity(allParams);
 	    }
 	    adminMapper.insertTransaction(allParams);
 	}
@@ -280,8 +280,8 @@ public class AdminService {
 	}
 
 	public Page<SalesPostDTO> findPostListWithSearch(Map<String, String> allParams) {
-		int page = Integer.parseInt((String) allParams.get("page"));
-		int size = Integer.parseInt((String) allParams.get("size"));
+		int page = Integer.parseInt(allParams.get("page"));
+		int size = Integer.parseInt(allParams.get("size"));
 		Pageable pageable = PageRequest.of(page, size);
 
 		List<SalesPostDTO> posts = adminMapper.findPostListWithSearch(allParams);
@@ -379,7 +379,7 @@ public class AdminService {
 				Inquiry.setCustomerDTO(customerDTO);
 				inquirieList.add(Inquiry);
 			}
-						
+
 			int start = (int) pageable.getOffset();
 			int end = Math.min((start + pageable.getPageSize()), inquirieList.size());
 			Page<InquiriesDTO> page = new PageImpl<>(inquirieList.subList(start, end), pageable, inquirieList.size());
@@ -395,7 +395,7 @@ public class AdminService {
 				Inquiry.setSalesPotDTO(salesPotDTO);
 				inquirieList.add(Inquiry);
 			}
-						
+
 			int start = (int) pageable.getOffset();
 			int end = Math.min((start + pageable.getPageSize()), inquirieList.size());
 			Page<InquiriesDTO> page = new PageImpl<>(inquirieList.subList(start, end), pageable, inquirieList.size());

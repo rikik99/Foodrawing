@@ -5,5 +5,5 @@ import com.food.domain.product.entity.ProductCategoryMapping;
 
 public interface ProductCategoryMappingRepository extends JpaRepository<ProductCategoryMapping, Long> {
 
-    
+
 }

@@ -5,5 +5,5 @@ import com.food.domain.user.entity.CustomerPreferences;
 
 public interface CustomerPreferencesRepository extends JpaRepository<CustomerPreferences, Long> {
 
-    
+
 }

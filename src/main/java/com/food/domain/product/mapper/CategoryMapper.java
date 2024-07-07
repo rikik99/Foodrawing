@@ -1,11 +1,12 @@
 package com.food.domain.product.mapper;
 
-import com.food.domain.product.dto.ProductCategoryDTO;
-import com.food.domain.product.dto.ProductCategoryMappingDTO;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import com.food.domain.product.dto.ProductCategoryDTO;
+import com.food.domain.product.dto.ProductCategoryMappingDTO;
 
 @Mapper
 public interface CategoryMapper {

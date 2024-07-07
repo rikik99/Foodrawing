@@ -1,13 +1,15 @@
 package com.food.domain.product.controller;
 
-import com.food.domain.product.dto.BestDTO;
-import com.food.domain.product.service.BestService;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import java.util.List;
+
+import com.food.domain.product.dto.BestDTO;
+import com.food.domain.product.service.BestService;
 
 @Controller
 @RequestMapping("/main")
@@ -33,5 +35,5 @@ public class BestController {
         model.addAttribute("bestSellingProducts", bestSellingProducts);
         return "main/mainpage";
     }
-     
+
 }

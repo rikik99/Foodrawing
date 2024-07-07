@@ -5,5 +5,5 @@ import com.food.domain.support.entity.Faq;
 
 public interface FaqRepository extends JpaRepository<Faq, Long> {
 
-    
+
 }

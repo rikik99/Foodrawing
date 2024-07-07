@@ -5,5 +5,5 @@ import com.food.domain.sales.entity.ReviewFile;
 
 public interface ReviewFileRepository extends JpaRepository<ReviewFile, Long> {
 
-    
+
 }

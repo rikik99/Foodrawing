@@ -7,7 +7,7 @@ import com.food.domain.product.mapper.WishListMapper;
 
 @Service
 public class WishListService {
-	
+
 	@Autowired
 	private WishListMapper wishListMapper;
 
