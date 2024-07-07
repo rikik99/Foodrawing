@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Ensure page scrolls to top on refresh
-    window.addEventListener('beforeunload', function () {
+    /*window.addEventListener('beforeunload', function () {
         history.replaceState(null, null, 'http://localhost:9086/ProductDetail');
-    });
+    });*/
 });

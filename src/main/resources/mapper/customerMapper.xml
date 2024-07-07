@@ -5,7 +5,7 @@
 <mapper namespace="com.food.domain.user.mapper.CustomerMapper">
     
     <select id="findById" resultType="com.food.domain.user.dto.CustomerDTO">
-        SELECT * FROM CUSTOMER_TB WHERE ID = #{id}
+        SELECT ID, USER_ID, NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE, ADDRESS, ADDRESS_DETAIL, ZIPCODE FROM CUSTOMER_TB WHERE ID = #{id}
     </select>
 
     <update id="updateCustomer">
@@ -21,6 +21,10 @@
     </delete>
 
     <select id="findCustomerByUserId" resultType="com.food.domain.user.dto.CustomerDTO">
+        SELECT * FROM CUSTOMER_TB WHERE USER_ID = #{userId}
+    </select>
+
+    <select id="findCustomerById" parameterType="Long" resultType="com.food.domain.user.dto.CustomerDTO">
         SELECT * FROM CUSTOMER_TB WHERE USER_ID = #{userId}
     </select>
 

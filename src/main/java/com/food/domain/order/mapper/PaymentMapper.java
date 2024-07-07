@@ -8,6 +8,8 @@ import com.food.domain.order.dto.OrderDTO;
 import com.food.domain.order.dto.OrderDetailDTO;
 import com.food.domain.order.dto.OrderStatusDTO;
 import com.food.domain.order.dto.PaymentRequest;
+import com.food.domain.user.dto.CustomerReservesDTO;
+import com.food.domain.user.dto.GuestDTO;
 
 @Mapper
 public interface PaymentMapper {
@@ -41,4 +43,10 @@ public interface PaymentMapper {
 	void increaseStock(@Param("productNumber") String productNumber, @Param("quantity") int quantity);
 
 	void deleteOrder(Long orderNumber);
+
+	void insertCustomerReserves(CustomerReservesDTO reserve);
+
+	void updateGuest(GuestDTO guestDTO);
+
+	void deleteGuestCartItem(String identifierId, String productNumber);
 }

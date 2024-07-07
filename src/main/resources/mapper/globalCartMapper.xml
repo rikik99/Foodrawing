@@ -4,6 +4,12 @@
 	<select id="getCartItemCount">
 		SELECT NVL(COUNT(*),0) AS count
 		FROM CART_TB
-		WHERE CUSTOMER_ID = 1
+		WHERE CUSTOMER_ID = #{id}
+	</select>
+	
+	<select id="getGuestCartItemCount">
+		SELECT NVL(COUNT(*),0) AS count
+		FROM GUEST_CART_TB
+		WHERE GUEST_ID = #{guestId}
 	</select>
 </mapper>

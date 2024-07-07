@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.food.domain.user.mapper.GuestMapper">
+	<!-- 게스트 아이디 조회 -->
+    <select id="findLastGuestIdByDate" resultType="string">
+        SELECT GUEST_ID 
+		    FROM (
+		        SELECT GUEST_ID 
+		        FROM GUEST_TB
+		        WHERE GUEST_ID LIKE 'GUEST' || #{today} || '%'
+		        ORDER BY GUEST_ID DESC 
+		    )
+		    WHERE ROWNUM = 1
+    </select>
+    
+    <!-- 새로운 게스트 아이디 삽입 -->
+    <insert id="insertGuestId">
+        INSERT INTO GUEST_TB (GUEST_ID)
+        VALUES (#{newGuestId})
+    </insert>
+    
+    <!-- 재고 확인 -->
+    <select id="checkStock" resultType="boolean">
+        SELECT CASE 
+            WHEN QUANTITY &gt;= #{quantity} THEN TRUE 
+            ELSE FALSE 
+        END
+        FROM PRODUCT_TB
+        WHERE PRODUCT_NUMBER = #{productNumber}
+    </select>
+
+    <!-- 게스트의 장바구니에 상품이 있는지 확인 -->
+    <select id="isInCart">
+        SELECT 
+		    CASE 
+		        WHEN COUNT(*) > 0 THEN 1 
+		        ELSE 0 
+		    END AS result
+		FROM GUEST_CART_TB
+		WHERE PRODUCT_NUMBER = #{productNumber} 
+		  AND GUEST_ID = #{guestId}
+    </select>
+
+    <!-- 게스트의 장바구니에 상품 추가 -->
+    <insert id="addToCart">
+        INSERT INTO GUEST_CART_TB (GUEST_ID, PRODUCT_NUMBER, QUANTITY, LAST_DATE)
+        VALUES (#{guestId}, #{productNumber}, #{quantity}, #{lastDate})
+    </insert>
+
+    <!-- 게스트의 장바구니에 있는 상품 업데이트 -->
+    <update id="updateCartItem">
+        UPDATE GUEST_CART_TB
+        SET QUANTITY = #{quantity}, LAST_DATE = #{lastDate}
+        WHERE GUEST_ID = #{guestId} 
+          AND PRODUCT_NUMBER = #{productNumber}
+    </update>
+
+    <!-- 게스트의 장바구니에서 상품 삭제 -->
+    <delete id="deleteCartItem">
+        DELETE FROM GUEST_CART_TB
+        WHERE GUEST_ID = #{guestId} 
+          AND PRODUCT_NUMBER = #{productNumber}
+    </delete>
+
+    <!-- 게스트의 장바구니에서 선택된 상품 삭제 -->
+    <delete id="deleteSelectedItems">
+        DELETE FROM GUEST_CART_TB
+        WHERE GUEST_ID = #{guestId} 
+          AND PRODUCT_NUMBER IN
+        <foreach item="item" index="index" collection="productNumbers" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+    
+    <!-- 게스트 ID와 상품 번호로 장바구니 항목 찾기 -->
+    <select id="findByCustomerIdAndProductId" resultType="com.food.domain.order.dto.GuestCartDTO">
+        SELECT GUEST_ID, PRODUCT_NUMBER, QUANTITY, LAST_DATE
+        FROM GUEST_CART_TB
+        WHERE GUEST_ID = #{guestId} 
+          AND PRODUCT_NUMBER = #{productNumber}
+    </select>
+    
+    <!-- 게스트 카트에 상품 추가 -->
+    <insert id="insertCart">
+    	INSERT INTO GUEST_CART_TB (GUEST_ID, PRODUCT_NUMBER, QUANTITY)
+    	VALUES (#{guestId}, #{productNumber}, #{quantity})
+    </insert>
+    
+    <!-- 주문 가져오기 -->
+    <select id="getGuestByOrderNumberAndName">
+    	SELECT * FROM ORDER_TB
+    	WHERE ORDER_NUMBER = #{OrderNumber}
+    </select>
+    
+    <!-- 주문 상세 가져오기 -->
+    <select id="getOrderDetailsByOrderNumber">
+    	SELECT * FROM ORDER_DETAIL_TB
+    	WHERE ORDER_ID = #{id}
+    </select>
+    
+    <!-- 주문 상태 가져오기 -->
+    <select id="getOrderStatusByOrderNumber">
+    	SELECT * FROM ORDER_STATUS_TB
+    	WHERE ORDER_ID = #{orderId}
+    </select>
+    
+    <!-- 배송 정보 가져오기 -->
+    <select id="getDeliveryByOrderId">
+    	SELECT * FROM DELIVERY_TB
+    	WHERE ORDER_ID = #{orderId}
+    </select>
+</mapper>
