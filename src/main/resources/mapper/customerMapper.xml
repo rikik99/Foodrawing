@@ -16,7 +16,10 @@
 		phone = #{phone}
 		WHERE id = #{id}
 	</update>
-
+    <insert id="insertCustomer" parameterType="com.food.domain.user.dto.CustomerDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
+        INSERT INTO CUSTOMER_TB (USER_ID, NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE, ADDRESS, ADDRESS_DETAIL, ZIPCODE)
+        VALUES (#{userId}, #{nickname}, #{name}, #{gender}, #{phone}, #{email}, #{birthDate}, #{address}, #{addressDetail}, #{zipcode})
+    </insert>
 	<delete id="deleteCustomer">
 		DELETE FROM CUSTOMER_TB WHERE ID = #{id}
 	</delete>
@@ -42,12 +45,9 @@
 		od.DISCOUNT_PRICE as discountPrice,
 		od.QUANTITY as quantity,
 		os.DESCRIPTION as deliveryStatus,
-		'dummy_carrier' as carrier, -- Replace this with the actual carrier column if
-		available
-		'dummy_tracking_number' as trackingNumber, -- Replace this with the actual tracking number
-		column if available
-		CURRENT_DATE as estimatedArrivalDate -- Replace this with the actual estimated
-		arrival date column if available
+		'dummy_carrier' as carrier,
+		'dummy_tracking_number' as trackingNumber,
+		CURRENT_DATE as estimatedArrivalDate
 		FROM ORDER_TB o
 		JOIN ORDER_DETAIL_TB od ON o.ID = od.ORDER_ID
 		JOIN ORDER_STATUS_TB os ON o.ID = os.ORDER_ID
