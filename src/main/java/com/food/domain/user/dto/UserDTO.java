@@ -2,6 +2,7 @@ package com.food.domain.user.dto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,16 +15,16 @@ public class UserDTO {
 	private Long id;
 	private String username;
 	private String password;
-	private Long role; 
+	private Long role;
 	private LocalDateTime createdDate;
 	private String deletedYn;
-	
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
+	private Date birthDate;
+	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
 
-    public String getFormattedCreatedDate() {
-        if (createdDate != null) {
-            return createdDate.format(formatter);
-        }
-        return "";
-    }
+	public String getFormattedCreatedDate() {
+		if (createdDate != null) {
+			return createdDate.format(formatter);
+		}
+		return "";
+	}
 }

@@ -5,5 +5,5 @@ import com.food.domain.sales.entity.SalesPost;
 
 public interface SalesPostRepository extends JpaRepository<SalesPost, Long> {
 
-    
+
 }

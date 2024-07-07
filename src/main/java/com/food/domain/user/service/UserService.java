@@ -100,19 +100,12 @@ public class UserService {
     }
 
     public void linkSocialAccount(Long userId, String provider, String providerId) {
-        if (provider == null || provider.isEmpty() || providerId == null || providerId.isEmpty()) {
-            // 로그를 남기고 메서드를 종료
-            System.out.println("Invalid provider or providerId: provider=" + provider + ", providerId=" + providerId);
-            return;
-        }
-
         UserSocialLinksDTO socialLink = new UserSocialLinksDTO();
         socialLink.setUserId(userId);
         socialLink.setProvider(provider);
         socialLink.setProviderId(providerId);
         userSocialLinksMapper.insertLinks(socialLink);
     }
-
 
     public UserSocialLinksDTO findSocialLinkByProviderAndProviderId(String provider, String providerId) {
         return userSocialLinksMapper.findByProviderAndProviderId(provider, providerId);

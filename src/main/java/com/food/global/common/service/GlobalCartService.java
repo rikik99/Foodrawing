@@ -9,7 +9,7 @@ import com.food.global.common.mapper.GlobalCartMapper;
 public class GlobalCartService {
 	@Autowired
 	GlobalCartMapper cartMapper;
-	
+
 	public int getCartItemCount() {
 		int count = cartMapper.getCartItemCount();
 		return count;

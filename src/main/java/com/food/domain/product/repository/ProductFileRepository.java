@@ -5,5 +5,5 @@ import com.food.domain.product.entity.ProductFile;
 
 public interface ProductFileRepository extends JpaRepository<ProductFile, Long> {
 
-    
+
 }

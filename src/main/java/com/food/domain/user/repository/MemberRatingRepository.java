@@ -5,5 +5,5 @@ import com.food.domain.user.entity.MemberRating;
 
 public interface MemberRatingRepository extends JpaRepository<MemberRating, Long> {
 
-    
+
 }

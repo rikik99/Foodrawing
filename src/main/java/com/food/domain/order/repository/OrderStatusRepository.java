@@ -6,5 +6,5 @@ import com.food.domain.order.entity.OrderStatus;
 
 public interface OrderStatusRepository extends JpaRepository<OrderStatus, Long> {
 
-    
+
 }

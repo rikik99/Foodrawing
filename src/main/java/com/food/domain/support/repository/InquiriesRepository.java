@@ -5,5 +5,5 @@ import com.food.domain.support.entity.Inquiries;
 
 public interface InquiriesRepository extends JpaRepository<Inquiries, Long> {
 
-    
+
 }

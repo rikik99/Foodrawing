@@ -26,8 +26,7 @@ public class CustomerDTO {
 	private Date birthDate;
 	private String address;
 	private String addressDetail;
-	private String zipcode;
-	
+	private String zipcode;	
 	
 	private UserDTO userDTO;
 	private MemberRatingDTO member;
@@ -41,4 +40,8 @@ public class CustomerDTO {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 MM월 dd일");
 		return birthDate != null ? sdf.format(birthDate) : "";
 	}
+
+    public Date getBirthDate() {
+        return birthDate != null ? birthDate : new Date(); // 기본값 설정, 필요에 따라 변경
+    }
 }

@@ -10,7 +10,7 @@ import com.food.global.common.service.GlobalCartService;
 public class GlobalControllerAdvice {
 	@Autowired
 	private GlobalCartService cartService;
-	 
+
 	@ModelAttribute("cartItemCount")
     public int getCartItemCount() {
         return cartService.getCartItemCount(); // 장바구니 아이템 갯수 가져오기

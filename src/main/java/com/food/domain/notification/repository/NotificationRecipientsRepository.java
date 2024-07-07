@@ -5,5 +5,5 @@ import com.food.domain.notification.entity.NotificationRecipients;
 
 public interface NotificationRecipientsRepository extends JpaRepository<NotificationRecipients, Long> {
 
-    
+
 }

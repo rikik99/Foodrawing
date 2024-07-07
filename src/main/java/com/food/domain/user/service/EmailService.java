@@ -26,7 +26,7 @@ public class EmailService {
 
         mailSender.send(message);
     }
-    
+
     public void sendVerificationEmail(String email, String verificationCode) throws MessagingException {
         String subject = "아이디 찾기 인증 코드";
         String content = "아이디 찾기를 위한 인증 코드는 다음과 같습니다: " + verificationCode;
@@ -40,5 +40,5 @@ public class EmailService {
 
         mailSender.send(message);
     }
-    
+
 }

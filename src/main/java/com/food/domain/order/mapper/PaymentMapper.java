@@ -6,9 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import com.food.domain.order.dto.DeliveryDTO;
 import com.food.domain.order.dto.OrderDTO;
 import com.food.domain.order.dto.OrderDetailDTO;
-import com.food.domain.order.dto.OrderDetailRequest;
 import com.food.domain.order.dto.OrderStatusDTO;
-import com.food.domain.order.dto.OrderStatusRequest;
 import com.food.domain.order.dto.PaymentRequest;
 
 @Mapper
@@ -23,7 +21,7 @@ public interface PaymentMapper {
     void updateProductQuantity(@Param("productNumber") String string, @Param("quantity") int i);
 
     void deleteCartItem(@Param("customerId") String customerId, @Param("productNumber") Long long1);
-    
+
     boolean existsOrderNumber(@Param("orderNumber") String orderNumber);
 
 	Long getOrderId(Long orderNumber);

@@ -5,5 +5,5 @@ import com.food.domain.support.entity.Chat;
 
 public interface ChatRepository extends JpaRepository<Chat, Long> {
 
-    
+
 }

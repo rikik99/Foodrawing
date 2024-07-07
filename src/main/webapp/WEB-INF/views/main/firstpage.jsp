@@ -3,6 +3,7 @@
 <html>
 <head>
     <title>Foodrawing</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <style>
 /* 배경 스타일 */
 @property --hue {
@@ -62,19 +63,18 @@ body {
 .letter {
   display: inline-block;
   animation: reveal 1s cubic-bezier(0.77, 0, 0.175, 1) forwards;
-  color: 5dad52;
-    font-family: Paytone One;
-    letter-spacing: -.005em;
-    opacity:0.7;
-    font-weight: 800;
-    font-size: 30px;
+  font-family: 'Paytone One';
+  letter-spacing: -0.005em;
+  opacity: 0.7;
+  font-weight: 800;
+  font-size: 30px;
 }
 
 /* ------------------- */
 
 /* 버튼 스타일 */
-@import url(https://fonts.googleapis.com/css?family=Raleway:400,500,700);
-@import url(https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css);
+@import url('https://fonts.googleapis.com/css?family=Raleway:400,500,700');
+@import url('https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css');
 .snip1477 {
   display: inline-block;
   margin-right: 20px; /* figure 사이의 간격 조절 */
@@ -92,14 +92,12 @@ figure.snip1477 {
   text-align: center;
   font-size: 16px;
   background-color: #000000;
-   border-radius: 30px;
+  border-radius: 30px;
 }
 figure.snip1477 *,
 figure.snip1477 *:before,
 figure.snip1477 *:after {
-  -webkit-box-sizing: border-box;
   box-sizing: border-box;
-  -webkit-transition: all 0.55s ease;
   transition: all 0.55s ease;
 }
 figure.snip1477 img {
@@ -125,13 +123,11 @@ figure.snip1477 .title:after {
 figure.snip1477 .title:before {
   top: 0;
   left: 10px;
-  -webkit-transform: translateX(100%);
   transform: translateX(100%);
 }
 figure.snip1477 .title:after {
   bottom: 0;
   right: 10px;
-  -webkit-transform: translateX(-100%);
   transform: translateX(-100%);
 }
 figure.snip1477 .title div:before,
@@ -145,13 +141,11 @@ figure.snip1477 .title div:after {
 figure.snip1477 .title div:before {
   top: 10px;
   right: 0;
-  -webkit-transform: translateY(100%);
   transform: translateY(100%);
 }
 figure.snip1477 .title div:after {
   bottom: 10px;
   left: 0;
-  -webkit-transform: translateY(-100%);
   transform: translateY(-100%);
 }
 figure.snip1477 h2,
@@ -194,7 +188,6 @@ figure.snip1477:hover img,
 figure.snip1477.hover img {
   zoom: 1;
   filter: alpha(opacity=35);
-  -webkit-opacity: 0.35;
   opacity: 0.35;
 }
 figure.snip1477:hover .title:before,
@@ -205,30 +198,25 @@ figure.snip1477:hover .title div:before,
 figure.snip1477.hover .title div:before,
 figure.snip1477:hover .title div:after,
 figure.snip1477.hover .title div:after {
-  -webkit-transform: translate(0, 0);
   transform: translate(0, 0);
 }
 figure.snip1477:hover .title:before,
 figure.snip1477.hover .title:before,
 figure.snip1477:hover .title:after,
 figure.snip1477.hover .title:after {
-  -webkit-transition-delay: 0.15s;
   transition-delay: 0.15s;
 }
 figure.snip1477:hover figcaption,
 figure.snip1477.hover figcaption {
   opacity: 1;
-  -webkit-transition-delay: 0.2s;
   transition-delay: 0.2s;
 }
 
 </style>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
             $(".food-button").click(function() {
                 const category = $(this).data("category");
-                console.log(category);
                 window.location.href = "/mainpage?category=" + category;
             });
         });
