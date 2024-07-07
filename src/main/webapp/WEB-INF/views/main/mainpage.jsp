@@ -402,7 +402,7 @@
             vertical: true,
             autoplaySpeed: 1000,
             arrows: false,
-            responsive: [
+            responsive: [ 
                 {
                     breakpoint: 768,
                     settings: {
