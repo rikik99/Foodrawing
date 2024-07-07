@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.food.domain.sales.dto.ProductInquiryDTO;
 import com.food.domain.sales.mapper.InquiryMapper;
+import com.food.domain.support.dto.InquiriesDTO;
 
 @Service
 public class InquiryService {
@@ -33,5 +34,9 @@ public class InquiryService {
 
     public int countInquiries(Long salesPostId) {
         return inquiryMapper.countInquiries(salesPostId);
+    }
+    
+    public void saveInquiry(InquiriesDTO inquiry) {
+        inquiryMapper.insertInquiry(inquiry);
     }
 }

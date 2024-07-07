@@ -5,6 +5,8 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface GlobalCartMapper {
 
-	int getCartItemCount();
+	int getCartItemCount(Long id);
+
+	int getGuestCartItemCount(String guestId);
 
 }

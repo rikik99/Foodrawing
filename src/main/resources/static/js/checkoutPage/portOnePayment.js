@@ -21,7 +21,7 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
         const orderNumber = document.getElementById('orderNumber').value;
         const paymentMethod = document.querySelector('.payment-method.selected').getAttribute('data-method');
         const finalPrice = parseInt(document.getElementById('finalPrice').innerText.replace('원', '').replace(',', ''));
-        var discount = parseInt(document.getElementById('discountPrice').innerText.replace('원', '').replace(',', ''));
+        var discount = parseInt(document.getElementById('totalDiscountPrice').innerText.replace('원', '').replace(',', ''));
         
 
         var productNumbers = Array.from(document.querySelectorAll('.productNumber')).map(input => input.value);
@@ -50,6 +50,7 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
         	    deliverName: deliverName,
         	    customerPhone: customerPhone,
         	    deliverPhone: deliverPhone,
+        	    email: customerEmail,
         	    finalPrice: finalPrice,
         	    discount: discount,
         	    orderDetails: orderDetails,
@@ -92,7 +93,7 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
                 pay_method: "card",
                 merchant_uid: 'merchant_' + orderNumber,
                 name: '주문명:결제테스트',
-                amount: 500,
+                amount: finalPrice,
                 buyer_email: customerEmail,
                 buyer_name: customerName,
                 buyer_tel: customerPhone,
@@ -126,14 +127,16 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
 		                	 console.log(data);
 		                     if (data.status === 'success') {
 		                         alert('결제가 성공적으로 완료되었습니다.');
-		                         window.location.href = '/best';
+		                         window.location.href = '/payment/success?orderNumber=' + orderNumber;
 		                     } else {
 		                         alert('결제 처리 중 문제가 발생했습니다: ' + data.message);
+		                         window.location.href = '/cart';
 		                     }
 		                 })
 		                 .catch(err => {
 		                     console.error(err);
 		                     alert('결제 처리 중 오류가 발생했습니다.');
+		                     window.location.href = '/cart';
 		                 });
 		              }
 		              
@@ -176,7 +179,7 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
             		    pay_method: "vbank",
 		                merchant_uid: 'merchant_' + orderNumber,
 		                name: '주문명:결제테스트',
-		                amount: 500,
+		                amount: finalPrice,
 		                buyer_email: customerEmail,
 		                buyer_name: customerName,
 		                buyer_tel: customerPhone,
@@ -210,14 +213,16 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
 		                	 console.log(data);
 		                     if (data.status === 'success') {
 		                         alert('결제가 성공적으로 완료되었습니다.');
-		                         window.location.href = '/best';
+		                         window.location.href = '/payment/success?orderNumber=' + orderNumber;
 		                     } else {
 		                         alert('결제 처리 중 문제가 발생했습니다: ' + data.message);
+		                         window.location.href = '/cart';
 		                     }
 		                 })
 		                 .catch(err => {
 		                     console.error(err);
 		                     alert('결제 처리 중 오류가 발생했습니다.');
+		                     window.location.href = '/cart';
 		                 });
 		              }
 		              
@@ -255,7 +260,7 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
             		    pay_method: "phone",
 		                merchant_uid: 'merchant_' + orderNumber,
 		                name: '주문명:결제테스트',
-		                amount: 500,
+		                amount: finalPrice,
 		                buyer_email: customerEmail,
 		                buyer_name: customerName,
 		                buyer_tel: customerPhone,
@@ -288,14 +293,16 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
 		                	 console.log(data);
 		                     if (data.status === 'success') {
 		                         alert('결제가 성공적으로 완료되었습니다.');
-		                         window.location.href = '/best';
+		                         window.location.href = '/payment/success?orderNumber=' + orderNumber;
 		                     } else {
 		                         alert('결제 처리 중 문제가 발생했습니다: ' + data.message);
+		                         window.location.href = '/cart';
 		                     }
 		                 })
 		                 .catch(err => {
 		                     console.error(err);
 		                     alert('결제 처리 중 오류가 발생했습니다.');
+		                     window.location.href = '/cart';
 		                 });
 		              }
 		              
@@ -330,7 +337,7 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
             		    pay_method: "card",
 		                merchant_uid: 'merchant_' + orderNumber,
 		                name: '주문명:결제테스트',
-		                amount: 500,
+		                amount: finalPrice,
 		                buyer_email: customerEmail,
 		                buyer_name: customerName,
 		                buyer_tel: customerPhone,
@@ -363,14 +370,16 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
 		                	 console.log(data);
 		                     if (data.status === 'success') {
 		                         alert('결제가 성공적으로 완료되었습니다.');
-		                         window.location.href = '/best';
+		                         window.location.href = '/payment/success?orderNumber=' + orderNumber;
 		                     } else {
 		                         alert('결제 처리 중 문제가 발생했습니다: ' + data.message);
+		                         window.location.href = '/cart';
 		                     }
 		                 })
 		                 .catch(err => {
 		                     console.error(err);
 		                     alert('결제 처리 중 오류가 발생했습니다.');
+		                     window.location.href = '/cart';
 		                 });
 		              }
 		              
@@ -404,7 +413,7 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
             		    pg: "payco.PARTNERTEST",
 		                merchant_uid: 'merchant_' + orderNumber,
 		                name: '주문명:결제테스트',
-		                amount: 500,
+		                amount: finalPrice,
 		                buyer_email: customerEmail,
 		                buyer_name: customerName,
 		                buyer_tel: customerPhone,
@@ -437,14 +446,16 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
 		                	 console.log(data);
 		                     if (data.status === 'success') {
 		                         alert('결제가 성공적으로 완료되었습니다.');
-		                         window.location.href = '/best';
+		                         window.location.href = '/payment/success?orderNumber=' + orderNumber;
 		                     } else {
 		                         alert('결제 처리 중 문제가 발생했습니다: ' + data.message);
+		                         window.location.href = '/cart';
 		                     }
 		                 })
 		                 .catch(err => {
 		                     console.error(err);
 		                     alert('결제 처리 중 오류가 발생했습니다.');
+		                     window.location.href = '/cart';
 		                 });
 		              }
 		              
@@ -479,7 +490,7 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
             		    pay_method: "card",
 		                merchant_uid: 'merchant_' + orderNumber,
 		                name: '주문명:결제테스트',
-		                amount: 500,
+		                amount: finalPrice,
 		                buyer_email: customerEmail,
 		                buyer_name: customerName,
 		                buyer_tel: customerPhone,
@@ -512,14 +523,16 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
 		                	 console.log(data);
 		                     if (data.status === 'success') {
 		                         alert('결제가 성공적으로 완료되었습니다.');
-		                         window.location.href = '/best';
+		                         window.location.href = '/payment/success?orderNumber=' + orderNumber;
 		                     } else {
 		                         alert('결제 처리 중 문제가 발생했습니다: ' + data.message);
+		                         window.location.href = '/cart';
 		                     }
 		                 })
 		                 .catch(err => {
 		                     console.error(err);
 		                     alert('결제 처리 중 오류가 발생했습니다.');
+		                     window.location.href = '/cart';
 		                 });
 		              }
 		              

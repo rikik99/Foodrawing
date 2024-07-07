@@ -12,5 +12,7 @@ public class RecentProductInfo {
 	private String name;
 	private String filePath;
 	private String discountPrice;
+	private String originalPrice;
 	private String price;
+	private String productNumber;
 }

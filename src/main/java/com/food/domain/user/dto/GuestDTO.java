@@ -16,4 +16,5 @@ public class GuestDTO {
 	private String address;
 	private String addressDetail;
 	private String zipcode;
+	private String guestId;
 }

@@ -45,6 +45,12 @@
         WHERE CUSTOMER_ID = #{identifierId} 
           AND PRODUCT_NUMBER = #{productNumber}
     </delete>
+    
+    <delete id="deleteGuestCartItem">
+        DELETE FROM GUEST_CART_TB 
+        WHERE GUEST_ID = #{identifierId} 
+          AND PRODUCT_NUMBER = #{productNumber}
+    </delete>
 
     <select id="existsOrderNumber" resultType="boolean">
         SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
@@ -82,5 +88,22 @@
     <delete id="deleteOrder">
     	DELETE FROM ORDER_TB WHERE ORDER_NUMBER = #{orderNumber}
     </delete>
+    
+    <insert id="insertCustomerReserves">
+    	INSERT INTO CUSTOMER_RESERVES_TB (CUSTOMER_ID, RESERVES, ORDER_ID, PLUSMINUS)
+    	VALUES (#{customerId}, #{reserves}, #{orderId}, '+')
+    </insert>
+    
+    <update id="updateGuest">
+    	UPDATE GUEST_TB
+    	SET NAME = #{name},
+    		  PHONE = #{phone}, 
+    		  EMAIL = #{email}, 
+    		  PASSWORD = #{password}, 
+    		  ADDRESS = #{address}, 
+    		  ADDRESS_DETAIL = #{addressDetail}, 
+    		  ZIPCODE = #{zipcode}
+    	WHERE GUEST_ID = #{guestId}
+    </update>
 
 </mapper>
