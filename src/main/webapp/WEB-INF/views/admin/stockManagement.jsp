@@ -63,12 +63,12 @@
                 </div>
             </div>
             <!-- 재고 목록 -->
-            <div class="custom-table-header">
+            <div class="product-list-header">
                 <div>
                     <span>조회된 상품 개수: <strong>${totalElements}</strong>개</span>
                 </div>
             </div>
-            <table class="custom-table dark-mode">
+            <table class="product-list dark-mode">
                 <thead>
                     <tr>
                         <th><input type="checkbox" id="selectAll" class="secondary"></th>

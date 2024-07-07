@@ -12,6 +12,7 @@ import com.food.domain.order.dto.OrderDTO;
 import com.food.domain.order.dto.OrderDetailDTO;
 import com.food.domain.order.dto.OrderStatusDTO;
 import com.food.domain.product.dto.ProductCategoryDTO;
+import com.food.domain.product.dto.ProductCategoryMappingDTO;
 import com.food.domain.product.dto.ProductDTO;
 import com.food.domain.product.dto.ProductFileDTO;
 import com.food.domain.product.dto.StockDTO;
@@ -30,6 +31,7 @@ import com.food.domain.user.dto.AdminDTO;
 import com.food.domain.user.dto.CustomerDTO;
 import com.food.domain.user.dto.MemberRatingDTO;
 import com.food.domain.user.dto.UserDTO;
+
 @Mapper
 public interface AdminMapper {
 
@@ -51,12 +53,11 @@ public interface AdminMapper {
 
 	void insertProductFile(ProductFileDTO productFile);
 
-	void updateCategoryById(Long categoryId);
+	void updateCategoryById(int categoryId);
 
-	void insertProductCategoryMapping(String productNumber, Long categoryId);
+	void insertProductCategoryMapping(String productNumber, int categoryId);
 
 	void deleteProductByProductNumber(String productNumber);
-
 
 	StockDTO findStockListByProductNumber(String productNumber);
 
@@ -202,6 +203,40 @@ public interface AdminMapper {
 
 	void deleteSalesPostFile(Long salesPostId);
 
+	void updateProduct(Map<String, String> allParams);
 
+	void deleteProductFile(String productNumber);
+
+	void updateProductCategoryMapping(String productNumber, int categoryId);
+
+	void updateProductCategoryMapping(ProductCategoryMappingDTO mapping);
+
+	Integer findCategoryIdByProductNumber(String productNumber);
+
+	void updateProductNumberInCategoryMapping(String oldProductNumber, String newProductNumber);
+
+	void updateProductNumber(String oldProductNumber, String newProductNumber);
+
+	void updateProductCategoryMappingNumber(String oldProductNumber, String newProductNumber);
+
+	void updateProductFileNumber(String oldProductNumber, String newProductNumber);
+
+	void insertStockByProductNumber(String productNumber);
+
+	List<CouponIssuanceDTO> findCouponIssuancesByCustomerId(Long customerId);
+
+	List<OrderDTO> findOrdersByCustomerId(Long customerId);
+
+	List<InquiriesDTO> findInquiriesByCustomerId(Long customerId);
+
+	Long findTotalOrderAmount(Long customerId);
+
+	Long findTotalReservesByCustomerId(Long customerId);
+
+	List<AdminDTO> findAdminList();
+
+	void createAdmin(Map<String, Object> allParams);
+
+	void createAdminUser(Map<String, Object> allParams);
 
 }

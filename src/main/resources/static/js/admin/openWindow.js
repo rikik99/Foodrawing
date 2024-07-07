@@ -35,3 +35,5 @@ setupOpenWindow('addProduct', '/admin/insertProduct');
 
 // 타겟 수정 윈도우 열기 설정
 setupOpenWindow('editDiscountTarget', '/admin/updateTarget');
+
+setupOpenWindow('addAdmin', '/admin/createAdmin');

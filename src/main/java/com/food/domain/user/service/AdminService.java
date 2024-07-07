@@ -1,5 +1,6 @@
 package com.food.domain.user.service;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,7 +43,6 @@ import com.food.domain.sales.dto.SalesPostDTO;
 import com.food.domain.sales.dto.SalesPostFileDTO;
 import com.food.domain.support.dto.InquiriesDTO;
 import com.food.domain.support.dto.ResponseDTO;
-import com.food.domain.user.controller.AdminController;
 import com.food.domain.user.dto.AdminDTO;
 import com.food.domain.user.dto.CustomerDTO;
 import com.food.domain.user.dto.MemberRatingDTO;
@@ -63,6 +64,9 @@ public class AdminService {
 	@Autowired
 	ProductFile productFileUtil;
 
+	@Autowired
+	PasswordEncoder passwordEncoder;
+	
 	@Autowired
 	SalesPostFile salesPostFileUtil;
 
@@ -131,7 +135,7 @@ public class AdminService {
 
 	@Transactional
 	public void insertProduct(Map<String, String> allParams, MultipartFile file) {
-		Long categoryId = Long.valueOf(allParams.get("category"));
+		int categoryId = Integer.valueOf(allParams.get("category"));
 		String productNumber = allParams.get("productNumber");
 		adminMapper.insertProduct(allParams);
 		try {
@@ -144,6 +148,7 @@ public class AdminService {
 			e.printStackTrace();
 		}
 		adminMapper.insertProductCategoryMapping(productNumber, categoryId);
+		adminMapper.insertStockByProductNumber(productNumber);
 		adminMapper.updateCategoryById(categoryId);
 
 	}
@@ -400,7 +405,7 @@ public class AdminService {
 			Inquiry.setResponseDTO(responseDTO);
 			inquirieList.add(Inquiry);
 		}
-
+		System.out.println(" inquirieList = " + inquirieList);
 		int start = (int) pageable.getOffset();
 		int end = Math.min((start + pageable.getPageSize()), inquirieList.size());
 		Page<InquiriesDTO> page = new PageImpl<>(inquirieList.subList(start, end), pageable, inquirieList.size());
@@ -791,26 +796,39 @@ public class AdminService {
 	}
 
 	public Page<CouponIssuanceDTO> findCouponIssuances(Pageable pageable, Map<String, String> allParams) {
-		List<CouponIssuanceDTO> couponIssuances = adminMapper.findCouponIssuances();
-		List<CouponIssuanceDTO> resultList = new ArrayList<>();
+	    List<CouponIssuanceDTO> couponIssuances = adminMapper.findCouponIssuances();
+	    List<CouponIssuanceDTO> resultList = new ArrayList<>();
 
-		for (CouponIssuanceDTO couponIssuance : couponIssuances) {
-			Long discountId = couponIssuance.getDiscountId();
-			DiscountDTO discount = adminMapper.findDiscountById(discountId);
-			Long customerId = couponIssuance.getCustomerId();
-			CustomerDTO customer = adminMapper.findCustomerByCustomerId(customerId);
-			Long userId = customer.getUserId();
-			String userName = adminMapper.findUserNameById(userId);
-			couponIssuance.setDiscountDTO(discount);
-			couponIssuance.setCustomerDTO(customer);
-			couponIssuance.setUsername(userName);
-			resultList.add(couponIssuance);
-		}
-		int start = (int) pageable.getOffset();
-		int end = Math.min((start + pageable.getPageSize()), resultList.size());
-		Page<CouponIssuanceDTO> page = new PageImpl<>(resultList.subList(start, end), pageable, resultList.size());
-		return page;
+	    for (CouponIssuanceDTO couponIssuance : couponIssuances) {
+	        Long discountId = couponIssuance.getDiscountId();
+	        DiscountDTO discount = adminMapper.findDiscountById(discountId);
+
+	        Long customerId = couponIssuance.getCustomerId();
+	        CustomerDTO customer = adminMapper.findCustomerByCustomerId(customerId);
+	        
+	        // 고객이 없는 경우 예외 처리
+	        if (customer == null) {
+	            log.error("Customer not found for customerId: {}", customerId);
+	            continue;
+	        }
+
+	        Long userId = customer.getUserId();
+	        String userName = adminMapper.findUserNameById(userId);
+
+	        couponIssuance.setDiscountDTO(discount);
+	        couponIssuance.setCustomerDTO(customer);
+	        couponIssuance.setUsername(userName);
+
+	        resultList.add(couponIssuance);
+	    }
+
+	    int start = (int) pageable.getOffset();
+	    int end = Math.min((start + pageable.getPageSize()), resultList.size());
+	    Page<CouponIssuanceDTO> page = new PageImpl<>(resultList.subList(start, end), pageable, resultList.size());
+
+	    return page;
 	}
+
 
 	public void deleteCouponIssuancesById(List<Long> couponIssuanceIds) {
 		for (Long couponIssuanceId : couponIssuanceIds) {
@@ -1072,8 +1090,9 @@ public class AdminService {
 			CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 			userId = userDetails.getId();
 		}
+		System.out.println("updateSalesPost userId = "+userId );
 		Long adminId = adminMapper.findAdminByUserId(userId);
-
+		System.out.println("updateSalesPost adminId = "+adminId );
 		SalesPostDTO salesPost = new SalesPostDTO();
 		salesPost.setId(Long.valueOf((String) allParams.get("salesPostId")));
 		salesPost.setAdminId(adminId);
@@ -1105,5 +1124,150 @@ public class AdminService {
 		}
 	}
 
+	public ProductDTO updateProductForm(String productNumber) {
+		ProductDTO product = adminMapper.findProductByProductNumber(productNumber);
+		ProductCategoryDTO category = adminMapper.findProductCategoryByProductNumber(productNumber);
+		ProductFileDTO file = adminMapper.findProductFileByProductNumber(productNumber);
+		product.setProductCategoryDTO(category);
+		product.setProductFileDTO(file);
+		return product;
+	}
+	
+	@Transactional
+	public void updateProduct(Map<String, String> allParams, MultipartFile file) {
+	    String oldProductNumber = allParams.get("oldProductNumber");
+	    String newProductNumber = allParams.get("productNumber");
+	    int categoryId = Integer.parseInt(allParams.get("category"));
 
+	    // 기존 제품이 존재하는지 확인
+	    ProductDTO existingProduct = adminMapper.findProductByProductNumber(oldProductNumber);
+	    if (existingProduct == null) {
+	        throw new IllegalArgumentException("Product not found for product number: " + oldProductNumber);
+	    }
+
+	    // 기존 카테고리 ID 가져오기
+	    Integer existingCategoryId = adminMapper.findCategoryIdByProductNumber(oldProductNumber);
+
+	    // 기존 카테고리 ID와 새로운 카테고리 ID가 다른 경우에만 updateCategoryById 실행
+	    if (existingCategoryId != categoryId) {
+	        adminMapper.updateCategoryById(categoryId);
+	    }
+
+	    // 부모 테이블에서 제품 번호 업데이트
+	    adminMapper.updateProductNumber(oldProductNumber, newProductNumber);
+
+	    // 제품 정보 업데이트
+	    adminMapper.updateProduct(allParams);
+
+	    // 파일 정보 파싱 및 삽입
+	    try {
+	        ProductFileDTO productFile = productFileUtil.parseFileInfo(newProductNumber, file);
+	        if (productFile != null) {
+	            adminMapper.deleteProductFile(oldProductNumber);
+	            adminMapper.insertProductFile(productFile);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+
+	public Page<CustomerDTO> findCustomers(Pageable pageable, Map<String, String> allParams) {
+	    List<CustomerDTO> customers = adminMapper.findCustomerList();
+	    List<CustomerDTO> customerList = new ArrayList<>();
+
+	    for (CustomerDTO customer : customers) {
+	        Long userId = customer.getUserId();
+	        UserDTO user = adminMapper.findUserById(userId);
+	        Long customerId = customer.getId();
+	        Long totalAmount = adminMapper.getTotalAmountByCustomerId(customerId);
+	        if (totalAmount == null) {
+	            totalAmount = 0L;
+	        }
+	        MemberRatingDTO member = adminMapper.getMemberRatingByTotalAmount(totalAmount);
+	        List<CouponIssuanceDTO> couponIssuances = adminMapper.findCouponIssuancesByCustomerId(customerId);
+	        List<OrderDTO> orders = adminMapper.findOrdersByCustomerId(customerId);
+	        List<InquiriesDTO> inquiries = adminMapper.findInquiriesByCustomerId(customerId);
+	        Long totalOrderAmount = adminMapper.findTotalOrderAmount(customerId);
+	        Long totalReserves = adminMapper.findTotalReservesByCustomerId(customerId);
+
+	        for (CouponIssuanceDTO couponIssuance : couponIssuances) {
+	            Long discountId = couponIssuance.getDiscountId();
+	            DiscountDTO discount = adminMapper.findDiscountById(discountId);
+	            couponIssuance.setDiscountDTO(discount);
+	        }
+
+	        customer.setCouponIssuances(couponIssuances == null ? new ArrayList<>() : couponIssuances);
+	        customer.setUserDTO(user == null ? new UserDTO() : user);
+	        customer.setMember(member == null ? new MemberRatingDTO() : member);
+	        customer.setOrders(orders == null ? new ArrayList<>() : orders);
+	        customer.setInquiries(inquiries == null ? new ArrayList<>() : inquiries);
+	        customer.setTotalOrderAmount(totalOrderAmount == null ? 0L : totalOrderAmount);
+	        customer.setTotalReserves(totalReserves == null ? 0L : totalReserves);
+	        customerList.add(customer);
+	    }
+	    System.out.println("customerList = " + customerList);
+	    int start = (int) pageable.getOffset();
+	    int end = Math.min((start + pageable.getPageSize()), customerList.size());
+	    return new PageImpl<>(customerList.subList(start, end), pageable, customerList.size());
+	}
+
+
+
+	public Page<CustomerDTO> findCustomersWithSearch(Pageable pageable, Map<String, String> allParams) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public List<MemberRatingDTO> findAllMemberRatings() {
+		List<MemberRatingDTO> memberRatings = adminMapper.findAllMemberRatings();
+		return memberRatings;
+	}
+
+	public Page<AdminDTO> findAdmins(Pageable pageable, Map<String, String> allParams) {
+		List<AdminDTO> admins  = adminMapper.findAdminList();
+		List<AdminDTO> adminList = new ArrayList<>();
+	    for (AdminDTO admin : admins) {
+	        Long userId = admin.getUserId();
+	        UserDTO user = adminMapper.findUserById(userId);
+	  
+	        admin.setUser(user == null ? new UserDTO() : user);
+	        adminList.add(admin);
+	    }
+	    int start = (int) pageable.getOffset();
+	    int end = Math.min((start + pageable.getPageSize()), adminList.size());
+	    return new PageImpl<>(adminList.subList(start, end), pageable, adminList.size());
+	}
+
+	public Page<AdminDTO> findAdminsWithSearch(Pageable pageable, Map<String, String> allParams) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Transactional
+	public void createAdmin(Map<String, Object> allParams) {
+	    // 비밀번호 인코딩
+	    String rawPassword = (String) allParams.get("password");
+	    String encodedPassword = passwordEncoder.encode(rawPassword);
+	    allParams.put("password", encodedPassword);
+
+	    // 유저 생성
+	    adminMapper.createAdminUser(allParams);
+
+	    // 생성된 유저 ID를 allParams에 추가
+	    Long userId = ((BigDecimal) allParams.get("userId")).longValue();
+	    allParams.put("userId", userId);
+
+	    // 관리자 생성
+	    adminMapper.createAdmin(allParams);
+	}
+
+
+
+
+
+
+
+
+
+	
 }

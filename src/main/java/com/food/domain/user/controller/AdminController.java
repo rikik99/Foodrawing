@@ -22,6 +22,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,7 +48,9 @@ import com.food.domain.sales.dto.ReviewDTO;
 import com.food.domain.sales.dto.SalesPostDTO;
 import com.food.domain.sales.dto.SalesPostFileDTO;
 import com.food.domain.support.dto.InquiriesDTO;
+import com.food.domain.user.dto.AdminDTO;
 import com.food.domain.user.dto.CustomerDTO;
+import com.food.domain.user.dto.MemberRatingDTO;
 import com.food.domain.user.service.AdminService;
 
 import jakarta.servlet.http.Cookie;
@@ -822,7 +825,7 @@ public class AdminController {
 		ModelAndView mv = new ModelAndView();
 		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
 		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
-		String status = "취소,반품,교환,취소 완료,반품 완료,교환 준비";
+		String status = "취소,반품,교환,교환 준비";
 		allParams.put("status", String.valueOf(status));
 		log.info("orderList allParams = {}", allParams);
 		allParams.put("page", String.valueOf(page));
@@ -946,6 +949,7 @@ public class AdminController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("판매글 등록에 실패했습니다.");
 		}
 	}
+
 	@PutMapping("/updateSalesPost")
 	@ResponseBody
 	public ResponseEntity<?> updateSalesPost(@RequestBody Map<String, Object> allParams) {
@@ -954,7 +958,7 @@ public class AdminController {
 			if (fileDTOListRaw == null) {
 				throw new IllegalArgumentException("fileDTOList is missing in request");
 			}
-			
+
 			List<SalesPostFileDTO> fileDTOList = new ArrayList<>();
 			for (Map<String, Object> fileDTOMap : fileDTOListRaw) {
 				SalesPostFileDTO fileDTO = new SalesPostFileDTO();
@@ -964,13 +968,35 @@ public class AdminController {
 				fileDTO.setUploadDate(LocalDateTime.parse(String.valueOf(fileDTOMap.get("uploadDate"))));
 				fileDTOList.add(fileDTO);
 			}
-			
+
 			adminService.updateSalesPost(allParams, fileDTOList);
 			return ResponseEntity.ok("판매글이 성공적으로 수정되었습니다.");
 		} catch (Exception e) {
 			e.printStackTrace(); // Print the stack trace to see the error
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("판매글 수정에 실패했습니다.");
 		}
+	}
+
+	@GetMapping("/updateProduct/{productNumber}")
+	public ModelAndView updateProductForm(@PathVariable String productNumber) {
+		ModelAndView mv = new ModelAndView();
+		ProductDTO product = adminService.updateProductForm(productNumber);
+		List<ProductCategoryDTO> categoryList = adminService.findCategoryList();
+
+		mv.addObject("product", product);
+		mv.addObject("categoryList", categoryList);
+		mv.setViewName("admin/updateProduct");
+		return mv;
+	}
+
+	@PutMapping("/updateProduct/{oldProductNumber}")
+	@ResponseBody
+	public ResponseEntity<?> updateProduct(@RequestParam Map<String, String> allParams,
+			@RequestPart("file") MultipartFile file, @PathVariable String oldProductNumber) {
+
+		allParams.put("oldProductNumber", oldProductNumber);
+		adminService.updateProduct(allParams, file);
+		return ResponseEntity.ok("상품이 성공적으로 수정되었습니다.");
 	}
 
 	@PatchMapping("/progressOrder")
@@ -987,6 +1013,93 @@ public class AdminController {
 			return ResponseEntity.ok("상태가 성공적으로 변경되었습니다.");
 		} else {
 			return ResponseEntity.status(500).body("상태 변경에 실패했습니다.");
+		}
+	}
+	
+	@GetMapping("/usersManagement")
+	public ModelAndView customerManagement(@RequestParam Map<String, String> allParams) {
+		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+		log.info("customer allParams = {}", allParams);
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		
+		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
+				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
+		
+		Page<CustomerDTO> customers; 
+		if (hasSearchParams) {
+			// 검색 조건이 있을 경우
+			customers = adminService.findCustomersWithSearch(pageable, allParams);
+
+		} else {
+			// 검색 조건이 없을 경우
+			customers = adminService.findCustomers(pageable, allParams);
+		}
+		// 데이터를 확인하기 위해 로그 추가
+		log.info("Customer List: {}", customers);
+		List<MemberRatingDTO> memberRatings = adminService.findAllMemberRatings();
+		// ModelAndView에 데이터 추가
+		mv.addObject("customers", customers);
+		mv.addObject("memberRatings", memberRatings);
+		mv.addObject("currentPage", customers.getNumber());
+		mv.addObject("pageCount", customers.getTotalPages());
+		mv.addObject("totalElements", customers.getTotalElements());
+		mv.addObject("size", size);
+
+		mv.setViewName("admin/usersManagement");
+		return mv;
+	}
+	@GetMapping("/adminManagement")
+	public ModelAndView adminManagement(@RequestParam Map<String, String> allParams) {
+		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+		log.info("customer allParams = {}", allParams);
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		
+		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
+				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
+		
+		Page<AdminDTO> admins; 
+		if (hasSearchParams) {
+			// 검색 조건이 있을 경우
+			admins = adminService.findAdminsWithSearch(pageable, allParams);
+			
+		} else {
+			// 검색 조건이 없을 경우
+			admins = adminService.findAdmins(pageable, allParams);
+		}
+		
+		mv.addObject("admins", admins);
+		mv.addObject("currentPage", admins.getNumber());
+		mv.addObject("pageCount", admins.getTotalPages());
+		mv.addObject("totalElements", admins.getTotalElements());
+		mv.addObject("size", size);
+		
+		mv.setViewName("admin/adminManagement");
+		return mv;
+	}
+	@GetMapping("/createAdmin")
+	public ModelAndView createAdminForm() {
+		ModelAndView mv = new ModelAndView();
+		mv.setViewName("admin/createAdmin");
+		return mv;
+	}
+
+	@PostMapping("/createAdmin")
+	@ResponseBody
+	public ResponseEntity<?> createAdmin(@RequestBody Map<String, Object> allParams) {
+		try {
+			adminService.createAdmin(allParams);
+			return ResponseEntity.ok("관리자가 성공적으로 등록되었습니다.");
+		} catch (Exception e) {
+			e.printStackTrace(); // Print the stack trace to see the error
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("관리자 등록에 실패했습니다.");
 		}
 	}
 }

@@ -184,6 +184,10 @@ document.addEventListener('click', function(e) {
 				alert('답변 작성 중 오류가 발생했습니다.');
 			});
 	}
+	if (e.target.classList.contains(('editButton'))) {
+		const productNumber = e.target.getAttribute('data-productNumber');
+		openWindow(`/admin/updateProduct/${productNumber}`, 'EditWindow');
+	}
 });
 
 document.addEventListener('click', async function(event) {
@@ -307,13 +311,12 @@ function fetchProductInfo(productName) {
 }
 
 function fillFormFields(data) {
-    document.getElementById('productNumber').value = data.productNumber || ''; // Ensure the correct key is used
+    document.getElementById('productNumber').value = data.productNumber || '';
     document.getElementById('title').value = data.title || '';
     document.getElementById('startPostDate').value = data.startPostDate || '';
     document.getElementById('lastPostDate').value = data.lastPostDate || '';
     document.getElementById('salesPostId').value = data.salesPostId || '';
-    
-    // Ensure the status is set only if a matching radio button is found
+
     const statusRadio = document.querySelector(`input[name="status"][value="${data.status}"]`);
     if (statusRadio) {
         statusRadio.checked = true;
@@ -322,46 +325,36 @@ function fillFormFields(data) {
     if (window.editorInstance) {
         window.editorInstance.setData(data.description || '');
     }
+
+    const previewArea = document.querySelector('.previewArea');
+    previewArea.src = data.imagePath || '/images/FooDrawing_Logo.png';
 }
 
-document.addEventListener('change', function(e) {
-    if (e.target && e.target.id === 'productList') {
-        console.log("상품명 선택했어요");
-        updateProductDetails('productList');
-    } else if (e.target && e.target.id === 'updateProductList') {
-        console.log("수정할 상품명 선택");
-        const productName = e.target.value;
-        if (productName) {
-            fetchProductInfo(productName);
-        }
-    }
-});
-
 document.addEventListener('blur', function(e) {
-    if (e.target.id === 'lastPostDate' || e.target.id === 'startPostDate') {
-        adjustDate(e.target);
-    }
+	if (e.target.id === 'lastPostDate' || e.target.id === 'startPostDate') {
+		adjustDate(e.target);
+	}
 }, true);
 
 function adjustDate(input) {
-    const today = new Date();
-    let date = new Date(input.value);
-    const maxYear = 2099;
+	const today = new Date();
+	let date = new Date(input.value);
+	const maxYear = 2099;
 
-    if (isNaN(date.getTime())) {
-        date = new Date();
-        date.setFullYear(maxYear);
-    }
+	if (isNaN(date.getTime())) {
+		date = new Date();
+		date.setFullYear(maxYear);
+	}
 
-    if (date < today) {
-        date = today;
-    }
+	if (date < today) {
+		date = today;
+	}
 
-    if (date.getFullYear() > maxYear) {
-        date.setFullYear(maxYear);
-    }
+	if (date.getFullYear() > maxYear) {
+		date.setFullYear(maxYear);
+	}
 
-    input.value = date.toISOString().split('T')[0];
+	input.value = date.toISOString().split('T')[0];
 }
 
 
@@ -383,6 +376,8 @@ function performSearch(urlPath) {
 		{ id: 'discount_to_date', name: 'discount_to_date' },
 		{ id: 'order_fr_date', name: 'order_fr_date' },
 		{ id: 'order_to_date', name: 'order_to_date' },
+		{ id: 'Issued_fr_date', name: 'Issued_fr_date' },
+		{ id: 'Issued_to_date', name: 'Issued_to_date' },
 		{ id: 'register_fr_date', name: 'register_fr_date' },
 		{ id: 'register_to_date', name: 'register_to_date' },
 		{ id: 'fr_min', name: 'fr_min' },
@@ -664,17 +659,17 @@ function deleteSelectedProducts(urlPath, pageType) {
 		selectedItems = selectedDiscountTargetIds;
 		bodyContent = { discountTargetIds: selectedItems };
 	} else if (pageType === 'couponList') {
-		const selectedCouponListtIds = Array.from(productCheckboxes).map(checkbox => {
+		const selectedCouponListIds = Array.from(productCheckboxes).map(checkbox => {
 			return checkbox.closest('tr').getAttribute('data-issuanceId');
 		});
-		selectedItems = selectedCouponListtIds;
+		selectedItems = selectedCouponListIds;
 		bodyContent = { couponIssuanceIds: selectedItems };
 	}
 
 	if (selectedItems.length > 0) {
 		const endpoint = pageType === 'productManagement' ? '/admin/deleteProducts' :
 			pageType === 'discountList' ? '/admin/deleteDiscounts' :
-				pageType === 'discountTarget' ? '/admin/discountTarget' : '/admin/couponList';
+				pageType === 'discountTarget' ? '/admin/discountTarget' : '/admin/deleteCoupons';
 
 		fetch(endpoint, {
 			method: 'DELETE',
@@ -693,6 +688,7 @@ function deleteSelectedProducts(urlPath, pageType) {
 		alert('삭제할 항목을 선택해주세요.');
 	}
 }
+
 function progressSelectedOrder(urlPath) {
 	const productCheckboxes = document.querySelectorAll('.selectOrder:checked');
 

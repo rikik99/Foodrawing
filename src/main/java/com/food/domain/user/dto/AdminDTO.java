@@ -12,4 +12,6 @@ public class AdminDTO {
 	private String name;
 	private Long userId;
 	private Long accessLevel;
+	
+	private UserDTO user;
 }

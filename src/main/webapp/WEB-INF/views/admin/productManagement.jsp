@@ -87,7 +87,7 @@
 					</span>
 				</div>
 				<div class="deleteAndAdd">
-					<button id="deleteSelectedButton" class="danger" data-url="/admin/stockManagement" data-pageType = "stockManagement">선택삭제</button>
+					<button id="deleteSelectedButton" class="danger" data-url="/admin/productManagement" data-pageType = "productManagement">선택삭제</button>
 					<button id="addProduct" class="primary">상품등록</button>
 				</div>
 			</div>
@@ -136,7 +136,7 @@
 							    </c:otherwise>
 							</c:choose>
 							</td>
-							<td><button class="editButton warning">수정</button></td>
+							<td><button class="editButton primary" data-productNumber = "${product.productNumber}">수정</button></td>
 						</tr>
 					</c:forEach>
 				</tbody>

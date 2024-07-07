@@ -69,7 +69,7 @@
 				</div>
 				<div class="full-width">
 					<div class="half-width number-group">
-						<label for="stock_min">상품 재고</label> <input type="number"
+						<label for="stock_min">진열 수량</label> <input type="number"
 							name="stock_min" id="stock_min" placeholder="이상"
 							class="secondary"> <input type="number" name="stock_max"
 							id="stock_max" placeholder="이하" class="secondary">
@@ -119,7 +119,7 @@
 						<th>작성자</th>
 						<th>상품코드</th>
 						<th>가격</th>
-						<th>재고수량</th>
+						<th>진열 수량</th>
 						<th>상태</th>
 						<th>판매 마감일</th>
 						<th>등록일</th>

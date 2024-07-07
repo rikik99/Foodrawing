@@ -33,11 +33,13 @@
 		<if test="price_max != null">
 			AND P.PRICE &lt;= #{price_max}
 		</if>
-		<if test="fr_date != null and fr_date != ''">
-			AND P.CREATED_DATE &gt;= TO_DATE(#{fr_date}, 'YYYY-MM-DD')
+		<if test="Issued_fr_date != null and Issued_fr_date != ''">
+			AND TRUNC(P.CREATED_DATE) &gt;= TO_DATE(#{Issued_fr_date},
+			'YYYY-MM-DD')
 		</if>
-		<if test="to_date != null and to_date != ''">
-			AND P.CREATED_DATE &lt;= TO_DATE(#{to_date}, 'YYYY-MM-DD')
+		<if test="Issued_to_date != null and Issued_to_date != ''">
+			AND TRUNC(P.CREATED_DATE) &lt;= TO_DATE(#{Issued_to_date},
+			'YYYY-MM-DD')
 		</if>
 		<if test="category != null and category != ''">
 			AND P.PRODUCT_NUMBER IN (
@@ -107,6 +109,12 @@
 		#{quantity},
 		SYSTIMESTAMP)
 	</insert>
+	<insert id="insertStockByProductNumber">
+		INSERT INTO STOCK_TB
+		(PRODUCT_NUMBER, QUANTITY,
+		LAST_UPDATED)
+		VALUES (#{productNumber}, 0, CURRENT_TIMESTAMP)
+	</insert>
 
 	<insert id="insertProductFile"
 		parameterType="com.food.domain.product.dto.ProductFileDTO">
@@ -124,7 +132,7 @@
 		VALUES (#{productNumber}, #{categoryId})
 	</insert>
 
-	<update id="updateCategoryById" parameterType="Long">
+	<update id="updateCategoryById" parameterType="Integer">
 		UPDATE
 		PRODUCT_CATEGORY_TB
 		SET next_val = next_val + 1
@@ -153,13 +161,6 @@
 			OR
 			P.NAME LIKE '%' || #{searchInput} || '%')
 		</if>
-
-		<if test="fr_date != null and fr_date != ''">
-			AND P.CREATED_DATE &gt;= TO_DATE(#{fr_date}, 'YYYY-MM-DD')
-		</if>
-		<if test="to_date != null and to_date != ''">
-			AND P.CREATED_DATE &lt;= TO_DATE(#{to_date}, 'YYYY-MM-DD')
-		</if>
 		<if test="category != null and category != ''">
 			AND P.PRODUCT_NUMBER IN (
 			SELECT M.PRODUCT_NUMBER
@@ -170,24 +171,22 @@
 			WHERE C.ID = #{category}
 			)
 		</if>
-		<if test="fr_date != null and fr_date != ''">
+		<if test="last_fr_date != null and last_fr_date != ''">
 			AND P.PRODUCT_NUMBER IN (
 			SELECT S.PRODUCT_NUMBER
 			FROM
 			STOCK_TB S
-			JOIN PRODUCT_TB P ON P.PRODUCT_NUMBER =
-			S.PRODUCT_NUMBER
-			WHERE S.LAST_UPDATED &gt;= TO_DATE(#{fr_date}, 'YYYY-MM-DD')
+			WHERE TRUNC(S.LAST_UPDATED) &gt;= TO_DATE(#{last_fr_date},
+			'YYYY-MM-DD')
 			)
 		</if>
-		<if test="to_date != null and to_date != ''">
+		<if test="last_to_date != null and last_to_date != ''">
 			AND P.PRODUCT_NUMBER IN (
 			SELECT S.PRODUCT_NUMBER
 			FROM
 			STOCK_TB S
-			JOIN PRODUCT_TB P ON P.PRODUCT_NUMBER =
-			S.PRODUCT_NUMBER
-			WHERE S.LAST_UPDATED &lt;= TO_DATE(#{fr_date}, 'YYYY-MM-DD')
+			WHERE TRUNC(S.LAST_UPDATED) &lt;= TO_DATE(#{last_to_date},
+			'YYYY-MM-DD')
 			)
 		</if>
 		<if test="stock_min != null">
@@ -195,11 +194,7 @@
 			SELECT S.PRODUCT_NUMBER
 			FROM
 			STOCK_TB S
-			JOIN
-			PRODUCT_TB P ON P.PRODUCT_NUMBER =
-			S.PRODUCT_NUMBER
-			WHERE
-			S.QUANTITY &gt;= #{stock_min}
+			WHERE S.QUANTITY &gt;= #{stock_min}
 			)
 		</if>
 		<if test="stock_max != null">
@@ -207,14 +202,11 @@
 			SELECT S.PRODUCT_NUMBER
 			FROM
 			STOCK_TB S
-			JOIN
-			PRODUCT_TB P ON P.PRODUCT_NUMBER =
-			S.PRODUCT_NUMBER
-			WHERE
-			S.QUANTITY &lt;= #{stock_max}
+			WHERE S.QUANTITY &lt;= #{stock_max}
 			)
 		</if>
 	</select>
+
 	<select id="findStockByProductNumber" parameterType="String">
 		SELECT ID,
 		PRODUCT_NUMBER, QUANTITY, LAST_UPDATED
@@ -354,19 +346,21 @@
 			)
 		</if>
 		<if test="last_fr_date != null and last_fr_date != ''">
-			AND S.LAST_POST_DATE &gt;= TO_DATE(#{last_fr_date},
+			AND TRUNC(S.LAST_POST_DATE) &gt;= TO_DATE(#{last_fr_date},
 			'YYYY-MM-DD')
 		</if>
 		<if test="last_to_date != null and last_to_date != ''">
-			AND S.LAST_POST_DATE &lt;= TO_DATE(#{last_to_date},
+			AND TRUNC(S.LAST_POST_DATE) &lt;= TO_DATE(#{last_to_date},
 			'YYYY-MM-DD')
 		</if>
 		<if test="register_fr_date != null and register_fr_date != ''">
-			AND S.CREATED_DATE &gt;= TO_DATE(#{register_fr_date},
+			AND TRUNC(S.CREATED_DATE) &gt;=
+			TO_DATE(#{register_fr_date},
 			'YYYY-MM-DD')
 		</if>
 		<if test="register_to_date != null and register_to_date != ''">
-			AND S.CREATED_DATE &lt;= TO_DATE(#{register_to_date},
+			AND TRUNC(S.CREATED_DATE) &lt;=
+			TO_DATE(#{register_to_date},
 			'YYYY-MM-DD')
 		</if>
 		<if test="sale_status != null and sale_status != ''">
@@ -1054,20 +1048,125 @@
 	<select id="findOrdersToConfirm"
 		parameterType="java.time.LocalDateTime" resultType="Long">
 		SELECT O.ID
-		FROM ORDER_TB O
+		FROM
+		ORDER_TB O
 		JOIN ORDER_STATUS_TB T ON O.ID = T.ORDER_ID
-		WHERE T.ORDER_STATUS = '구매 확정 대기'
-		AND O.ORDER_DATE &lt;= #{oneWeekAgo}
+		WHERE
+		T.ORDER_STATUS = '구매 확정 대기'
+		AND TRUNC(O.ORDER_DATE) &lt;= #{oneWeekAgo}
 	</select>
 	<delete id="deleteSalesPostFile">
-		DELETE FROM SALES_POST_FILE_TB WHERE SALES_POST_ID = #{salesPostId}
+		DELETE FROM SALES_POST_FILE_TB WHERE SALES_POST_ID =
+		#{salesPostId}
 	</delete>
 	<update id="updateSalesPost"
 		parameterType="com.food.domain.sales.dto.SalesPostDTO">
 		UPDATE
 		SALES_POST_TB
-		SET ADMIN_ID = #{adminId}, PRODUCT_NUMBER = #{productNumber}, TITLE = #{title}, DESCRIPTION = #{description}, LAST_POST_DATE = #{lastPostDate}, UPDATED_DATE = CURRENT_TIMESTAMP,
-		START_POST_DATE = #{startPostDate}, STATUS = #{status}
+		SET ADMIN_ID = #{adminId},
+		PRODUCT_NUMBER = #{productNumber}, TITLE = #{title}, DESCRIPTION =
+		#{description}, LAST_POST_DATE = #{lastPostDate}, UPDATED_DATE =
+		CURRENT_TIMESTAMP,
+		START_POST_DATE = #{startPostDate}, STATUS =
+		#{status}
 		WHERE id = #{id}
 	</update>
+	<update id="updateProduct" parameterType="map">
+		UPDATE
+		PRODUCT_TB
+		SET
+		NAME = #{name}, DESCRIPTION = #{description}, PRICE = #{price}
+		WHERE
+		PRODUCT_NUMBER = #{productNumber}
+	</update>
+	<update id="updateProductCategoryMapping"
+		parameterType="com.food.domain.product.dto.ProductCategoryMappingDTO">
+		UPDATE
+		PRODUCT_CATEGORY_MAPPING_TB
+		SET CATEGORY_ID =
+		#{categoryId}
+		WHERE PRODUCT_NUMBER = #{productNumber}
+	</update>
+	<delete id="deleteProductFile">
+		DELETE FROM PRODUCT_TB WHERE PRODUCT_NUMBER =
+		#{productNumber}
+	</delete>
+	<select id="findCategoryIdByProductNumber"
+		resultType="java.lang.Integer">
+		SELECT CATEGORY_ID
+		FROM PRODUCT_CATEGORY_MAPPING_TB
+		WHERE
+		PRODUCT_NUMBER = #{productNumber}
+	</select>
+
+	<update id="updateProductNumberInCategoryMapping"
+		parameterType="map">
+		UPDATE PRODUCT_CATEGORY_MAPPING_TB
+		SET PRODUCT_NUMBER =
+		#{newProductNumber}
+		WHERE PRODUCT_NUMBER = #{oldProductNumber}
+	</update>
+	<update id="updateProductNumber">
+		UPDATE PRODUCT_TB
+		SET PRODUCT_NUMBER =
+		#{newProductNumber}
+		WHERE PRODUCT_NUMBER = #{oldProductNumber}
+	</update>
+	<select id="findCouponIssuancesByCustomerId"
+		parameterType="Long">
+		SELECT *
+		FROM COUPON_ISSUANCE_TB
+		WHERE CUSTOMER_ID =
+		#{customerId}
+	</select>
+	<select id="findOrdersByCustomerId">
+		select *
+		from ORDER_TB
+		where IDENTIFIER_ID =
+		#{customerId}
+	</select>
+	<select id="findInquiriesByCustomerId">
+		select *
+		from INQUIRIES_TB
+		where CUSTOMER_ID =
+		#{customerId}
+	</select>
+	<select id="findTotalOrderAmount" parameterType="Long"
+		resultType="Long">
+		SELECT SUM(O.TOTAL_AMOUNT)
+		FROM ORDER_TB O
+		JOIN
+		ORDER_STATUS_TB OS ON O.ID = OS.ORDER_ID
+		WHERE O.IDENTIFIER_ID =
+		#{customerId}
+		AND O.IDENTIFIER_TYPE = 'CUSTOMER'
+		AND OS.ORDER_STATUS =
+		'구매 확정'
+	</select>
+	<select id="findTotalReservesByCustomerId" parameterType="Long"
+		resultType="Long">
+		SELECT SUM(CASE
+		WHEN PLUSMINUS = '플러스' THEN RESERVES
+		WHEN
+		PLUSMINUS = '마이너스' THEN -RESERVES
+		ELSE 0
+		END) AS total_reserves
+		FROM
+		CUSTOMER_RESERVES_TB
+		WHERE CUSTOMER_ID = #{customerId}
+	</select>
+	<select id="findAdminList">
+		select * from ADMIN_TB
+	</select>
+	<insert id="createAdminUser" parameterType="map"
+		useGeneratedKeys="true" keyProperty="userId" keyColumn="ID">
+		INSERT INTO
+		USER_TB (USERNAME, PASSWORD, ROLE, CREATED_DATE)
+		VALUES (#{username},
+		#{password}, 2, SYSDATE)
+	</insert>
+	<insert id="createAdmin" parameterType="map">
+		INSERT INTO ADMIN_TB (USER_ID, NAME, ACCESS_LEVEL)
+		VALUES (#{userId}, #{name}, #{accessLevel})
+	</insert>
 </mapper>
