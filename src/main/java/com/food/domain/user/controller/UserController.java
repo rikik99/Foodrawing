@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.food.domain.order.dto.OrderStatusDTO;
+import com.food.domain.user.dto.CouponDTO;
 import com.food.domain.user.dto.CustomerDTO;
 import com.food.domain.user.dto.EmailResponseDTO;
 import com.food.domain.user.dto.MyPageOrderDTO;
@@ -27,11 +27,10 @@ import com.food.domain.user.dto.UserDTO;
 import com.food.domain.user.dto.UserSocialLinksDTO;
 import com.food.domain.user.dto.VerificationRequestDTO;
 import com.food.domain.user.dto.VerificationResponseDTO;
+import com.food.domain.user.service.CouponService;
 import com.food.domain.user.service.CustomerService;
 import com.food.domain.user.service.EmailService;
 import com.food.domain.user.service.UserService;
-import com.food.domain.user.dto.CouponDTO;
-import com.food.domain.user.service.CouponService;
 import com.food.global.auth.CustomUserDetails;
 import com.food.global.auth.Oauth2AttributesToModel;
 
@@ -45,125 +44,124 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private UserService userService;
 
-    @Autowired
-    private Oauth2AttributesToModel OTM;
+	@Autowired
+	private Oauth2AttributesToModel OTM;
 
-    @Autowired
-    private EmailService emailService;
+	@Autowired
+	private EmailService emailService;
 
-    @Autowired
-    private CustomerService customerService;
+	@Autowired
+	private CustomerService customerService;
 
-    @Autowired
-    private CouponService couponService;
+	@Autowired
+	private CouponService couponService;
 
-    @GetMapping("/login")
-    public ModelAndView login(Authentication authentication) {
-        // 로그인된 사용자가 로그인 페이지로 접근할 경우 메인 페이지로 리다이렉트
-        if (authentication != null && authentication.isAuthenticated()) {
-            return new ModelAndView("redirect:/");
-        }
-        ModelAndView mv = new ModelAndView();
-        mv.setViewName("user/login");
-        return mv;
-    }
+	@GetMapping("/login")
+	public ModelAndView login(Authentication authentication) {
+		// 로그인된 사용자가 로그인 페이지로 접근할 경우 메인 페이지로 리다이렉트
+		if (authentication != null && authentication.isAuthenticated()) {
+			return new ModelAndView("redirect:/");
+		}
+		ModelAndView mv = new ModelAndView();
+		mv.setViewName("user/login");
+		return mv;
+	}
 
-    @GetMapping("/signupInfo")
-    public ModelAndView signupInfo() {
-        ModelAndView mv = new ModelAndView();
-        mv.setViewName("user/signupInfo");
-        return mv;
-    }
+	@GetMapping("/signupInfo")
+	public ModelAndView signupInfo() {
+		ModelAndView mv = new ModelAndView();
+		mv.setViewName("user/signupInfo");
+		return mv;
+	}
+	@GetMapping("/signup")
+	public ModelAndView signup(HttpServletRequest request) {
+	    ModelAndView mv = new ModelAndView();
+	    mv.setViewName("user/signup");
 
-    @GetMapping("/signup")
-    public ModelAndView signup(HttpServletRequest request) {
-        ModelAndView mv = new ModelAndView();
-        mv.setViewName("user/signup");
+	    HttpSession session = request.getSession();
+	    String email = (String) session.getAttribute("email");
+	    String userName = null;
+	    if (email != null) {
+	        userName = email.split("@")[0]; // '@' 이전의 값을 userName으로 설정
+	    }
+	    String provider = (String) session.getAttribute("provider");
+	    String providerId = (String) session.getAttribute("providerId");
 
-        HttpSession session = request.getSession();
-        String email = (String) session.getAttribute("email");
-        String userName = null;
-        if (email != null) {
-            userName = email.split("@")[0]; // '@' 이전의 값을 userName으로 설정
-        }
-        String provider = (String) session.getAttribute("provider");
-        String providerId = (String) session.getAttribute("providerId");
+	    mv.addObject("userName", userName);
+	    mv.addObject("password", session.getAttribute("password"));
+	    mv.addObject("nickname", session.getAttribute("nickname"));
+	    mv.addObject("email", email);
+	    mv.addObject("birthYear", session.getAttribute("birthYear"));
+	    mv.addObject("birthMonth", session.getAttribute("birthMonth"));
+	    mv.addObject("birthDay", session.getAttribute("birthDay"));
+	    mv.addObject("gender", session.getAttribute("gender"));
+	    mv.addObject("phoneNumber", session.getAttribute("phoneNumber"));
+	    mv.addObject("pendingRegistration", session.getAttribute("pendingRegistration"));
+	    mv.addObject("oauth2RedirectUrl", session.getAttribute("oauth2RedirectUrl"));
+	    log.info("providerId = {}", providerId);
+	    // 추가: 소셜 로그인 정보
+	    mv.addObject("provider", provider);
+	    mv.addObject("providerId", providerId);
 
-        mv.addObject("userName", userName);
-        mv.addObject("password", session.getAttribute("password"));
-        mv.addObject("nickname", session.getAttribute("nickname"));
-        mv.addObject("email", email);
-        mv.addObject("birthYear", session.getAttribute("birthYear"));
-        mv.addObject("birthMonth", session.getAttribute("birthMonth"));
-        mv.addObject("birthDay", session.getAttribute("birthDay"));
-        mv.addObject("gender", session.getAttribute("gender"));
-        mv.addObject("phoneNumber", session.getAttribute("phoneNumber"));
-        mv.addObject("pendingRegistration", session.getAttribute("pendingRegistration"));
-        mv.addObject("oauth2RedirectUrl", session.getAttribute("oauth2RedirectUrl"));
-        log.info("providerId = {}", providerId);
-        // 추가: 소셜 로그인 정보
-        mv.addObject("provider", provider);
-        mv.addObject("providerId", providerId);
+	    return mv;
+	}
 
-        return mv;
-    }
 
-    @PostMapping("/signup")
-    public ModelAndView signupProcess(@ModelAttribute UserDTO userDTO, @RequestParam String birthYear,
-                                      @RequestParam String birthMonth, @RequestParam String birthDay,
-                                      @ModelAttribute CustomerDTO customerDTO, @RequestParam String provider,
-                                      @RequestParam String providerId, HttpServletRequest request, Model model) {
-        ModelAndView mv = new ModelAndView();
 
-        // 수동 유효성 검증 로직
+	@PostMapping("/signup")
+	public ModelAndView signupProcess(@ModelAttribute UserDTO userDTO, @RequestParam String birthYear,
+	                                  @RequestParam String birthMonth, @RequestParam String birthDay, @ModelAttribute CustomerDTO customerDTO,
+	                                  @RequestParam(required = false) String provider, @RequestParam(required = false) String providerId, 
+	                                  HttpServletRequest request) {
+	    ModelAndView mv = new ModelAndView();
+
         if (userDTO.getUsername() == null || userDTO.getUsername().isEmpty()) {
-            model.addAttribute("error", "아이디를 입력하세요.");
+        	mv.addObject("error", "아이디를 입력하세요.");
             mv.setViewName("user/signup");
             return mv;
         }
         if (userDTO.getPassword() == null || userDTO.getPassword().isEmpty()) {
-            model.addAttribute("error", "비밀번호를 입력하세요.");
+        	mv.addObject("error", "비밀번호를 입력하세요.");
             mv.setViewName("user/signup");
             return mv;
         }
         if (customerDTO.getNickname() == null || customerDTO.getNickname().isEmpty()) {
-            model.addAttribute("error", "닉네임을 입력하세요.");
+        	mv.addObject("error", "닉네임을 입력하세요.");
             mv.setViewName("user/signup");
             return mv;
         }
         if (customerDTO.getName() == null || customerDTO.getName().isEmpty()) {
-            model.addAttribute("error", "이름을 입력하세요.");
+        	mv.addObject("error", "이름을 입력하세요.");
             mv.setViewName("user/signup");
             return mv;
         }
         if (customerDTO.getEmail() == null || customerDTO.getEmail().isEmpty()) {
-            model.addAttribute("error", "이메일을 입력하세요.");
+        	mv.addObject("error", "이메일을 입력하세요.");
             mv.setViewName("user/signup");
             return mv;
-        }
-        // 추가적인 유효성 검증 로직...
+        }	    
+	    
+	    // 생년월일 설정
+	    String birthDateString = birthYear + "-" + birthMonth + "-" + birthDay;
+	    customerDTO.setBirthDate(Date.valueOf(birthDateString));
 
-        // 생년월일 설정
-        String birthDateString = birthYear + "-" + birthMonth + "-" + birthDay;
-        customerDTO.setBirthDate(Date.valueOf(birthDateString));
+	    // 서비스 호출하여 사용자 저장
+	    userService.signup(userDTO, customerDTO);
+	    OTM.authenticateUserAndSetSession(userDTO, request);
 
-        // 서비스 호출하여 사용자 저장
-        userService.signup(userDTO, customerDTO);
-        OTM.authenticateUserAndSetSession(userDTO, request);
+	    if (provider != null && !provider.isEmpty() && providerId != null && !providerId.isEmpty()) {
+	        // 소셜 로그인인 경우에만 USER_SOCIAL_LINKS에 데이터 추가
+	        userService.linkSocialAccount(customerDTO.getUserId(), provider, providerId);
+	    }
 
-        if (provider != null && providerId != null) {
-            // 소셜 로그인인 경우에만 USER_SOCIAL_LINKS에 데이터 추가
-            userService.linkSocialAccount(customerDTO.getUserId(), provider, providerId);
-        }
+	    mv.setViewName("redirect:/login");
+	    return mv;
+	}
 
-        mv.setViewName("redirect:/login");
-        return mv;
-    }
-
-    @GetMapping("/linkAccount")
+	@GetMapping("/linkAccount")
     public ModelAndView linkAccount(HttpServletRequest request) {
         ModelAndView mv = new ModelAndView();
         mv.setViewName("user/linkAccount");
@@ -180,7 +178,7 @@ public class UserController {
         return mv;
     }
 
-    @PostMapping("/linkAccount")
+	@PostMapping("/linkAccount")
     public ModelAndView linkAccountProcess(HttpServletRequest request, @ModelAttribute UserSocialLinksDTO social, @RequestParam String email) {
         ModelAndView mv = new ModelAndView();
         String provider = social.getProvider();
@@ -205,7 +203,7 @@ public class UserController {
         return mv;
     }
 
-    @PostMapping("/sendVerificationEmail")
+	@PostMapping("/sendVerificationEmail")
     public ResponseEntity<String> sendVerificationEmail(@RequestParam String email) {
         try {
             log.info("email = {}", email);
@@ -217,7 +215,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/verify")
+	@GetMapping("/verify")
     public ModelAndView verifyUser(@RequestParam String token) {
         String result = userService.verifyUser(token);
         ModelAndView mv = new ModelAndView();
@@ -231,27 +229,27 @@ public class UserController {
         return mv;
     }
 
-    @GetMapping("/verificationSuccess")
+	@GetMapping("/verificationSuccess")
     public ModelAndView verificationSuccess() {
         ModelAndView mv = new ModelAndView();
         mv.setViewName("verificationSuccess");
         return mv;
     }
 
-    @GetMapping("/verificationFail")
+	@GetMapping("/verificationFail")
     public ModelAndView verificationFail() {
         ModelAndView mv = new ModelAndView();
         mv.setViewName("verificationFail");
         return mv;
     }
 
-    @ResponseBody
+	@ResponseBody
     @GetMapping("/checkDuplicateUsername")
     public boolean checkDuplicateUsername(@RequestParam("username") String userName) {
         return userService.isUserIdExists(userName);
     }
 
-    @GetMapping("/logout")
+	@GetMapping("/logout")
     public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession();
         session.invalidate();
@@ -269,7 +267,7 @@ public class UserController {
         return mv;
     }
 
-    @PostMapping("/invalidateSession")
+	@PostMapping("/invalidateSession")
     @ResponseBody
     public void invalidateSession(HttpServletRequest request, @RequestParam(required = false) String email) {
         if (email != null && !email.isEmpty()) {
@@ -281,12 +279,12 @@ public class UserController {
         request.getSession().invalidate();
     }
 
-    @GetMapping("/findUsername")
+	@GetMapping("/findUsername")
     public String showFindUsernameForm() {
         return "user/findUsername";
     }
 
-    @PostMapping("/findUsername")
+	@PostMapping("/findUsername")
     @ResponseBody
     public EmailResponseDTO findUsername(@RequestBody VerificationRequestDTO request, HttpSession session) {
         EmailResponseDTO response = new EmailResponseDTO();
@@ -306,12 +304,12 @@ public class UserController {
         return response;
     }
 
-    private String generateVerificationCode() {
+	private String generateVerificationCode() {
         // 인증 코드 생성 로직
         return UUID.randomUUID().toString().substring(0, 6);
     }
 
-    @PostMapping("/verify-id-code")
+	@PostMapping("/verify-id-code")
     @ResponseBody
     public VerificationResponseDTO verifyIdCode(@RequestBody VerificationRequestDTO request, HttpSession session, Model model) {
         String sessionCode = (String) session.getAttribute("verificationCode");
@@ -333,7 +331,7 @@ public class UserController {
         return response;
     }
 
-    @GetMapping("/showUsername")
+	@GetMapping("/showUsername")
     public ModelAndView showUsername(@RequestParam String userId) {
         ModelAndView mv = new ModelAndView();
         mv.setViewName("user/showUsername");
@@ -341,12 +339,12 @@ public class UserController {
         return mv;
     }
 
-    @GetMapping("/findPassword")
+	@GetMapping("/findPassword")
     public String showFindPasswordForm() {
         return "user/findPassword";
     }
 
-    @PostMapping("/findPassword")
+	@PostMapping("/findPassword")
     @ResponseBody
     public EmailResponseDTO sendPasswordResetCode(@RequestBody VerificationRequestDTO request, HttpSession session) {
         EmailResponseDTO response = new EmailResponseDTO();
@@ -366,7 +364,7 @@ public class UserController {
         return response;
     }
 
-    @PostMapping("/verify-password-code")
+	@PostMapping("/verify-password-code")
     @ResponseBody
     public VerificationResponseDTO verifyPasswordCode(@RequestBody VerificationRequestDTO request, HttpSession session, Model model) {
         String sessionCode = (String) session.getAttribute("verificationCode");
@@ -387,7 +385,7 @@ public class UserController {
         return response;
     }
 
-    @GetMapping("/passwordReset")
+	@GetMapping("/passwordReset")
     public String showPasswordResetForm(HttpSession session, Model model) {
         String email = (String) session.getAttribute("emailForPasswordReset");
         if (email == null) {
@@ -397,13 +395,13 @@ public class UserController {
         return "user/passwordReset";
     }
 
-    @PostMapping("/passwordReset")
+	@PostMapping("/passwordReset")
     public String resetPassword(@RequestParam String email, @RequestParam String newPassword) {
         userService.updatePasswordByEmail(email, newPassword);
         return "redirect:/login";
     }
 
-    @GetMapping("/myPage")
+	@GetMapping("/myPage")
     public String myPage(Model model, Authentication authentication) {
         if (authentication == null) {
             log.info("Authentication is null, redirecting to login");
@@ -434,7 +432,7 @@ public class UserController {
         return "redirect:/login"; // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
     }
 
-    @GetMapping("/user/myPageInfo")
+	@GetMapping("/user/myPageInfo")
     public String myPageInfo(Model model, Authentication authentication) {
         if (authentication == null) {
             log.info("Authentication is null, redirecting to login");
@@ -457,7 +455,7 @@ public class UserController {
         return "redirect:/login"; // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
     }
 
-    @GetMapping("/user/myPageOrder")
+	@GetMapping("/user/myPageOrder")
     public String getOrderHistory(@RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate, Model model, Authentication authentication) {
         log.debug("getOrderHistory called with startDate: {}, endDate: {}", startDate, endDate);
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -491,7 +489,7 @@ public class UserController {
         return "user/myPageOrder";
     }
 
-    @PostMapping("/user/confirmOrder")
+	@PostMapping("/user/confirmOrder")
     public String confirmOrder(@RequestParam Long orderId, Authentication authentication) {
         log.debug("confirmOrder called with orderId: {}", orderId);
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -506,7 +504,7 @@ public class UserController {
         return "redirect:/user/myPageOrder";
     }
 
-    @GetMapping("/user/myPageOrderCancel")
+	@GetMapping("/user/myPageOrderCancel")
     public String myPageOrderCancel(@RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate, Model model, Authentication authentication) {
         log.debug("getOrderHistory called with startDate: {}, endDate: {}", startDate, endDate);
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -543,7 +541,7 @@ public class UserController {
         return "user/myPageOrderCancel";
     }
 
-    @PostMapping("/user/updateOrderStatus")
+	@PostMapping("/user/updateOrderStatus")
     public String updateOrderStatus(@RequestParam Long orderId, @RequestParam String status, Authentication authentication) {
         log.debug("updateOrderStatus called with orderId: {}, status: {}", orderId, status);
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -557,7 +555,7 @@ public class UserController {
         return "redirect:/user/myPageOrderCancel";  // 필요한 페이지로 리다이렉트
     }
 
-    private CustomerDTO convertToCustomerDTO(CustomUserDetails customUserDetails) {
+	private CustomerDTO convertToCustomerDTO(CustomUserDetails customUserDetails) {
         CustomerDTO customerDTO = new CustomerDTO();
         customerDTO.setId(customUserDetails.getId());
         customerDTO.setUserId(customUserDetails.getId());

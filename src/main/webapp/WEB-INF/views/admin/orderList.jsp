@@ -1,11 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!DOCTYPE html>
 <html>
 <head>
 <link rel="stylesheet" href="/css/admin/common.css" />
-<link rel="stylesheet" href="/css/admin/adminSalesInquiries.css" />
+<link rel="stylesheet" href="/css/admin/consolidated.css" />
 </head>
 <body class="dark-mode">
 	<div class="dashboard-container">
@@ -13,112 +14,129 @@
 		<div class="main-content dark-mode" id="mainContent">
 			<h1>주문 관리</h1>
 
-			<!-- 검색창 -->
-			<form name="fsearch" id="fsearch" method="get">
-				<div class="search-bar">
-					<div class="full-width">
-						<div class="half-width">
-							<label for="searchUser">검색어</label> 
-							<input type="text" class="searchInput" placeholder="고객 아이디 및 이름을 입력해주세요" id="searchUser" name="searchUser">
-						</div>
-					</div>
-					<div class="full-width">
-						<label for="orderStatus">주문 상태</label>
-						<div class="checkbox-group" data-group="orderStatus">
-							<label><input type="checkbox" class="select-all" data-group="orderStatus" value="all"> 전체</label>
-							<label><input type="checkbox" name="orderStatus" value="pending"> 입금대기</label>
-							<label><input type="checkbox" name="orderStatus" value="paid"> 입금완료</label>
-							<label><input type="checkbox" name="orderStatus" value="preparing"> 배송준비</label>
-							<label><input type="checkbox" name="orderStatus" value="shipping"> 배송중</label>
-							<label><input type="checkbox" name="orderStatus" value="delivered"> 배송완료</label>
-						</div>
-					</div>
-					<div class="full-width">
-						<label for="cancelStatus">취소 상태</label>
-						<div class="checkbox-group" data-group="cancelStatus">
-							<label><input type="checkbox" class="select-all" data-group="cancelStatus" value="all"> 전체</label>
-							<label><input type="checkbox" name="cancelStatus" value="cancelled"> 취소</label>
-							<label><input type="checkbox" name="cancelStatus" value="refunded"> 환불</label>
-							<label><input type="checkbox" name="cancelStatus" value="returned"> 반품</label>
-							<label><input type="checkbox" name="cancelStatus" value="exchanged"> 교환</label>
-						</div>
-					</div>
-					<div class="full-width">
-						<div class="date-group">
-							<label for="dateType">날짜 유형</label> 
-							<select id="dateType" name="dateType" class="secondary">
-								<option value="orderDate">주문일</option>
-								<option value="paymentDate">입금일</option>
-								<option value="shippingRegisterDate">배송등록일</option>
-								<option value="deliveryDate">배송완료일</option>
-							</select> 
-							<input type="date" name="searchIssuedDateFrom" id="searchIssuedDateFrom" placeholder="시작일" class="secondary">
-							<input type="date" name="searchIssuedDateTo" id="searchIssuedDateTo" placeholder="종료일" class="secondary">
-							<span class="btn_group"> 
-								<input type="button" class="btn_small white primary date-range-btn" data-range="today" data-group="searchIssuedDate" value="오늘">
-								<input type="button" class="btn_small white primary date-range-btn" data-range="yesterday" data-group="searchIssuedDate" value="어제">
-								<input type="button" class="btn_small white primary date-range-btn" data-range="week" data-group="searchIssuedDate" value="일주일"> 
-								<input type="button" class="btn_small white primary date-range-btn" data-range="month" data-group="searchIssuedDate" value="1개월">
-								<input type="button" class="btn_small white primary date-range-btn" data-range="3months" data-group="searchIssuedDate" value="3개월">
-								<input type="button" class="btn_small white primary date-range-btn" data-range="all" data-group="searchIssuedDate" value="전체">
-							</span>
-						</div>
-					</div>
-					<div class="search-buttons full-width">
-						<button type="submit" class="primary">검색</button>
-						<button type="reset" class="secondary">초기화</button>
+			<div class="search-bar">
+				<div class="full-width">
+					<div class="half-width">
+						<label for="searchInput">검색어</label> <input type="text"
+							class="searchInput" placeholder="고객 아이디 및 이름을 입력해주세요"
+							id="searchInput" name="searchInput">
 					</div>
 				</div>
-			</form>
+				<div class="full-width">
+	<div class="half-width">
+		<label for="orderStatus">주문 상태</label>
+		<div class="checkbox-group" data-group="orderStatus">
+			<label><input type="checkbox" class="select-all" data-group="orderStatus" value="all"> 전체</label>
+			<label><input type="checkbox" name="orderStatus" value="결제 대기"> 결제 대기</label>
+			<label><input type="checkbox" name="orderStatus" value="결제 완료"> 결제 완료</label>
+			<label><input type="checkbox" name="orderStatus" value="배송 준비"> 배송 준비</label>
+			<label><input type="checkbox" name="orderStatus" value="배송 중"> 배송 중</label>
+			<label><input type="checkbox" name="orderStatus" value="배송 완료"> 배송 완료</label>
+		</div>
+	</div>
+</div>
+<div class="full-width">
+	<div class="half-width">
+		<label for="paymentType">결제 방법</label>
+		<div class="checkbox-group" data-group="paymentType">
+			<label><input type="checkbox" class="select-all" data-group="paymentType" value="all"> 전체</label>
+			<label><input type="checkbox" name="paymentType" value="card"> 카드</label>
+			<label><input type="checkbox" name="paymentType" value="phone"> 휴대폰 결제</label>
+			<label><input type="checkbox" name="paymentType" value="tosspayments">토스 페이먼츠</label>
+			<label><input type="checkbox" name="paymentType" value="payco">페이코</label>
+			<label><input type="checkbox" name="paymentType" value="kakaopay">카카오페이</label>
+			<label><input type="checkbox" name="paymentType" value="vbank">가상계좌</label>
+		</div>
+	</div>
+</div>
 
-			<!-- 주문 목록 -->
-			<div class="product-list-header">
-				<div>
-					<span>조회된 주문 수: <strong>10</strong>개</span>
+				<div class="full-width">
+				<div class="half-width">
+						<label for="order_fr_date">주문 날짜</label> <input type="date"
+							name="order_fr_date" id="order_fr_date" placeholder="시작일"
+							class="secondary"> <input type="date"
+							name="order_to_date" id="order_to_date" placeholder="종료일"
+							class="secondary"> <span class="btn_group"> <input
+							type="button" class="btn_small white primary date-range-btn"
+							data-range="today" data-group="order" value="오늘"> <input
+							type="button" class="btn_small white primary date-range-btn"
+							data-range="yesterday" data-group="order" value="어제">
+							<input type="button"
+							class="btn_small white primary date-range-btn" data-range="week"
+							data-group="order" value="일주일"> <input type="button"
+							class="btn_small white primary date-range-btn" data-range="month"
+							data-group="order" value="1개월"> <input type="button"
+							class="btn_small white primary date-range-btn"
+							data-range="3months" data-group="order" value="3개월"> <input
+							type="button" class="btn_small white primary date-range-btn"
+							data-range="all" data-group="order" value="전체">
+						</span>
+				</div>			
+				</div>
+				<div class="search-buttons full-width">
+					<button type="button" class="primary search-btn"
+						data-url="/admin/orderList">검색</button>
+					<button type="reset" class="secondary">초기화</button>
 				</div>
 			</div>
-			<table class="product-list dark-mode" id="orderTable">
+
+			<!-- 주문 목록 -->
+			<div class="custom-table-header">
+				<div>
+					<span>조회된 주문 수: <strong>${totalElements}</strong>개
+					</span>
+				</div>
+			</div>
+			<table class="custom-table dark-mode" id="orderTable">
 				<thead>
 					<tr>
-						<th class="order-id-column">주문 번호</th>
 						<th class="customer-id-column">고객 ID</th>
 						<th class="customer-name-column">고객 이름</th>
+						<th class="order-id-column">주문 번호</th>
 						<th class="order-date-column">주문 날짜</th>
-						<th class="payment-date-column">입금 날짜</th>
-						<th class="shipping-register-date-column">배송등록 날짜</th>
-						<th class="delivery-date-column">배송완료 날짜</th>
+						<th class="customer-name-column">주문 상품</th>
+						<th class="customer-name-column">구매 수량</th>
+						<th class="customer-name-column">상품 금액</th>
 						<th class="order-status-column">주문 상태</th>
-						<th class="cancel-status-column">취소 상태</th>
-						<th class="total-amount-column">총 금액</th>
+						<th class="total-amount-column">총 주문액</th>
+						<th class="total-amount-column">결제방법</th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<td class="order-id-column">123456789</td>
-						<td class="customer-id-column">user01</td>
-						<td class="customer-name-column">홍길동</td>
-						<td class="order-date-column">2024-07-01</td>
-						<td class="payment-date-column">2024-07-01</td>
-						<td class="shipping-register-date-column">2024-07-02</td>
-						<td class="delivery-date-column">2024-07-05</td>
-						<td class="order-status-column">배송완료</td>
-						<td class="cancel-status-column">-</td>
-						<td class="total-amount-column">₩100,000</td>
-					</tr>
-					<tr>
-						<td class="order-id-column">987654321</td>
-						<td class="customer-id-column">user02</td>
-						<td class="customer-name-column">이순신</td>
-						<td class="order-date-column">2024-06-01</td>
-						<td class="payment-date-column">2024-06-01</td>
-						<td class="shipping-register-date-column">2024-06-02</td>
-						<td class="delivery-date-column">2024-06-05</td>
-						<td class="order-status-column">배송완료</td>
-						<td class="cancel-status-column">-</td>
-						<td class="total-amount-column">₩200,000</td>
-					</tr>
+					<c:forEach items="${orders.content}" var="order">
+						<c:forEach items="${order.orderDetailList}" var="details"
+							varStatus="status">
+							<tr>
+								<c:if test="${status.first}">
+									<td rowspan="${fn:length(order.orderDetailList)}">${order.customer.userDTO.username}</td>
+									<td rowspan="${fn:length(order.orderDetailList)}">${order.customer.name}</td>
+									<td rowspan="${fn:length(order.orderDetailList)}">${order.orderNumber}</td>
+									<td rowspan="${fn:length(order.orderDetailList)}">${order.formattedOrderDate}</td>
+								</c:if>
+								<td>${details.sales.title}</td>
+								<td>${details.quantity}</td>
+								<td>${details.unitPrice}</td>
+								<c:if test="${status.first}">
+									<td rowspan="${fn:length(order.orderDetailList)}">${order.orderStatus.orderStatus}</td>
+									<td rowspan="${fn:length(order.orderDetailList)}">${order.totalAmount}</td>
+									<td rowspan="${fn:length(order.orderDetailList)}">${order.paymentType}</td>
+								</c:if>
+							</tr>
+						</c:forEach>
+					</c:forEach>
 				</tbody>
 			</table>
+
+			<nav aria-label="Page navigation">
+				<ul class="pagination">
+					<c:forEach begin="1" end="${pageCount}" var="i">
+						<li class="page-item ${currentPage + 1 == i ? 'active' : ''}">
+							<a class="page-link" data-page="${i - 1}"
+							data-url="/admin/discountList" data-size="${size}">${i}</a>
+						</li>
+					</c:forEach>
+				</ul>
+			</nav>
 		</div>
 		<button id="toggleMode" class="primary">Toggle Mode</button>
 		<script src="<c:url value='/js/admin/main.js'/>"></script>

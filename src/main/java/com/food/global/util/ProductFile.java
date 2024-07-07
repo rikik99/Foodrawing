@@ -1,6 +1,7 @@
 package com.food.global.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -32,7 +33,11 @@ public class ProductFile {
         String path = "/images/" + current.format(format);
         File file = new File(absolutePath);
         if (!file.exists()) {
-            file.mkdirs();
+            boolean dirsCreated = file.mkdirs();
+            if (!dirsCreated) {
+                System.err.println("Failed to create directories: " + absolutePath);
+                return null;
+            }
         }
 
         String newFileName;
@@ -71,7 +76,13 @@ public class ProductFile {
             productFileDTO.setUploadDate(LocalDateTime.now());
             productFileDTO.setFileType(originalFileExtension); // 파일 타입 저장
             file = new File(absolutePath + "/" + newFileName);
-            productFile.transferTo(file);
+            try {
+                productFile.transferTo(file);
+            } catch (IOException e) {
+                System.err.println("Failed to save file: " + file.getAbsolutePath());
+                e.printStackTrace();
+                return null;
+            }
 
             return productFileDTO;
         }

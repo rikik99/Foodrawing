@@ -4,7 +4,7 @@
 <html>
 <head>
 <link rel="stylesheet" href="/css/admin/common.css" />
-<link rel="stylesheet" href="/css/admin/adminSalesInquiries.css" />
+<link rel="stylesheet" href="/css/admin/consolidated.css" />
 </head>
 <body class="dark-mode">
     <div class="dashboard-container">

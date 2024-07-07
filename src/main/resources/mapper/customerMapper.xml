@@ -3,56 +3,66 @@
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.food.domain.user.mapper.CustomerMapper">
-    
+
     <select id="findById" resultType="com.food.domain.user.dto.CustomerDTO">
-        SELECT ID, USER_ID, NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE, ADDRESS, ADDRESS_DETAIL, ZIPCODE FROM CUSTOMER_TB WHERE ID = #{id}
+        SELECT ID, USER_ID, NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE, ADDRESS, ADDRESS_DETAIL, ZIPCODE, REFUND_ACCOUNT, REFUND_BANK FROM CUSTOMER_TB WHERE ID = #{id}
     </select>
 
-    <update id="updateCustomer">
-        UPDATE CUSTOMER_TB SET 
-        name = #{name},
-        email = #{email},
-        phone = #{phone}
-        WHERE id = #{id}
-    </update>
 
-    <delete id="deleteCustomer">
-        DELETE FROM CUSTOMER_TB WHERE ID = #{id}
-    </delete>
+	<update id="updateCustomer">
+		UPDATE CUSTOMER_TB SET
+		name = #{name},
+		email = #{email},
+		phone = #{phone}
+		WHERE id = #{id}
+	</update>
+    <insert id="insertCustomer" parameterType="com.food.domain.user.dto.CustomerDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
+        INSERT INTO CUSTOMER_TB (USER_ID, NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE, ADDRESS, ADDRESS_DETAIL, ZIPCODE)
+        VALUES (#{userId}, #{nickname}, #{name}, #{gender}, #{phone}, #{email}, #{birthDate}, #{address}, #{addressDetail}, #{zipcode})
+    </insert>
+	<delete id="deleteCustomer">
+		DELETE FROM CUSTOMER_TB WHERE ID = #{id}
+	</delete>
 
-    <select id="findCustomerByUserId" resultType="com.food.domain.user.dto.CustomerDTO">
-        SELECT * FROM CUSTOMER_TB WHERE USER_ID = #{userId}
-    </select>
+	<select id="findCustomerByUserId"
+		resultType="com.food.domain.user.dto.CustomerDTO">
+		SELECT * FROM CUSTOMER_TB WHERE USER_ID = #{userId}
+	</select>
 
-    <select id="findCustomerById" parameterType="Long" resultType="com.food.domain.user.dto.CustomerDTO">
-        SELECT * FROM CUSTOMER_TB WHERE USER_ID = #{userId}
-    </select>
+	<select id="findCustomerById" parameterType="Long"
+		resultType="com.food.domain.user.dto.CustomerDTO">
+		SELECT * FROM CUSTOMER_TB WHERE USER_ID = #{userId}
+	</select>
+	
+	<select id="findOrdersByCustomerAndDateRange"
+		parameterType="map"
+		resultType="com.food.domain.user.dto.MyPageOrderDTO">
+		SELECT
+		o.ID as orderId,
+		o.ORDER_DATE as orderDate,
+		os.ORDER_STATUS as orderStatus,
+		o.TOTAL_AMOUNT as totalAmount,
+		od.UNIT_PRICE as unitPrice,
+		od.DISCOUNT_PRICE as discountPrice,
+		od.QUANTITY as quantity,
+		os.DESCRIPTION as deliveryStatus,
+		'dummy_carrier' as carrier,
+		'dummy_tracking_number' as trackingNumber,
+		CURRENT_DATE as estimatedArrivalDate
+		FROM ORDER_TB o
+		JOIN ORDER_DETAIL_TB od ON o.ID = od.ORDER_ID
+		JOIN ORDER_STATUS_TB os ON o.ID = os.ORDER_ID
+		WHERE o.IDENTIFIER_ID = #{customerId}
+		AND o.ORDER_DATE BETWEEN #{startDate} AND #{endDate}
+		ORDER BY o.ORDER_DATE DESC
+	</select>
 
-    <select id="findOrdersByCustomerAndDateRange" parameterType="map" resultType="com.food.domain.user.dto.MyPageOrderDTO">
-        SELECT 
-            o.ID as orderId, 
-            o.ORDER_DATE as orderDate, 
-            os.ORDER_STATUS as orderStatus, 
-            o.TOTAL_AMOUNT as totalAmount, 
-            od.UNIT_PRICE as unitPrice, 
-            od.DISCOUNT_PRICE as discountPrice, 
-            od.QUANTITY as quantity, 
-            os.DESCRIPTION as deliveryStatus, 
-            'dummy_carrier' as carrier, -- Replace this with the actual carrier column if available 
-            'dummy_tracking_number' as trackingNumber, -- Replace this with the actual tracking number column if available 
-            CURRENT_DATE as estimatedArrivalDate -- Replace this with the actual estimated arrival date column if available 
-        FROM ORDER_TB o 
-        JOIN ORDER_DETAIL_TB od ON o.ID = od.ORDER_ID 
-        JOIN ORDER_STATUS_TB os ON o.ID = os.ORDER_ID 
-        WHERE o.IDENTIFIER_ID = #{customerId} 
-        AND o.ORDER_DATE BETWEEN #{startDate} AND #{endDate} 
-        ORDER BY o.ORDER_DATE DESC
-    </select>
-    
-    <update id="updateCancelOrderStatus" parameterType="com.food.domain.order.dto.OrderStatusDTO">
-        UPDATE ORDER_STATUS_TB
-        SET ORDER_STATUS = #{orderStatus}
-        WHERE ORDER_ID = #{orderId}
-    </update>
+	<update id="updateCancelOrderStatus"
+		parameterType="com.food.domain.order.dto.OrderStatusDTO">
+		UPDATE ORDER_STATUS_TB
+		SET ORDER_STATUS = #{orderStatus}
+		WHERE ORDER_ID = #{orderId}
+	</update>
+
 
 </mapper>
