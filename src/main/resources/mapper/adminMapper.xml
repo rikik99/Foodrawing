@@ -1166,7 +1166,15 @@
 		#{password}, 2, SYSDATE)
 	</insert>
 	<insert id="createAdmin" parameterType="map">
-		INSERT INTO ADMIN_TB (USER_ID, NAME, ACCESS_LEVEL)
-		VALUES (#{userId}, #{name}, #{accessLevel})
+		INSERT INTO ADMIN_TB
+		(USER_ID, NAME, ACCESS_LEVEL)
+		VALUES (#{userId}, #{name},
+		#{accessLevel})
 	</insert>
+	<update id="updateDiscountStatus" parameterType="map">
+		UPDATE DISCOUNT_TB
+		SET ONSALE_YN = #{newStatus}
+		WHERE ID = #{discountId}
+	</update>
+
 </mapper>

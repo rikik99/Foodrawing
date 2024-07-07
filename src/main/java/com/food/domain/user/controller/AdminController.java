@@ -605,6 +605,27 @@ public class AdminController {
 		mv.setViewName("admin/couponList");
 		return mv;
 	}
+	
+	@PatchMapping("/updateDiscountStatus")
+	@ResponseBody
+	public Map<String, Object> updateDiscountStatus(@RequestBody Map<String, Object> request) {
+	    Map<String, Object> response = new HashMap<>();
+	    try {
+	        Long discountId = Long.parseLong(request.get("discountId").toString());
+	        String newStatus = request.get("onsaleYn").toString();
+	        
+	        // 할인 상태 업데이트 서비스 호출
+	        boolean success = adminService.updateDiscountStatus(discountId, newStatus);
+	        
+	        response.put("success", success);
+	        response.put("message", success ? "진행 여부 변경에 성공했습니다." : "진행 여부 변경에 실패했습니다.");
+	    } catch (Exception e) {
+	        response.put("success", false);
+	        response.put("message", "진행 여부 변경 중 오류가 발생했습니다.");
+	        e.printStackTrace();
+	    }
+	    return response;
+	}
 
 	@DeleteMapping("/couponList")
 	@ResponseBody

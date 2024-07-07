@@ -239,4 +239,6 @@ public interface AdminMapper {
 
 	void createAdminUser(Map<String, Object> allParams);
 
+	void updateDiscountStatus(Long discountId, String newStatus);
+
 }

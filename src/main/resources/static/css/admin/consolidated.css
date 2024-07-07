@@ -246,6 +246,10 @@ button.editButton:hover {
 .custom-table .status-column {
 	width: 100px;
 }
+.custom-table .discount-status-column {
+	width: 100px;
+	cursor: pointer;
+}
 
 .collapse-content {
 	display: none;

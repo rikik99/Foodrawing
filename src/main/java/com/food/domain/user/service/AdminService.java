@@ -1261,6 +1261,17 @@ public class AdminService {
 	    adminMapper.createAdmin(allParams);
 	}
 
+	@Transactional
+	public boolean updateDiscountStatus(Long discountId, String newStatus) {
+	    try {
+	        adminMapper.updateDiscountStatus(discountId, newStatus);
+	        return true;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+
 
 
 

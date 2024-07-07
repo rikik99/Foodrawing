@@ -188,6 +188,33 @@ document.addEventListener('click', function(e) {
 		const productNumber = e.target.getAttribute('data-productNumber');
 		openWindow(`/admin/updateProduct/${productNumber}`, 'EditWindow');
 	}
+
+    if (e.target.classList.contains('discount-status-column')) {
+        let discountId = e.target.closest('tr').getAttribute('data-discountId');
+        let currentStatus = e.target.innerText.trim();
+        let newStatus = (currentStatus === 'Y') ? 'N' : 'Y';
+        fetch('/admin/updateDiscountStatus', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ discountId: discountId, onsaleYn: newStatus })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('진행 여부 변경에 성공했습니다.');
+                loadContent('/admin/discountList', 'discountList', true);
+            } else {
+                alert('진행 여부 변경에 실패했습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('진행 여부 변경 중 오류가 발생했습니다.');
+        });
+    }
+
 });
 
 document.addEventListener('click', async function(event) {
@@ -285,49 +312,49 @@ document.addEventListener('click', async function(event) {
 });
 
 document.addEventListener('change', function(e) {
-    if (e.target && e.target.id === 'productList') {
-        console.log("상품명 선택했어요");
-        updateProductDetails('productList');
-    } else if (e.target && e.target.id === 'updateProductList') {
-        console.log("수정할 상품명 선택");
-        const productName = e.target.value;
-        if (productName) {
-            fetchProductInfo(productName);
-        }
-    }
+	if (e.target && e.target.id === 'productList') {
+		console.log("상품명 선택했어요");
+		updateProductDetails('productList');
+	} else if (e.target && e.target.id === 'updateProductList') {
+		console.log("수정할 상품명 선택");
+		const productName = e.target.value;
+		if (productName) {
+			fetchProductInfo(productName);
+		}
+	}
 });
 
 function fetchProductInfo(productName) {
-    fetch('/admin/getProductInfo', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ name: productName })
-    })
-    .then(response => response.json())
-    .then(data => fillFormFields(data))
-    .catch(error => console.error('Error fetching product info:', error));
+	fetch('/admin/getProductInfo', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({ name: productName })
+	})
+		.then(response => response.json())
+		.then(data => fillFormFields(data))
+		.catch(error => console.error('Error fetching product info:', error));
 }
 
 function fillFormFields(data) {
-    document.getElementById('productNumber').value = data.productNumber || '';
-    document.getElementById('title').value = data.title || '';
-    document.getElementById('startPostDate').value = data.startPostDate || '';
-    document.getElementById('lastPostDate').value = data.lastPostDate || '';
-    document.getElementById('salesPostId').value = data.salesPostId || '';
+	document.getElementById('productNumber').value = data.productNumber || '';
+	document.getElementById('title').value = data.title || '';
+	document.getElementById('startPostDate').value = data.startPostDate || '';
+	document.getElementById('lastPostDate').value = data.lastPostDate || '';
+	document.getElementById('salesPostId').value = data.salesPostId || '';
 
-    const statusRadio = document.querySelector(`input[name="status"][value="${data.status}"]`);
-    if (statusRadio) {
-        statusRadio.checked = true;
-    }
+	const statusRadio = document.querySelector(`input[name="status"][value="${data.status}"]`);
+	if (statusRadio) {
+		statusRadio.checked = true;
+	}
 
-    if (window.editorInstance) {
-        window.editorInstance.setData(data.description || '');
-    }
+	if (window.editorInstance) {
+		window.editorInstance.setData(data.description || '');
+	}
 
-    const previewArea = document.querySelector('.previewArea');
-    previewArea.src = data.imagePath || '/images/FooDrawing_Logo.png';
+	const previewArea = document.querySelector('.previewArea');
+	previewArea.src = data.imagePath || '/images/FooDrawing_Logo.png';
 }
 
 document.addEventListener('blur', function(e) {

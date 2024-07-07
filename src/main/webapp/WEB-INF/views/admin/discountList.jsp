@@ -121,7 +121,7 @@
 						<th class="max-discount-value-column">최대 할인 값</th>
 						<th class="start-date-column">시작 날짜</th>
 						<th class="end-date-column">종료 날짜</th>
-						<th class="status-column">진행 여부</th>
+						<th class="discount-status-column">진행 여부</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -145,7 +145,7 @@
 							<td class="max-discount-value-column">&#8361;${discounts.maxDiscount}</td>
 							<td class="start-date-column">${discounts.formattedStartDate}</td>
 							<td class="end-date-column">${discounts.formattedEndDate}</td>
-							<td class="status-column">${discounts.onsaleYn}</td>
+							<td class="discount-status-column">${discounts.onsaleYn}</td>
 						</tr>
 					</c:forEach>
 				</tbody>
