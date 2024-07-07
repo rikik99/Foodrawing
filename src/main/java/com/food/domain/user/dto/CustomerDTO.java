@@ -23,6 +23,7 @@ public class CustomerDTO {
     private String zipcode;
     private String refundAccount;
     private String refundBank;
+    private UserDTO userDTO;
 
     public Date getBirthDate() {
         return birthDate != null ? birthDate : new Date(); // 기본값 설정, 필요에 따라 변경

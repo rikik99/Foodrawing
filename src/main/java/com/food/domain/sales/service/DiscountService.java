@@ -11,27 +11,31 @@ import com.food.domain.sales.mapper.DiscountMapper;
 @Service
 public class DiscountService {
 
-    @Autowired
-    private DiscountMapper discountMapper;
+	@Autowired
+	private DiscountMapper discountMapper;
 
-    public Discount2DTO getDiscountById(Long id) {
-        return discountMapper.findDiscountById(id);
-    }
+	public Discount2DTO getDiscountById(Long id) {
+		return discountMapper.findDiscountByIdQuery(id);
+	}
 
-    public List<Discount2DTO> getCategoryTargetDiscount(Long categoryId) {
-        return discountMapper.findCategoryTargetDiscount(categoryId);
-    }
+	public List<Discount2DTO> getCategoryTargetDiscount(Long categoryId) {
+		return discountMapper.findCategoryTargetDiscountQuery(categoryId);
+	}
 
-    public List<Discount2DTO> getProductTargetDiscount(Long productId) {
-        return discountMapper.findProductTargetDiscount(productId);
-    }
-    public List<Discount2DTO> getDiscountProducts() {
-        List<Discount2DTO> discountProducts = discountMapper.findDiscountProducts();
-        for (Discount2DTO product : discountProducts) {
-            double discountedPrice = product.getOriginalPrice() * (1 - (product.getDiscountValue() / 100.0));
-            product.setDiscountedPrice(discountedPrice);
-        }
-        return discountProducts;
-    
-}
+	public List<Discount2DTO> getProductTargetDiscount(Long productId) {
+		return discountMapper.findProductTargetDiscountQuery(productId);
+	}
+
+	public List<Discount2DTO> getDiscountProducts() {
+		List<Discount2DTO> discountProducts = discountMapper.findDiscountProductsQuery();
+		for (Discount2DTO product : discountProducts) {
+			double discountedPrice = product.getOriginalPrice() * (1 - (product.getDiscountValue() / 100.0));
+			product.setDiscountedPrice(discountedPrice);
+		}
+		
+		System.out.println("discountProducts: " + discountProducts);
+		
+		return discountProducts;
+
+	}
 }

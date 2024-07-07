@@ -14,13 +14,14 @@
 	integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
 	crossorigin="anonymous">
 <link rel="stylesheet" href="css/common.css">
+<link rel="stylesheet" href="css/sidebar.css">
 <link rel="stylesheet" href="css/bestpage.css">
-<!-- <link rel="stylesheet" href="css/sidebar.css"> -->
 <link rel="stylesheet" href="css/product/productimage.css">
 <link rel="stylesheet" href="css/product/slider.css">
 <link rel="stylesheet" href="css/product/cart.css">
 <link rel="stylesheet" href="css/product/reviewchartbox.css">
 <style>
+/* 스타일 추가 및 기존 스타일 유지 */
 .detail-top {
 	margin: 0;
 	padding: 0;
@@ -208,12 +209,7 @@
 	{
 	margin-left: 10px;
 }
-/*.review-item {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid #eee;
-            padding: 15px 0;
-        }*/
+
 .review-details {
 	display: flex;
 	flex-direction: column;
@@ -339,6 +335,29 @@
 	border-radius: 5px;
 }
 
+.inquiry-answer-content {
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+.inquiry-answer-content p {
+    margin: 0;
+    line-height: 1.5;
+}
+.inquiry-answer-content strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.lock-icon {
+    font-size: 14px;
+    color: #aaa;
+    margin-right: 5px;
+}
+
 .pagination {
 	display: flex;
 	justify-content: center;
@@ -369,7 +388,6 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 20px;
 }
 
 .cart-item div {
@@ -439,7 +457,7 @@
 }
 
 .full-size-img {
-	width: 70%;
+	width: 300px;
 	height: auto;
 	margin-top: 10px;
 }
@@ -451,46 +469,47 @@
 	margin-top: 10px;
 }
 
-.review .review-answer {
+.review-section .review-answer {
 	background-color: #e5e5e5;
 	padding: 20px;
 	border-radius: 5px;
-	width: 900px;
+	width: 850px;
+	margin-top: 10px;
 }
 
-.review .review-comment {
+.review-section .review-comment {
 	width: 900px;
 }
 
 .product-title {
-    display: flex;
-    align-items: center;  /* 수직 중앙 정렬 */
-    justify-content: space-between; /* 자식 요소 간의 간격을 최대화하여 양 끝에 배치 */
-    width: 100%;
-    padding: 10px; /* 선택 사항: 내부 여백 추가 */
-    box-sizing: border-box; /* 패딩과 테두리를 포함한 박스 크기 계산 */
+	display: flex;
+	align-items: center; /* 수직 중앙 정렬 */
+	justify-content: space-between; /* 자식 요소 간의 간격을 최대화하여 양 끝에 배치 */
+	width: 100%;
+	padding: 10px; /* 선택 사항: 내부 여백 추가 */
+	box-sizing: border-box; /* 패딩과 테두리를 포함한 박스 크기 계산 */
 }
 
 /* 제품 이름 스타일 */
 .product-title .product-name {
-    font-size: 24px; /* 적절한 글꼴 크기 지정 */
-    margin: 0; /* 기본 마진 제거 */
-    flex-grow: 1; /* 여유 공간을 차지하게 함 */
-    margin-right: 20px; /* 아이콘과의 간격 */
+	font-size: 24px; /* 적절한 글꼴 크기 지정 */
+	margin: 0; /* 기본 마진 제거 */
+	flex-grow: 1; /* 여유 공간을 차지하게 함 */
+	margin-right: 20px; /* 아이콘과의 간격 */
 }
 
 /* 위시리스트 아이콘 스타일 */
 .product-title .wish-icon {
-    cursor: pointer; /* 커서를 포인터로 변경하여 클릭 가능 표시 */
+	cursor: pointer; /* 커서를 포인터로 변경하여 클릭 가능 표시 */
 }
 </style>
 <script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
 	integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
 	crossorigin="anonymous"></script>
-	
-	<script>
-	   // UTF-8 문자열을 Base64로 인코딩하는 함수
+
+<script>
+       // UTF-8 문자열을 Base64로 인코딩하는 함수
     function btoaUtf8(str) {
         return btoa(unescape(encodeURIComponent(str)));
     }
@@ -499,413 +518,67 @@
     function atobUtf8(str) {
         return decodeURIComponent(escape(atob(str)));
     }
-	document.addEventListener('DOMContentLoaded', function () {
-	    const salesPostId = '${salesInfo.id}';
-	    var discountPrice = '${discountPrice}';
-	    const price = '${productInfo.price}';
-	    
-	    if(discountPrice == 0) {
-	        discountPrice = price;
-	    }
-	    
-	    const productInfo = {
-	        salesPostId: salesPostId,
-	        name: '${productInfo.name}',
-	        filePath: '${productFileInfo.filePath}',
-	        price: discountPrice
-	    };
-
-	    // 쿠키에 저장된 최근 본 상품 목록을 가져옴
-	    let recentViewedProducts = JSON.parse(atobUtf8(getCookie('recentViewedProducts') || 'W10=')); // Base64 디코딩
-
-	    // 현재 상품을 최근 본 상품 목록에 추가
-	    recentViewedProducts = recentViewedProducts.filter(product => product.salesPostId !== salesPostId);
-	    recentViewedProducts.unshift(productInfo);
-
-	    // 최대 5개의 최근 본 상품만 저장
-	    if (recentViewedProducts.length > 5) {
-	        recentViewedProducts.pop();
-	    }
-
-	    // 쿠키에 저장
-	    setCookie('recentViewedProducts', btoaUtf8(JSON.stringify(recentViewedProducts)), 7); // Base64 인코딩
-
-	    function setCookie(name, value, days) {
-	        const d = new Date();
-	        d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
-	        const expires = "expires=" + d.toUTCString();
-	        document.cookie = name + "=" + value + ";" + expires + ";path=/";
-	    }
-
-	    function getCookie(name) {
-	        const decodedCookie = decodeURIComponent(document.cookie);
-	        const ca = decodedCookie.split(';');
-	        name = name + "=";
-	        for (let i = 0; i < ca.length; i++) {
-	            let c = ca[i];
-	            while (c.charAt(0) == ' ') {
-	                c = c.substring(1);
-	            }
-	            if (c.indexOf(name) == 0) {
-	                return c.substring(name.length, c.length);
-	            }
-	        }
-	        return "";
-	    }
-	});
-
-    </script>
-	
-	<script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const wishIcon = document.getElementById('wish-icon');
-            const salesPostId = document.getElementById('salesPostId').value;
-            const customerId = 1; //설정해 줘야함
-
-            wishIcon.addEventListener('click', function() {
-                const isWished = wishIcon.getAttribute('data-wished') === 'true';
-                const url = isWished ? '/wishlist/remove' : '/wishlist/add';
-                const newIconSrc = isWished ? '/images/svg/iconUtilWish.svg' : '/images/svg/iconUtilWishOn.svg';
-
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ 
-                        salesPostId: salesPostId, 
-                        customerId: customerId
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        wishIcon.src = newIconSrc;
-                        wishIcon.setAttribute('data-wished', !isWished);
-                        if(isWished) {
-                        	alert('위시리스트에 상품이 삭제되었습니다. ')
-                        } else{
-	                        alert('위시리스트에 상품이 담겼습니다. ')
-                        }
-                    } else {
-                        alert('위시리스트 상태를 업데이트하는데 문제가 발생했습니다.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('위시리스트 상태를 업데이트하는데 문제가 발생했습니다.');
-                });
-            });
-        });
-    </script>
-
-<!-- <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const wishIcon = document.getElementById('wish-icon');
-
-    wishIcon.addEventListener('click', function() {
-        const wished = wishIcon.getAttribute('data-wished') === 'true'; 
+    document.addEventListener('DOMContentLoaded', function () {
+        const salesPostId = '${salesInfo.id}';
+        var discountPrice = '${discountPrice}';
+        const price = '${productInfo.price}';
         
-        if (wished) {
-            wishIcon.src = '/images/svg/iconUtilWish.svg';
-            wishIcon.setAttribute('data-wished', 'false');
-        } else {
-            wishIcon.src = '/images/svg/iconUtilWishOn.svg';
-            wishIcon.setAttribute('data-wished', 'true');
+        if(discountPrice == 0) {
+            discountPrice = price;
+        }
+        
+        const productInfo = {
+            salesPostId: salesPostId,
+            name: '${productInfo.name}',
+            filePath: '${productFileInfo.filePath}',
+            originalPrice: '${productInfo.price}',
+            price: discountPrice
+        };
+
+        // 쿠키에 저장된 최근 본 상품 목록을 가져옴
+        let recentViewedProducts = JSON.parse(atobUtf8(getCookie('recentViewedProducts') || 'W10=')); // Base64 디코딩
+
+        // 현재 상품을 최근 본 상품 목록에 추가
+        recentViewedProducts = recentViewedProducts.filter(product => product.salesPostId !== salesPostId);
+        recentViewedProducts.unshift(productInfo);
+
+        // 최대 5개의 최근 본 상품만 저장
+        if (recentViewedProducts.length > 5) {
+            recentViewedProducts.pop();
+        }
+
+        // 쿠키에 저장
+        setCookie('recentViewedProducts', btoaUtf8(JSON.stringify(recentViewedProducts)), 7); // Base64 인코딩
+
+        function setCookie(name, value, days) {
+            const expires = ""; // 컴퓨터가 종료되면 쿠키가 삭제되도록 설정
+            document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        }
+
+        function getCookie(name) {
+            const decodedCookie = decodeURIComponent(document.cookie);
+            const ca = decodedCookie.split(';');
+            name = name + "=";
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
         }
     });
-});
-</script> -->
-	
-<script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const quantityInputs = document.querySelectorAll('.quantity');
-            const totalPriceElements = document.querySelectorAll('.total-price');
-            const pricePerItem = parseInt(document.getElementById('productprice').value);
 
-            function updateTotalPrice() {
-                const quantity = parseInt(quantityInputs[0].value);
-                totalPriceElements.forEach(totalPriceElement => {
-                    const totalPrice = quantity * pricePerItem;
-                    totalPriceElement.innerText = totalPrice.toLocaleString() + '원';
-                });
-                quantityInputs.forEach(input => {
-                    input.value = quantity;
-                });
-            }
-
-            document.querySelectorAll('.increment').forEach(button => {
-                button.addEventListener('click', function() {
-                    const quantity = parseInt(quantityInputs[0].value) + 1;
-                    quantityInputs.forEach(input => input.value = quantity);
-                    updateTotalPrice();
-                });
-            });
-
-            document.querySelectorAll('.decrement').forEach(button => {
-                button.addEventListener('click', function() {
-                    if (quantityInputs[0].value > 1) {
-                        const quantity = parseInt(quantityInputs[0].value) - 1;
-                        quantityInputs.forEach(input => input.value = quantity);
-                        updateTotalPrice();
-                    }
-                });
-            });
-
-            updateTotalPrice();
-        });
-        
-        document.addEventListener('DOMContentLoaded', function () {
-        		const cartButton = document.querySelector('.cart-button');
-            const buyButton = document.querySelector('.buy-button');
-            const quantityInput = document.querySelector('.quantity');
-            const productNumberInput = document.getElementById('product_number');
-            
-            cartButton.addEventListener('click', function () {
-                const quantity = parseInt(quantityInput.value);
-                const productNumber = productNumberInput.value; // 실제 제품 ID로 교체
-                const customerId = 1; // 실제 사용자 ID로 교체
-
-                checkStock(productNumber, quantity, customerId);
-            });
-
-            buyButton.addEventListener('click', function () {
-                const quantity = parseInt(quantityInput.value);
-                const productNumber = productNumberInput.value; // salesPostId로 교체
-                const customerId = 1; // 실제 사용자 ID로 교체
-
-                prepareDirectPurchase(productNumber, quantity, customerId);
-            });
-
-            function checkStock(productNumber, quantity, customerId) {
-                const data = { productNumber, quantity, customerId };
-                fetch('/cart/checkStock', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        if (data.stockAvailable) {
-                            if (data.inCart) {
-                            	if (confirm('장바구니에 이미 있는 상품입니다. 수량을 추가하시겠습니까?')) {
-                                    addToCart(productNumber, quantity, customerId, false);
-                                }
-                            } else {
-                                addToCart(productNumber, quantity, customerId);
-                            }
-                        } else {
-                            alert('재고가 부족합니다.');
-                        }
-                    } else {
-                        alert('장바구니에 담는데 문제가 발생했습니다');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('장바구니에 담는데 문제가 발생했습니다');
-                });
-            }
-
-            function addToCart(productNumber, quantity, customerId, updateCount) {
-                const data = { productNumber, quantity, customerId };
-                fetch('/cart/addToCart', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('장바구니에 담겼습니다');
-                        if (updateCount) {
-                            updateCartCount(quantity);
-                        }
-                    } else {
-                        alert('장바구니에 담는데 문제가 발생했습니다');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('장바구니에 담는데 문제가 발생했습니다');
-                });
-            }
-
-            function updateCartCount(quantity) {
-                const headerCartCount = document.getElementById('headerCartCount');
-                const cartBadge = document.querySelector('.cart-link .badge');
-
-                if (headerCartCount) {
-                    const currentCount = parseInt(headerCartCount.textContent) || 0;
-                    headerCartCount.textContent = currentCount + quantity;
-                }
-
-                if (cartBadge) {
-                    const currentBadgeCount = parseInt(cartBadge.textContent) || 0;
-                    cartBadge.textContent = currentBadgeCount + quantity;
-                }
-            }
-            
-            function prepareDirectPurchase(productNumber, quantity, customerId) {
-                fetch('/order/prepareCheckoutAll', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ productNumber, quantity, customerId }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (!data.success) {
-                        alert('결제 준비 중 오류가 발생했습니다.');
-                        return;
-                    }
-                    // Create a form and submit it with POST method
-                    var form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '/buy/checkoutPage';
-
-                    var customerIdInput = document.createElement('input');
-                    customerIdInput.type = 'hidden';
-                    customerIdInput.name = 'customerId';
-                    customerIdInput.value = customerId;
-                    form.appendChild(customerIdInput);
-
-                    var productNumberInput = document.createElement('input');
-                    productNumberInput.type = 'hidden';
-                    productNumberInput.name = 'productNumber'; // Change this line
-                    productNumberInput.value = productNumber;
-                    form.appendChild(productNumberInput);
-
-                    var quantityInput = document.createElement('input');
-                    quantityInput.type = 'hidden';
-                    quantityInput.name = 'quantity';
-                    quantityInput.value = quantity;
-                    form.appendChild(quantityInput);
-
-                    document.body.appendChild(form);
-                    form.submit();
-                })
-                .catch(error => {
-                    console.error('결제 준비 오류:', error);
-                    alert('결제 준비 중 오류가 발생했습니다.');
-                });
-            }
-
-            function checkoutAllItems() {
-                var customerId = 1; // 고객 ID를 적절히 넣어야 합니다
-                var cartItems = document.querySelectorAll('.order-cart-item');
-                var productNumbers = Array.from(cartItems).map(item => item.getAttribute('data-item-id'));
-
-                if (productNumbers.length === 0) {
-                    alert('장바구니에 담긴 항목이 없습니다.');
-                    return;
-                }
-
-                var soldOutItems = document.querySelectorAll('.order-cart-item .sold-out-overlay');
-                var hasSoldOut = false;
-                var insufficientStock = false;
-
-                cartItems.forEach(item => {
-                    var productQuantity = parseInt(item.querySelector('.productQuantity').value);
-                    var quantity = parseInt(item.querySelector('.quantity').value);
-                    if (productQuantity == 0) {
-                        hasSoldOut = true;
-                    }
-                    if (quantity > productQuantity) {
-                        insufficientStock = true;
-                    }
-                });
-
-                if (hasSoldOut) {
-                    alert('품절된 상품이 있습니다.');
-                    return;
-                }
-
-                if (insufficientStock) {
-                    alert('재고가 부족한 상품이 있습니다.');
-                    return;
-                }
-
-                fetch('/order/prepareCheckoutAll', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        customerId: customerId,
-                        productNumbers: productNumbers
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (!data.success) {
-                        alert('품절된 상품이 있습니다.');
-                        return;
-                    }
-                    // Create a form and submit it with POST method
-                    var form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '/checkoutPage';
-
-                    var customerIdInput = document.createElement('input');
-                    customerIdInput.type = 'hidden';
-                    customerIdInput.name = 'customerId';
-                    customerIdInput.value = customerId;
-                    form.appendChild(customerIdInput);
-
-                    productNumbers.forEach(id => {
-                        var productNumberInput = document.createElement('input');
-                        productNumberInput.type = 'hidden';
-                        productNumberInput.name = 'productNumbers'; // Change this line
-                        productNumberInput.value = id;
-                        form.appendChild(productNumberInput);
-                    });
-
-                    document.body.appendChild(form);
-                    form.submit();
-                })
-                .catch(error => {
-                    console.error('결제 준비 오류:', error);
-                    alert('결제 준비 중 오류가 발생했습니다.');
-                });
-            }
-        });
     </script>
 
-<script>
-    function toggleMoreContent(id) {
-        var content = document.getElementById('more-content-' + id);
-        var btn = document.getElementById('more-btn-' + id);
-        var thumbnail = document.getElementById('thumbnail-' + id);
-
-        if (content.style.display === 'none' || content.style.display === '') {
-            content.style.display = 'flex';
-            thumbnail.style.display = 'none'; // 작은 이미지 숨기기
-            btn.innerText = '닫기';
-        } else {
-            content.style.display = 'none';
-            thumbnail.style.display = 'block'; // 작은 이미지 보이기
-            btn.innerText = '더보기';
-        }
-    }
-    
-    function toggleInquiryAnswer(id) {
-        var answer = document.getElementById('inquiry-answer-' + id);
-        if (answer.style.display === 'none' || answer.style.display === '') {
-            answer.style.display = 'flex';
-        } else {
-            answer.style.display = 'none';
-        }
-    }
-    </script>
 </head>
 <body>
+	<c:set var="totalReviews" value="${totalReviews}" />
+	<c:set var="ratingPercentages" value="${ratingPercentages}" />
+
 	<div class="header-wrap">
 		<%@include file="/WEB-INF/include/header.jsp"%>
 		<%@include file="/WEB-INF/include/nav.jsp"%>
@@ -933,18 +606,26 @@ document.addEventListener('DOMContentLoaded', function() {
 				</div>
 				<div class="right-column">
 					<input type="hidden" id="product_number" name="productNumber"
-						value="${productInfo.productNumber}">
-					<input type="hidden" id="salesPostId" name="salesPostId"
-						value="${salesInfo.id}">
+						value="${productInfo.productNumber}"> <input type="hidden"
+						id="salesPostId" name="salesPostId" value="${salesInfo.id}">
+					<input type="hidden" id="discountPrice" name="discountPrice"
+						class="discountPrice" value="${discountPrice}"> <input
+						type="hidden" id="productName" name="productName"
+						class="productName" value="${productInfo.name}"> <input
+						type="hidden" id="productFilePath" name="productFilePath"
+						class="productFilePath" value="${productFileInfo.filePath}">
 					<div class="product-title">
-						<h1 class="product-name">${productInfo.name}1.05kg</h1>
-						<img id="wish-icon" class="wish-icon" src="/images/svg/iconUtilWish.svg" data-wished="false" alt="위시리스트 아이콘">
+						<h1 class="product-name">${productInfo.name}</h1>
+						<img id="wish-icon" class="wish-icon"
+							src="/images/svg/iconUtilWish.svg" data-wished="false"
+							alt="위시리스트 아이콘">
 					</div>
 					<div class="product-info" style="text-align: left;">
 						<input type="hidden" id="productprice" name="productprice"
 							class="productprice" value="${productInfo.price}">
 
 						<c:choose>
+
 							<c:when test="${discountPrice == 0}">
 								<p class="price">
 									<fmt:formatNumber type="number" value="${productInfo.price}" />
@@ -964,11 +645,11 @@ document.addEventListener('DOMContentLoaded', function() {
 						</c:choose>
 
 						<p>원산지 : 하단 상품정보 참고</p>
-						<div class="rating">⭐ 4.9 (9,999)</div>
+						<div class="rating">⭐ ${averageRating} (<fmt:formatNumber type="number" value="${totalReviews}" />)</div>
 					</div>
 					<div class="detail-cart-wrap mt-3">
 						<div class="cart-item">
-							<div class="item-info">${productInfo.name}1.05kg</div>
+							<div class="item-info">${productInfo.name}</div>
 							<div class="item-quantity">
 								<button class="decrement">-</button>
 								<input type="text" class="quantity" value="1" readonly>
@@ -1077,7 +758,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				<ul class="nav nav-tabs">
 					<li class="nav-item"><a class="nav-link active"
 						href="#detail-content">상세정보</a></li>
-					<li class="nav-item"><a class="nav-link" href="#review">리뷰(9,999+)</a>
+					<li class="nav-item"><a class="nav-link" href="#review">리뷰(<fmt:formatNumber type="number" value="${totalReviews}" />)</a>
 					</li>
 					<li class="nav-item"><a class="nav-link" href="#purchase-info">구매정보</a>
 					</li>
@@ -1117,64 +798,52 @@ document.addEventListener('DOMContentLoaded', function() {
 
 					<!-- Review Summary Section -->
 					<div class="review-chart-box">
-						<div class="rating-wrap">
-							<div class="average-rating">
-								4.8<span>/5</span>
+						<div class="rating-chart-box-inner">
+							<div class="rating-wrap">
+								<div class="average-rating">
+									<fmt:formatNumber value="${averageRating}" type="number"
+										minFractionDigits="1" maxFractionDigits="1" />
+									<span>/ 5</span>
+								</div>
+								<div class="star-rating">
+									<c:forEach var="i" begin="1" end="${floorRating}">
+                    ★
+                </c:forEach>
+									<c:forEach var="i" begin="${floorRating + 1}" end="5">
+                    ☆
+                </c:forEach>
+								</div>
 							</div>
-							<div class="star-rating">★★★★★</div>
-						</div>
-						<div class="review-summary">
-							<div class="total-reviews">
-								총 <span style="color: #FFA500;">47건</span>의 리뷰 중
-							</div>
-							<div class="percentage">
-								<span style="color: #FFA500;">87%</span> 고객님이 <span
-									style="color: #FFA500;">5점</span>을 주었어요
+							<div class="review-summary">
+								<div class="total-reviews">
+									총 <span style="color: #FFA500;">${totalReviews}건</span>의 리뷰 중
+								</div>
+								<div class="percentage">
+									<span style="color: #FFA500;"> ${ratingPercentages[4]}%
+									</span> 고객님이 <span style="color: #FFA500;">5점</span>을 주었어요
+								</div>
 							</div>
 						</div>
 						<div class="bar-chart-wrap">
-							<div class="score-item">
-								<div>5점</div>
-								<div class="score-bar">
-									<div class="score" style="width: 87%;"></div>
+							<c:forEach var="i" begin="0" end="4">
+								<div class="score-item">
+									<div>${5 - i}점</div>
+									<div class="score-bar">
+										<div class="score"
+											style="width: ${ratingPercentages[4 - i]}%;"></div>
+									</div>
+									<div class="score-percentage">${ratingPercentages[4 - i]}%
+									</div>
 								</div>
-								<div class="score-percentage">87%</div>
-							</div>
-							<div class="score-item">
-								<div>4점</div>
-								<div class="score-bar">
-									<div class="score" style="width: 10%;"></div>
-								</div>
-								<div class="score-percentage">10%</div>
-							</div>
-							<div class="score-item">
-								<div>3점</div>
-								<div class="score-bar">
-									<div class="score" style="width: 2%;"></div>
-								</div>
-								<div class="score-percentage">2%</div>
-							</div>
-							<div class="score-item">
-								<div>2점</div>
-								<div class="score-bar">
-									<div class="score" style="width: 1%;"></div>
-								</div>
-								<div class="score-percentage">1%</div>
-							</div>
-							<div class="score-item">
-								<div>1점</div>
-								<div class="score-bar">
-									<div class="score" style="width: 0%;"></div>
-								</div>
-								<div class="score-percentage">0%</div>
-							</div>
+							</c:forEach>
 						</div>
 					</div>
+
 
 					<!-- 리뷰 내용 추가 -->
 					<div class="review-section">
 						<div class="review-header">
-							<h2>상품리뷰 59건</h2>
+							<h2>상품리뷰 ${totalReviews}건</h2>
 							<div class="sort-options">
 								<select>
 									<option>최근 등록순</option>
@@ -1182,64 +851,20 @@ document.addEventListener('DOMContentLoaded', function() {
 									<option>낮은 평점순</option>
 								</select>
 								<button class="btn btn-outline-secondary">포토리뷰 모아보기</button>
-								<button class="btn btn-primary">상품리뷰 쓰기</button>
 							</div>
 						</div>
 
-						<!-- Review Item -->
-						<div class="review-item">
-							<div class="review-details">
-								<div class="review-info">
-									<span class="review-rating">★★★★★</span> <span
-										class="review-author">sang *****</span> <span
-										class="review-date">2024.06.10</span> <span
-										class="review-badge text-dark" style="margin-left: 10px;">한달사용기</span>
-								</div>
-								<div class="review-content">
-									<div class="review">
-										<div class="review-comment">
-											<p>
-												맛있게 빨리 먹어서 조리하고 사진을 못찍었네요~<br> 넘 자극적이지하고 담백한 육개장 맛있게
-												먹었어요~<br> 좋아요~
-											</p>
-										</div>
-										<div class="review-thumbnail">
-											<img id="thumbnail-1"
-												src="images/20240517_CaTchWorkFavicon.png"
-												alt="Review Image" onclick="toggleMoreContent(1)">
-										</div>
-										<div id="more-content-1" class="more-content">
-											<img src="images/20240517_CaTchWorkFavicon.png"
-												class="full-size-img" alt="Full Review Image">
-											<div class="review-answer">
-												<p>
-													마이셰프<br> 안녕하세요 마이셰프 입니다.<br> 마이셰프를 믿고 구매해주셔서
-													감사합니다.<br> 늘 변하지 않는 맛과 서비스를 보답하겠습니다.<br> 감사합니다.
-												</p>
-											</div>
-										</div>
-										<div id="more-btn-1" class="more-btn"
-											onclick="toggleMoreContent(1)">더보기</div>
-									</div>
-								</div>
-							</div>
+						<div id="review-section" class="review-section">
+							<!-- 리뷰 데이터가 여기에 비동기적으로 추가됩니다 -->
 						</div>
-
-						<!-- Repeat the Review Item block for more reviews -->
-
-						<!-- Pagination -->
 						<ul class="pagination">
-							<li class="page-item"><a class="page-link" href="#">1</a></li>
-							<li class="page-item"><a class="page-link" href="#">2</a></li>
-							<li class="page-item"><a class="page-link" href="#">3</a></li>
-							<li class="page-item"><a class="page-link" href="#">4</a></li>
-							<li class="page-item"><a class="page-link" href="#">5</a></li>
-							<li class="page-item"><a class="page-link" href="#">다음</a></li>
+							<!-- 페이지네이션이 여기에 추가됩니다 -->
 						</ul>
 					</div>
 				</div>
-				<div id="purchase-info" class="detail-content">
-					<h2>구매 정보</h2>
+
+				<div id="inquiry-info" class="detail-content">
+					<h2>상품 문의</h2>
 					<!-- 구매 정보 추가 -->
 					<div class="inquiry-section">
 						<div class="inquiry-header">
@@ -1247,8 +872,11 @@ document.addEventListener('DOMContentLoaded', function() {
 							<button class="btn btn-primary">상품문의 하기</button>
 						</div>
 
+						<div id="inquiry-section" class="inquiry-section"></div>
+						<ul id="inquiry-pagination" class="pagination"></ul>
+
 						<!-- Inquiry Item -->
-						<div class="inquiry-item" onclick="toggleInquiryAnswer(1)">
+						<!-- <div class="inquiry-item" onclick="toggleInquiryAnswer(1)">
 							<div class="inquiry-info">
 								<span class="inquiry-badge text-dark">답변완료</span> <span
 									class="inquiry-content">배송문의입니다.</span>
@@ -1275,14 +903,14 @@ document.addEventListener('DOMContentLoaded', function() {
 									</p>
 								</div>
 							</div>
-						</div>
+						</div> -->
 
 						<!-- Pagination -->
-						<ul class="pagination">
+						<!-- <ul class="pagination">
 							<li class="page-item"><a class="page-link" href="#">&#60;</a></li>
 							<li class="page-item"><a class="page-link" href="#">1</a></li>
 							<li class="page-item"><a class="page-link" href="#">&#62;</a></li>
-						</ul>
+						</ul> -->
 					</div>
 				</div>
 			</div>
@@ -1327,117 +955,232 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	<%@include file="/WEB-INF/include/sidebar.jsp"%>
 	<%@include file="/WEB-INF/include/footer.jsp"%>
-	<script>
-        document.querySelectorAll('.mini span').forEach(span => {
-            span.addEventListener('click', function() {
-                var bigImage = document.getElementById('bigImage');
-                var newSrc = this.getAttribute('data-image');
-                bigImage.setAttribute('src', newSrc);
-            });
-        });
-    </script>
 
 	<script>
-    let currentIndex = {};
-
-    function initSliders() {
-        const sliders = document.querySelectorAll('.slider');
-        sliders.forEach(slider => {
-            currentIndex[slider.id] = 0;
-            const slides = slider.querySelector('.slides');
-            const totalSlides = slides.children.length;
-            const slidesToShow = 3; // 한 번에 보여줄 슬라이드 수
-
-            // 슬라이더의 너비를 설정하여 슬라이드가 모두 보이도록 합니다.
-            slides.style.width = '100%';
-            for (let slide of slides.children) {
-                slide.style.width = (100 / slidesToShow) + '%';
-            }
-
-            // 페이지 인디케이터 업데이트
-            updatePageIndicator(slider.id);
-        });
-    }
-
-    function nextSlide(sliderId) {
-        const slider = document.getElementById(sliderId);
-        const slides = slider.querySelector('.slides');
-        const totalSlides = slides.children.length;
-        const slidesToShow = 3;
-        const maxIndex = totalSlides - slidesToShow;
-
-        if (currentIndex[sliderId] < maxIndex) {
-            currentIndex[sliderId] += slidesToShow;
-            updateSlider(slides, currentIndex[sliderId]);
-            updatePageIndicator(sliderId);
-        }
-    }
-
-    function prevSlide(sliderId) {
-        const slider = document.getElementById(sliderId);
-        const slides = slider.querySelector('.slides');
-        const totalSlides = slides.children.length;
-        const slidesToShow = 3;
-
-        if (currentIndex[sliderId] > 0) {
-            currentIndex[sliderId] -= slidesToShow;
-            updateSlider(slides, currentIndex[sliderId]);
-            updatePageIndicator(sliderId);
-        }
-    }
-
-    function updateSlider(slides, index) {
-        const slideWidth = slides.children[0].getBoundingClientRect().width;
-        const newTransformValue = -(index * slideWidth);
-        slides.style.transform = 'translateX(' + newTransformValue + 'px)';
-    }
-
-    function updatePageIndicator(sliderId) {
-        const slider = document.getElementById(sliderId);
-        const slides = slider.querySelector('.slides');
-        const totalSlides = slides.children.length;
-        const slidesToShow = 3;
-        const currentPage = Math.ceil((currentIndex[sliderId] + 1) / slidesToShow);
-        const totalPages = Math.ceil(totalSlides / slidesToShow);
-
-        const pageIndicator = document.getElementById('page-indicator-' + sliderId);
-        pageIndicator.textContent = currentPage + '/' + totalPages;
-    }
-
-    document.addEventListener('DOMContentLoaded', initSliders);
-    
     document.addEventListener('DOMContentLoaded', function () {
-        var navLinks = document.querySelectorAll('.nav-tabs .nav-link');
-        navLinks.forEach(function (link) {
-            link.addEventListener('click', function (event) {
-                event.preventDefault(); // Prevent default anchor behavior
-                navLinks.forEach(function (navLink) {
-                    navLink.classList.remove('active'); // Remove active class from all tabs
-                });
-                link.classList.add('active'); // Add active class to clicked tab
-                var targetId = link.getAttribute('href').substring(1); // Get the target content ID
-                var targetElement = document.getElementById(targetId);
-                var offset = document.querySelector('.sticky-wrap').offsetHeight; // Adjust scroll position by sticky-wrap height
-                window.scrollTo({
-                    top: targetElement.offsetTop - offset,
-                    behavior: 'smooth'
-                });
-            });
-        });
+        loadReviews(1);
 
-        // Scroll to top on page load and replace URL without hash
-        if (window.location.hash) {
-            history.replaceState(null, null, 'http://localhost:9086/ProductDetail');
-            window.scrollTo(0, 0);
-        } else {
-            window.scrollTo(0, 0);
+        function loadReviews(page) {
+            const salesPostId = document.getElementById('salesPostId').value;
+            fetch(`/reviews/\${salesPostId}?page=\${page}&size=5`)
+                .then(response => response.json())
+                .then(data => {
+                    displayReviews(data.reviews);
+                    setupPagination(data.totalPages, data.currentPage);
+                })
+                .catch(error => console.error('Error fetching reviews:', error));
+        }
+
+        function displayReviews(reviews) {
+            const reviewSection = document.getElementById('review-section');
+            reviewSection.innerHTML = '';
+
+            reviews.forEach((review, index) => {
+                const reviewItem = document.createElement('div');
+                reviewItem.className = 'review-item';
+
+                let reviewContent = `
+                    <div class="review-details">
+                        <div class="review-info">
+                            <span class="review-rating">\${'★'.repeat(review.rating)}</span>
+                            <span class="review-author">\${review.customer.nickname}</span>
+                            <span class="review-date">\${new Date(review.createdDate).toLocaleDateString()}</span>
+                        </div>
+                        <div class="review-content">
+                            <div class="review-comment">
+                                <p>\${review.message}</p>
+                            </div>
+                `;
+
+                if (review.files && review.files.filePath) {
+                    reviewContent += `
+                        <div class="review-thumbnail">
+                            <img id="thumbnail-\${index}" src="\${review.files.filePath}" alt="Review Image" onclick="toggleReviewMoreContent(\${index})">
+                        </div>
+                        <div id="more-content-\${index}" class="more-content">
+                            <img src="\${review.files.filePath}" class="full-size-img" alt="Full Review Image">
+                    `;
+                }
+
+                if (review.reply) {
+                    reviewContent += `
+                        <div class="review-answer">
+                            <p>\${review.reply.message}</p>
+                        </div>
+                    `;
+                }
+
+                if (review.files || review.reply) {
+                    reviewContent += `</div><div id="more-btn-\${index}" class="more-btn" onclick="toggleReviewMoreContent(\${index})">더보기</div>`;
+                }
+
+                reviewContent += `
+                        </div>
+                    </div>
+                `;
+
+                reviewItem.innerHTML = reviewContent;
+                reviewSection.appendChild(reviewItem);
+            });
+        }
+
+        function setupPagination(totalPages, currentPage) {
+            const pagination = document.querySelector('.pagination');
+            pagination.innerHTML = '';
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageItem = document.createElement('li');
+                pageItem.className = 'page-item' + (i == currentPage ? ' active' : '');
+                pageItem.innerHTML = `<a class="page-link" href="#">\${i}</a>`;
+                pageItem.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    loadReviews(i);
+                });
+                pagination.appendChild(pageItem);
+            }
         }
     });
 
-    // Ensure page scrolls to top on refresh
-    window.addEventListener('beforeunload', function () {
-        history.replaceState(null, null, 'http://localhost:9086/ProductDetail');
-    });
-    </script>
+    function toggleReviewMoreContent(index) {
+        const moreContent = document.getElementById(`more-content-\${index}`);
+        const moreBtn = document.getElementById(`more-btn-\${index}`);
+        const thumbnail = document.getElementById(`thumbnail-\${index}`);
+
+        if (moreContent.style.display == 'none' || moreContent.style.display == '') {
+            moreContent.style.display = 'flex';
+            moreBtn.textContent = '닫기';
+            thumbnail.style.display = 'none';
+        } else {
+            moreContent.style.display = 'none';
+            moreBtn.textContent = '더보기';
+            thumbnail.style.display = 'block';
+        }
+    }
+    
+    function toggleInquiryAnswer(id) {
+        var answer = document.getElementById('inquiry-answer-' + id);
+        if (answer.style.display == 'none' || answer.style.display == '') {
+            answer.style.display = 'flex';
+        } else {
+            answer.style.display = 'none';
+        }
+    }
+</script>
+
+	<script>
+	document.addEventListener('DOMContentLoaded', function () {
+	    //const userId = '${user != null ? user.id : ""}'; // 로그인된 사용자 ID, 없으면 빈 문자열
+	    const customerId = 1;
+
+	    loadInquiries(1);
+
+	    function loadInquiries(page) {
+	        const salesPostId = document.getElementById('salesPostId').value;
+	        fetch(`/inquiries/\${salesPostId}?page=\${page}&size=5`)
+	            .then(response => {
+	                if (!response.ok) {
+	                    throw new Error('Network response was not ok ' + response.statusText);
+	                }
+	                return response.json();
+	            })
+	            .then(data => {
+	                console.log('Received data:', data);
+	                displayInquiries(data.inquiries);
+	                setupInquiryPagination(data.totalPages, data.currentPage);
+	            })
+	            .catch(error => {
+	                console.error('Error fetching inquiries:', error);
+	                alert('상품 문의를 가져오는 중 오류가 발생했습니다.');
+	            });
+	    }
+
+	    function displayInquiries(inquiries) {
+	        const inquirySection = document.getElementById('inquiry-section');
+	        inquirySection.innerHTML = '';
+
+	        inquiries.forEach((inquiry, index) => {
+	            const reply = inquiry.responses ? inquiry.responses.message : null;
+	            const isSecret = inquiry.secret === '2';
+	            const isOwner = customerId && inquiry.customerId == customerId;
+	            const canView = !isSecret || isOwner;
+	            const inquiryItem = document.createElement('div');
+	            inquiryItem.className = 'inquiry-item';
+
+	            if (canView) {
+	                inquiryItem.setAttribute('onclick', `toggleInquiryAnswer(\${index})`);
+	                inquiryItem.innerHTML = `
+	                    <div class="inquiry-info">
+	                        \${inquiry.resolvedYn === 'Y' ? '<span class="inquiry-badge text-dark">답변완료</span>' : '<span class="inquiry-badge text-dark">미답변</span>'}
+	                        \${isSecret ? '<span class="lock-icon">🔒</span>' : ''}
+	                        <span class="inquiry-content">\${inquiry.subject}</span>
+	                    </div>
+	                    <div class="inquiry-meta">
+	                        <span class="inquiry-author">\${inquiry.customer.nickname}</span>
+	                        <span class="inquiry-date">\${new Date(inquiry.createdDate).toLocaleDateString()}</span>
+	                    </div>
+	                    <div id="inquiry-answer-\${index}" class="inquiry-answer" style="display: none;">
+	                        <p>\${inquiry.message}</p>
+	                        \${reply ? `
+	                            <div class="inquiry-answer-content">
+	                                <p><strong>관리자</strong></p>
+	                                <p>\${reply}</p>
+	                            </div>
+	                        ` : ''}
+	                    </div>
+	                `;
+	            } else {
+	                inquiryItem.innerHTML = `
+	                    <div class="inquiry-info">
+	                        \${inquiry.resolvedYn === 'Y' ? '<span class="inquiry-badge text-dark">답변완료</span>' : '<span class="inquiry-badge text-dark">미답변</span>'}
+	                        <span class="lock-icon">🔒</span>
+	                        <span class="inquiry-content">비밀글입니다.</span>
+	                    </div>
+	                    <div class="inquiry-meta">
+	                        <span class="inquiry-author">\${inquiry.customer.nickname}</span>
+	                        <span class="inquiry-date">\${new Date(inquiry.createdDate).toLocaleDateString()}</span>
+	                    </div>
+	                `;
+	            }
+
+	            inquirySection.appendChild(inquiryItem);
+	        });
+	    }
+
+	    function setupInquiryPagination(totalPages, currentPage) {
+	        const pagination = document.getElementById('inquiry-pagination');
+	        pagination.innerHTML = '';
+
+	        for (let i = 1; i <= totalPages; i++) {
+	            const pageItem = document.createElement('li');
+	            pageItem.className = 'page-item' + (i === currentPage ? ' active' : '');
+	            pageItem.innerHTML = `<a class="page-link" href="#">\${i}</a>`;
+	            pageItem.addEventListener('click', (e) => {
+	                e.preventDefault();
+	                loadInquiries(i);
+	            });
+	            pagination.appendChild(pageItem);
+	        }
+	    }
+
+	    window.toggleInquiryAnswer = function (index) {
+	        const answer = document.getElementById(`inquiry-answer-\${index}`);
+	        if (answer) {
+	            if (answer.style.display === 'none' || answer.style.display === '') {
+	                answer.style.display = 'block';
+	            } else {
+	                answer.style.display = 'none';
+	            }
+	        }
+	    };
+	});
+</script>
+
+	<script src="/js/productDetail/main.js" defer></script>
+	<script src="js/productDetail/wishlist.js"></script>
+	<script src="js/productDetail/cart.js"></script>
+	<script src="js/productDetail/reviews.js"></script>
+	<script src="/js/productDetail/slider.js"></script>
+	<script src="js/productDetail/tabs.js"></script>
+	<script src="js/productDetail/totalPrice.js"></script>
 </body>
 </html>

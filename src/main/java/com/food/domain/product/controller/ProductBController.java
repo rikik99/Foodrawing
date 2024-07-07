@@ -1,5 +1,6 @@
 package com.food.domain.product.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,12 @@ import com.food.domain.product.dto.ProductCategoryDTO;
 import com.food.domain.product.dto.ProductDTO;
 import com.food.domain.product.dto.ProductFileDTO;
 import com.food.domain.product.mapper.ProductDetailMapper;
+import com.food.domain.sales.dto.DiscountDTO;
 import com.food.domain.sales.dto.DiscountInfoDTO;
+import com.food.domain.sales.dto.DiscountTargetDTO;
 import com.food.domain.sales.dto.SalesPostDTO;
+import com.food.domain.sales.mapper.DiscountMapper;
+import com.food.domain.sales.mapper.ReviewMapper;
 import com.food.domain.sales.mapper.SalesMapper;
 
 @Controller
@@ -25,6 +30,14 @@ public class ProductBController {
 
 	@Autowired
 	SalesMapper salesMapper;
+
+	
+	@Autowired
+	ReviewMapper reviewMapper;
+	
+	@Autowired
+	DiscountMapper discountMapper;
+	
 
     @RequestMapping("/best")
     public ModelAndView main() {
@@ -43,8 +56,8 @@ public class ProductBController {
 	   ModelAndView mv = new ModelAndView();
 
 	   //salesPost 고정
-	   salesPost.setId(3L);
-
+	   salesPost.setId(1L);
+	   
 	   //SalesPostTb productNumber 가져오기
 	   salesPost.setProductNumber(salesMapper.getIdByProductNumber(salesPost));
 	   System.out.println("productNumber and Sales Post id : " + salesPost.getProductNumber() + " / " + salesPost.getId());
@@ -73,9 +86,31 @@ public class ProductBController {
 	   //상품 카테고리 정보
 	   String categoryCode = productInfo.getProductNumber().substring(0, 2);
 	   ProductCategoryDTO productCategoryInfo = productDetailMapper.getCategoryByCategryCode(categoryCode);
+	   
+	   // 상품 할인 정보(카테고리 or 상품 할인)
+	   List<DiscountInfoDTO> discountInfo = new ArrayList<>();
 
-	   //상품 할인 정보(카테고리 or 상품 할인)
-	   List<DiscountInfoDTO> discountInfo = productDetailMapper.getDiscount(productCategoryInfo, salesPost.getProductNumber());
+	   // 카테고리로 할인 가져오기
+	   DiscountTargetDTO categoryTargetDiscount = discountMapper.getCategroyTargetDiscount(productCategoryInfo.getId());
+	   if (categoryTargetDiscount != null) {
+	       DiscountDTO categoryDiscount = discountMapper.getDiscount(categoryTargetDiscount.getDiscountId());
+	       DiscountInfoDTO categoryDiscountInfo = new DiscountInfoDTO();
+	       categoryDiscountInfo.setDiscountDTO(categoryDiscount);
+	       categoryDiscountInfo.setDiscountTargetDTO(categoryTargetDiscount);
+	       discountInfo.add(categoryDiscountInfo);
+	   }
+
+	   // 상품으로 할인 가져오기
+	   DiscountTargetDTO productTargetDiscount = discountMapper.getProductTargetDiscount(salesPost.getProductNumber());
+	   if (productTargetDiscount != null) {
+	       DiscountDTO productDiscount = discountMapper.getDiscount(productTargetDiscount.getDiscountId());
+	       DiscountInfoDTO productDiscountInfo = new DiscountInfoDTO();
+	       productDiscountInfo.setDiscountDTO(productDiscount);
+	       productDiscountInfo.setDiscountTargetDTO(productTargetDiscount);
+	       discountInfo.add(productDiscountInfo);
+	   }
+	   
+	   //productDetailMapper.getDiscount(productCategoryInfo, salesPost.getProductNumber());
 	   int discountPrice = 0;
 
 	   //할인가 계산
@@ -102,8 +137,31 @@ public class ProductBController {
 
 		   discountPrice = (a > b) ? a : b;
 	   }
+	   
 	   mv.addObject("discountPrice", discountPrice);
+	   
+	   //리뷰 사전 정보 가져오기
+	   //리뷰 개수
+	   int totalReviews = (reviewMapper.countReviews(salesPost.getId()) > 0 ? reviewMapper.countReviews(salesPost.getId()) : 0);
+	   mv.addObject("totalReviews", totalReviews);
+	   
+	   // 리뷰 평균 점수
+       double averageRating = reviewMapper.getAverageRating(salesPost.getId());
+       mv.addObject("averageRating", averageRating);
+       int floorRating = (int) Math.floor(averageRating);
+       mv.addObject("floorRating", floorRating);
 
+       // 점수별 리뷰 비율
+       int[] ratingPercentageArray = new int[5];
+       
+       for (int i = 5; i > 0; i--) {
+    	   ratingPercentageArray[i - 1] = reviewMapper.getRatingPercentages(salesPost.getId(), i);
+       }   		   
+       System.out.println("ratingPercentageArray : " + ratingPercentageArray.toString());
+       
+       
+       mv.addObject("ratingPercentages", ratingPercentageArray);
+	   
 	   Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
        boolean isLoggedIn = authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal());
 

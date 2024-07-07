@@ -8,8 +8,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RecentProductInfo {
-	private Long salesPostId;
+	private String salesPostId;
 	private String name;
 	private String filePath;
-	private int price;
+	private String discountPrice;
+	private String price;
 }

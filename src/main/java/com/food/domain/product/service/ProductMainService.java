@@ -59,7 +59,7 @@ public class ProductMainService {
     }
 
     public List<Discount2DTO> getDiscountProducts() { // 추가된 메서드
-        return discountMapper.findDiscountProducts();
+        return discountMapper.findDiscountProductsQuery();
     }
 
     private List<ProductDTO> addFileInfoToProducts(List<ProductDTO> products) {

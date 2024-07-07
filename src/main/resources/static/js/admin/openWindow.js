@@ -6,9 +6,10 @@ function openWindow(url, windowName) {
     const windowHeight = screenHeight * 0.8;
     const left = (screenWidth - windowWidth) / 2;
     const top = (screenHeight - windowHeight) / 2;
-    const options = 'width=' + windowWidth + ',height=' + windowHeight + ',left=' + left + ',top=' + top;
+    const options = 'width=' + windowWidth + ',height=' + windowHeight + ',left=' + left + ',top=' + top + ',resizable=yes,scrollbars=yes';
     window.open(url, windowName, options);
 }
+
 
 // 이벤트 리스너 설정 함수
 function setupOpenWindow(buttonId, url) {
@@ -20,8 +21,11 @@ function setupOpenWindow(buttonId, url) {
     });
 }
 
+// 할인 대상 추가 윈도우 열기 설정
+setupOpenWindow('addDiscountTarget', '/admin/insertDiscountTarget');
+
 // 할인 추가 윈도우 열기 설정
-setupOpenWindow('addDiscount', '/admin/discountManagement');
+setupOpenWindow('addDiscount', '/admin/insertDiscount');
 
 // 쿠폰 추가 윈도우 열기 설정
 setupOpenWindow('addCounpon', '/admin/couponManagement');

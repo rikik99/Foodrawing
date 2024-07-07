@@ -1,53 +1,191 @@
 @charset "UTF-8";
 
- .sidebar {
-            position: fixed;
-            top: 50%;
-            right: 0;
-            transform: translateY(-50%);
-            width: 100px; /* Increased width for more content space */
-            background-color: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px 0 0 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            z-index: 1000;
-        }
-        .sidebar a {
-            margin: 20px 0;
-            text-decoration: none;
-            color: #333;
-            font-size: 14px;
-            text-align: center;
-        }
-        .sidebar a img {
-            width: 24px;
-            height: 24px;
-            display: block;
-            margin: 0 auto;
-        }
-        .sidebar .cart-link {
-            position: relative;
-        }
-        .sidebar .cart-link .badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: red;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 12px;
-            left: revert-layer;
-        }
-        .sidebar .top-button {
-            margin-top: auto;
-            margin-bottom: 10px;
-        }
-        .sidebar .top-button img {
-            width: 32px;
-            height: 32px;
-        }
+/* Sidebar 스타일 정의 */
+.sidebar {
+    position: fixed; /* 화면에 고정 */
+    top: 50%; /* 화면의 수직 중앙에 배치 */
+    right: 0; /* 화면의 오른쪽에 배치 */
+    transform: translateY(-50%); /* 수직 중앙 정렬 */
+    width: 140px; /* 사이드바 너비 */
+    background-color: white; /* 배경색 */
+    border: 1px solid #e0e0e0; /* 테두리 색상 및 두께 */
+    border-radius: 8px 0 0 8px; /* 테두리 둥글게 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    display: flex; /* 플렉스 박스 사용 */
+    flex-direction: column; /* 아이템을 세로로 나열 */
+    align-items: center; /* 아이템 중앙 정렬 */
+    padding: 10px; /* 내부 여백 */
+    z-index: 1000; /* 쌓임 순서 */
+}
+
+/* Sidebar 내부 링크 스타일 */
+.sidebar a {
+    margin: 10px 0; /* 위아래 여백 */
+    text-decoration: none; /* 링크 밑줄 제거 */
+    color: #333; /* 글자 색상 */
+    font-size: 14px; /* 글자 크기 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+}
+
+/* Sidebar 아이콘 스타일 */
+.sidebar a .basket-icon, .sidebar a .top-icon {
+    width: 24px; /* 아이콘 너비 */
+    height: 24px; /* 아이콘 높이 */
+    display: block; /* 블록 요소로 설정 */
+    margin: 0 auto; /* 수평 중앙 정렬 */
+}
+
+/* 장바구니 링크 스타일 */
+.sidebar .cart-link {
+    position: relative; /* 상대 위치 설정 */
+}
+
+/* 장바구니 뱃지 스타일 */
+.sidebar .cart-link .sidebar-badge {
+    position: absolute; /* 절대 위치 설정 */
+    top: -5px; /* 위쪽 위치 조정 */
+    right: -5px; /* 오른쪽 위치 조정 */
+    background-color: red; /* 배경색 */
+    color: white; /* 글자 색상 */
+    border-radius: 50%; /* 원형으로 설정 */
+    padding: 2px 4px; /* 내부 여백 */
+    font-size: 12px; /* 글자 크기 */
+}
+
+/* 최상단으로 이동 버튼 스타일 */
+.sidebar .top-button {
+    margin-top: auto; /* 자동 위쪽 여백 */
+    margin-bottom: 10px; /* 아래쪽 여백 */
+}
+
+/* 최상단으로 이동 버튼 이미지 스타일 */
+.sidebar .top-button img {
+    width: 32px; /* 이미지 너비 */
+    height: 32px; /* 이미지 높이 */
+}
+
+/* 최근 본 상품 섹션 스타일 */
+.recent-view {
+    width: 100%; /* 전체 너비 */
+    margin-bottom: 20px; /* 아래쪽 여백 */
+}
+
+/* 최근 본 상품 캐러셀 스타일 */
+.recent-view-carousel {
+    position: relative; /* 상대 위치 설정 */
+    overflow: hidden; /* 넘치는 부분 숨김 */
+    width: 100%; /* 전체 너비 */
+    height: 360px; /* 고정 높이 */
+}
+
+/* 캐러셀 슬라이드 컨테이너 스타일 */
+.carousel-slides {
+    display: flex; /* 플렉스 박스 사용 */
+    transition: transform 0.3s ease-in-out; /* 슬라이드 전환 효과 */
+    flex-direction: row; /* 아이템 가로 나열 */
+    align-items: flex-start; /* 아이템 위쪽 정렬 */
+    height: 100%; /* 전체 높이 */
+}
+
+/* 개별 슬라이드 스타일 */
+.carousel-slide {
+    display: flex; /* 플렉스 박스 사용 */
+    flex-direction: column; /* 아이템 세로 나열 */
+    align-items: center; /* 아이템 중앙 정렬 */
+    width: 140px; /* 슬라이드 너비 */
+}
+
+/* 최근 본 상품 스타일 */
+.recent-product {
+    margin: 5px 0; /* 위아래 여백 */
+    position: relative; /* 상대 위치 설정 */
+    width: 100%; /* 전체 너비 */
+    height: 90px; /* 고정 높이 */
+    display: flex; /* 플렉스 박스 사용 */
+    flex-direction: column; /* 아이템 세로 나열 */
+    align-items: center; /* 아이템 중앙 정렬 */
+}
+
+/* 최근 본 상품 이미지 스타일 */
+.recent-product img {
+    width: 80px; /* 이미지 너비 */
+    height: 80px; /* 이미지 높이 */
+    object-fit: cover; /* 이미지 크기 조정 */
+    border-radius: 5px; /* 둥근 테두리 */
+}
+
+/* 최근 본 상품 정보 스타일 */
+.recent-product .product-info {
+    display: none; /* 초기 숨김 상태 */
+    position: absolute; /* 절대 위치 설정 */
+    top: 50%; /* 수직 중앙 위치 */
+    left: -90px; /* 왼쪽 위치 조정 */
+    width: 180px; /* 너비 설정 */
+    background: white; /* 배경색 */
+    border: 1px solid #ddd; /* 테두리 */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    padding: 10px; /* 내부 여백 */
+    z-index: 2000; /* 쌓임 순서 */
+    transform: translateY(-50%); /* 수직 중앙 정렬 */
+}
+
+/* 최근 본 상품 정보 텍스트 스타일 */
+.recent-product .product-info p {
+    margin: 0; /* 기본 여백 제거 */
+}
+
+/* 최근 본 상품의 원래 가격 스타일 */
+.recent-product .product-info .original-price {
+    text-decoration: line-through; /* 취소선 */
+    color: gray; /* 글자 색상 */
+}
+
+/* 최근 본 상품의 할인 가격 스타일 */
+.recent-product .product-info .discount-price {
+    color: red; /* 글자 색상 */
+    font-weight: bold; /* 글자 굵게 */
+}
+
+/* 최근 본 상품의 비할인 가격 스타일 */
+.recent-product .product-info .no-discount-price {
+    color: red; /* 글자 색상 */
+    font-weight: bold; /* 글자 굵게 */
+}
+
+/* 최근 본 상품 제거 버튼 스타일 */
+.recent-product .product-info button.remove-product {
+    background: none; /* 배경 없음 */
+    border: none; /* 테두리 없음 */
+    color: red; /* 글자 색상 */
+    cursor: pointer; /* 포인터 커서 */
+    font-size: 12px; /* 글자 크기 */
+    position: absolute; /* 절대 위치 설정 */
+    top: 5px; /* 위쪽 위치 조정 */
+    right: 5px; /* 오른쪽 위치 조정 */
+}
+
+/* 캐러셀 네비게이션 스타일 */
+.carousel-navigation {
+    position: absolute; /* 절대 위치 설정 */
+    bottom: 10px; /* 아래쪽 위치 조정 */
+    left: 50%; /* 수평 중앙 정렬 */
+    transform: translateX(-50%); /* 수평 중앙 정렬 */
+    display: flex; /* 플렉스 박스 사용 */
+}
+
+/* 캐러셀 이전 버튼 스타일 */
+.carousel-navigation .carousel-prev,
+.carousel-navigation .carousel-next {
+    background: white; /* 배경색 */
+    border: 1px solid #ddd; /* 테두리 */
+    cursor: pointer; /* 포인터 커서 */
+    padding: 5px 10px; /* 내부 여백 */
+    margin: 0 5px; /* 좌우 여백 */
+    z-index: 3000; /* 쌓임 순서 */
+}
+
+/* 페이지 인디케이터 스타일 */
+.page-indicator {
+    margin-top: 10px; /* 위쪽 여백 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+}

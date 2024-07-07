@@ -19,4 +19,8 @@ public class WishListService {
 		return wishListMapper.deleteWish(customerId, salesPostId);
 	}
 
+	public boolean isWished(Long salesPostId, Long customerId) {
+		return wishListMapper.isWished(salesPostId, customerId);
+	}
+
 }

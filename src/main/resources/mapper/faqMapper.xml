@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.food.domain.support.mapper.FaqMapper">
+
+    <!-- FAQ 검색 및 페이징 -->
+    <select id="search" parameterType="map" resultType="com.food.domain.support.dto.FaqDTO">
+        SELECT *
+        FROM (
+            SELECT ROWNUM AS rn, inner_query.*
+            FROM (
+                SELECT *
+                FROM FAQ_TB
+                WHERE 1=1
+                <if test="query != null and query != ''">
+                    AND (question LIKE '%' || #{query} || '%' OR answer LIKE '%' || #{query} || '%')
+                </if>
+                ORDER BY id -- 정렬 기준이 되는 컬럼을 지정하세요
+            ) inner_query
+            WHERE ROWNUM &lt;= #{offset} + #{size}
+        )
+        WHERE rn &gt; #{offset}
+    </select>
+
+    <!-- FAQ 개수 세기 -->
+    <select id="count" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM FAQ_TB
+        WHERE 1=1
+        <if test="query != null and query != ''">
+            AND (question LIKE '%' || #{query} || '%' OR answer LIKE '%' || #{query} || '%')
+        </if>
+    </select>
+</mapper>

@@ -10,7 +10,7 @@
 
     <update id="updateCustomer">
         UPDATE CUSTOMER_TB SET 
-        username = #{username},
+        name = #{name},
         email = #{email},
         phone = #{phone}
         WHERE id = #{id}
