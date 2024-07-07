@@ -26,8 +26,8 @@ public class CustomerDTO {
 	private Date birthDate;
 	private String address;
 	private String addressDetail;
-	private String zipcode;	
-	
+	private String zipcode;
+
 	private UserDTO userDTO;
 	private MemberRatingDTO member;
 	private List<CouponIssuanceDTO> couponIssuances;
@@ -41,7 +41,7 @@ public class CustomerDTO {
 		return birthDate != null ? sdf.format(birthDate) : "";
 	}
 
-    public Date getBirthDate() {
-        return birthDate != null ? birthDate : new Date(); // 기본값 설정, 필요에 따라 변경
-    }
+	public Date getBirthDate() {
+		return birthDate != null ? birthDate : new Date(); // 기본값 설정, 필요에 따라 변경
+	}
 }
