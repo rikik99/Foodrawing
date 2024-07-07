@@ -3,7 +3,6 @@ package com.food.domain.user.service;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,9 +28,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final CustomUserDetailsService customUserDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-    
+
     public CustomOAuth2UserService(HttpServletRequest request, CustomerMapper customerMapper,
-                                   UserService userService, CustomUserDetailsService customUserDetailsService, 
+                                   UserService userService, CustomUserDetailsService customUserDetailsService,
                                    PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.request = request;
         this.customerMapper = customerMapper;

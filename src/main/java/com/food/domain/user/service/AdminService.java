@@ -148,8 +148,8 @@ public class AdminService {
 	}
 
 	public Page<ProductDTO> findStockListWithSearch(Map<String, String> allParams) {
-		int page = Integer.parseInt((String) allParams.get("page"));
-		int size = Integer.parseInt((String) allParams.get("size"));
+		int page = Integer.parseInt(allParams.get("page"));
+		int size = Integer.parseInt(allParams.get("size"));
 		Pageable pageable = PageRequest.of(page, size);
 
 		List<ProductDTO> products = adminMapper.finddStockListByKeyword(allParams);
@@ -288,8 +288,8 @@ public class AdminService {
 	}
 
 	public Page<SalesPostDTO> findPostListWithSearch(Map<String, String> allParams) {
-		int page = Integer.parseInt((String) allParams.get("page"));
-		int size = Integer.parseInt((String) allParams.get("size"));
+		int page = Integer.parseInt(allParams.get("page"));
+		int size = Integer.parseInt(allParams.get("size"));
 		Pageable pageable = PageRequest.of(page, size);
 
 		List<SalesPostDTO> posts = adminMapper.findPostListWithSearch(allParams);

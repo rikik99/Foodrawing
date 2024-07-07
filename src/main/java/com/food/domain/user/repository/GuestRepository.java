@@ -5,5 +5,5 @@ import com.food.domain.user.entity.Guest;
 
 public interface GuestRepository extends JpaRepository<Guest, Long> {
 
-    
+
 }

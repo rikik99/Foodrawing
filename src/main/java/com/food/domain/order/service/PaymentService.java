@@ -1,6 +1,7 @@
 package com.food.domain.order.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -114,9 +115,13 @@ public class PaymentService {
 		CustomerReservesDTO reserve = new CustomerReservesDTO();
 		reserve.setOrderId(orderDTO.getId());
 		reserve.setCustomerId(Long.valueOf(orderDTO.getIdentifierId()));
+		
 		BigDecimal number = new BigDecimal("0.01");
-		BigDecimal point = paymentRequest.getFinalPrice().multiply(number);
-		reserve.setReserves(point);
+        // 연산 수행
+        BigDecimal point = paymentRequest.getFinalPrice().multiply(number);
+        // 반올림하여 long 타입으로 변환
+        Long pointLong = point.setScale(0, RoundingMode.HALF_UP).longValue();
+		reserve.setReserves(pointLong);
 		paymentMapper.insertCustomerReserves(reserve);
 	}
 

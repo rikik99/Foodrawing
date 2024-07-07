@@ -6,5 +6,5 @@ import com.food.domain.order.entity.Delivery;
 
 public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
 
-    
+
 }

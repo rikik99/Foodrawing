@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.food.domain.user.mapper.CouponMapper">
+
+    <!-- 사용 가능한 쿠폰 목록 조회 -->
+    <select id="findAvailableCouponsByCustomerId" parameterType="long" resultType="com.food.domain.user.dto.CouponDTO">
+        SELECT 
+            CI.ID as id,
+            CI.COUPON_NUMBER as couponNumber,
+            D.NAME as discountName,
+            CI.ISSUED_AT as issuedAt,
+            D.DESCRIPTION as description,
+            D.DISCOUNT_TYPE as discountType,
+            D.DISCOUNT_VALUE as discountValue,
+            D.MAX_DISCOUNT as maxDiscount
+        FROM COUPON_ISSUANCE_TB CI
+        JOIN DISCOUNT_TB D ON CI.DISCOUNT_ID = D.ID
+        WHERE CI.CUSTOMER_ID = #{customerId} AND CI.USED_YN = 'N'
+    </select>
+
+    <!-- 사용 가능한 쿠폰 개수 조회 -->
+    <select id="countAvailableCouponsByCustomerId" parameterType="long" resultType="int">
+        SELECT COUNT(*)
+        FROM COUPON_ISSUANCE_TB CI
+        WHERE CI.CUSTOMER_ID = #{customerId} AND CI.USED_YN = 'N'
+    </select>
+
+</mapper>

@@ -10,18 +10,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomerDTO {
-	private Long id; 
-	private Long userId; 
-	private String nickname;
-	private String name;
-	private String gender;
-	private String phone;
-	private String email;
-	private Date birthDate;
-	private String address;
-	private String addressDetail;
-	private String zipcode;
-	private String refundAccount;
-	private String refundBank;
-	private UserDTO userDTO;
+    private Long id;
+    private Long userId;
+    private String nickname;
+    private String name;
+    private String gender;
+    private String phone;
+    private String email;
+    private Date birthDate;
+    private String address;
+    private String addressDetail;
+    private String zipcode;
+    private String refundAccount;
+    private String refundBank;
+    private UserDTO userDTO;
+
+    public Date getBirthDate() {
+        return birthDate != null ? birthDate : new Date(); // 기본값 설정, 필요에 따라 변경
+    }
 }

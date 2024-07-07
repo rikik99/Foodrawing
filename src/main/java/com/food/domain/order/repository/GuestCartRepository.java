@@ -6,5 +6,5 @@ import com.food.domain.order.entity.GuestCart;
 
 public interface GuestCartRepository extends JpaRepository<GuestCart, Long> {
 
-    
+
 }

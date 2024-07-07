@@ -61,7 +61,7 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
             .securityMatcher("/admin/**")
             .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                .requestMatchers("/admin/login").permitAll()
+                .requestMatchers("/admin/login", "/admin/loginFail").permitAll()
                 .anyRequest().hasAuthority("ROLE_ADMIN"))
             .formLogin(formLogin -> formLogin
                 .loginPage("/admin/login")
@@ -112,7 +112,7 @@ public class SecurityConfig {
                                  "/cart/updateCartItem", "/cart/deleteSelectedItems", 
                                  "/payment/result", "/payment/restoreStock", "/buy/checkoutPage", 
                                  "/wishlist/add", "/wishlist/remove", "/wishlist/check", "/reviews/**", "/inquiries/**",
-                                 "/cs/csMain", "/csMain", "/guest/**", "/guest/order/**", "/guest/cart/**", "/payment/**").permitAll()
+                                 "/cs/csMain", "/csMain", "/guest/**", "/guest/order/**", "/guest/cart/**", "/payment/**", "/myPageInfo", "/myPage", "/user/myPageOrder", "/user/updateOrderStatus", "/discounts/discountpage").permitAll() // 추가
                 .anyRequest().hasAuthority("ROLE_USER"))
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
             .formLogin(formLogin -> formLogin

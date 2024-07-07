@@ -26,13 +26,8 @@
 
 <div class="sidebar">
     <div class="list-group">
-        <a href="/Users/Info?user_id=${ sessionScope.plogin.user_id }"
-            class="list-group-item shadow">개인정보</a> 
-        <a href="/Users/ResumeForm?user_id=${ sessionScope.plogin.user_id }"
-            class="list-group-item shadow">주문/배송조회</a> 
-        <a href="/Users/ApplyList?user_id=${ sessionScope.plogin.user_id }"
-            class="list-group-item shadow">취소/교환/반품</a> 
-        <a href="/Users/BookmarkList?user_id=${ sessionScope.plogin.user_id }"
-            class="list-group-item shadow">설정/알림</a>
+        <a href="/user/myPageInfo" class="list-group-item shadow">개인정보</a>
+        <a href="/user/myPageOrder" class="list-group-item shadow">주문/배송조회</a>
+        <a href="/user/myPageOrderCancel" class="list-group-item shadow">취소/교환/반품</a>
     </div>
 </div>

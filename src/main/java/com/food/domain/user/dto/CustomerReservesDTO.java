@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomerReservesDTO {
-	private Long id;
-	private Long customerId;
-	private BigDecimal reserves;
-	private Long orderId;
-	private Date creditDate;
-	private String plusminus;
+    private Long id;
+    private Long customerId;
+    private Long reserves;
+    private Long orderId;
+    private Date creditDate;
+    private String plusminus; // 새로운 필드 추가
 }

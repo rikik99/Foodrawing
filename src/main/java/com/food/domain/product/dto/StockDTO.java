@@ -17,7 +17,7 @@ public class StockDTO {
     private String productNumber;
     private Long quantity;
     private LocalDateTime lastUpdated;
-    
+
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public String getFormattedLastUpdated() {
@@ -26,5 +26,5 @@ public class StockDTO {
         }
         return "";
     }
-    
+
 }

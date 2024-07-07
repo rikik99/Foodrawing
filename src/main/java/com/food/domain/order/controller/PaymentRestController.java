@@ -2,7 +2,6 @@ package com.food.domain.order.controller;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,12 +34,12 @@ public class PaymentRestController {
         	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new PaymentResponse("error", e.getMessage()));
         }
     }
-    
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new PaymentResponse("error", e.getMessage()));
     }
-    
+
     @PostMapping("/payment/restoreStock")
     public ResponseEntity<Map<String, String>> restoreStock(@RequestBody RestoreRequest restoreRequest) {
         try {
@@ -53,7 +52,7 @@ public class PaymentRestController {
                 paymentService.increaseStock(productNumber, quantity);
                 System.out.println("재고 복구: " + productNumber + ' ' + quantity);
             }
-            
+
             System.out.println("재고 복구됨");
             //주문번호 삭제
             paymentService.deleteOrder(restoreRequest.getOrderNumber());

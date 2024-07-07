@@ -11,9 +11,9 @@ public class GuestDTO {
 	private Long id;
 	private String name;
 	private String phone;
-	private String email; 
-	private String password; 
-	private String address; 
+	private String email;
+	private String password;
+	private String address;
 	private String addressDetail;
 	private String zipcode;
 	private String guestId;

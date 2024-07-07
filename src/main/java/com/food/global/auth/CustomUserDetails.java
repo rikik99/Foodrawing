@@ -39,7 +39,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
     public Long getId() {
         return userDTO.getId();
     }
-    
+
     @Override
     public String getPassword() {
         return userDTO.getPassword();
@@ -78,5 +78,9 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
     @Override
     public String getName() {
         return String.valueOf(userDTO.getId());
+    }
+
+    public UserDTO getUserDTO() {
+        return userDTO;
     }
 }

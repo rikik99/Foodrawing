@@ -92,7 +92,16 @@
 		</div>
 	</main>
 	<%@ include file="/WEB-INF/include/footer.jsp"%>
+ <script>
+        function atobUtf8(str) {
+            return decodeURIComponent(escape(window.atob(str)));
+        }
 
+        document.addEventListener("DOMContentLoaded", function() {
+            // atobUtf8 함수를 사용하여 필요한 로직을 수행
+            console.log(atobUtf8("c29tZSBzdHJpbmc=")); // 예시: 디코딩된 문자열 출력
+        });
+    </script>
 	<script src="<c:url value='/js/bootstrap.bundle.min.js' />"></script>
 </body>
 </html>

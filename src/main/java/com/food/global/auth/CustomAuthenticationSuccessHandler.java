@@ -1,5 +1,8 @@
 package com.food.global.auth;
 
+import java.io.IOException;
+import java.util.Collection;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -8,8 +11,6 @@ import org.springframework.stereotype.Component;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Collection;
 
 @Component
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
@@ -26,10 +27,10 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         boolean rememberMe = rememberMeParam != null && rememberMeParam.equals("on");
         // 세션에서 provider 값을 가져옴
         String provider = (String) request.getSession().getAttribute("provider");
-        
+
         // 토큰 생성 시 provider 정보도 포함
         String token = jwtUtil.generateToken(authentication.getName(), rememberMe, provider, null); // 추가 클레임을 null로 전달
-        
+
         if (rememberMe) {
             Cookie cookie = new Cookie("jwt", token);
             cookie.setHttpOnly(true);

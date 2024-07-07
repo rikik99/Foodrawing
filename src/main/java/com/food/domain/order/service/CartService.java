@@ -26,11 +26,7 @@ public class CartService {
 
     public CartResponseDTO checkStock(CartRequestDTO cartRequest) {
         ProductDTO product = productMapper.findById(cartRequest.getProductNumber());
-        if (product == null) {
-            return new CartResponseDTO(false, false, false);
-        }
-
-        if (product.getQuantity() < cartRequest.getQuantity()) {
+        if ((product == null) || (product.getQuantity() < cartRequest.getQuantity())) {
             return new CartResponseDTO(false, false, false);
         }
 

@@ -5,5 +5,5 @@ import com.food.domain.product.entity.StockTransaction;
 
 public interface StockTransactionRepository extends JpaRepository<StockTransaction, Long> {
 
-    
+
 }

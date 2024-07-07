@@ -74,12 +74,12 @@ public class SalesPostFile {
                 salesPostFileDTO.setUploadDate(LocalDateTime.now());
                 salesPostFileDTO.setFileType(originalFileExtension);
                 File file = new File(absolutePath + "/" + newFileName);
-                
+
                 // 로그 추가
                 System.out.println("Saving file to: " + file.getAbsolutePath());
-                
+
                 salesPostFile.transferTo(file);
-                
+
                 fileDTOList.add(salesPostFileDTO);
             }
         }
