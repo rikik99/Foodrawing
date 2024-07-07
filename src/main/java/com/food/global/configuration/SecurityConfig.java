@@ -112,7 +112,7 @@ public class SecurityConfig {
                                  "/cart/updateCartItem", "/cart/deleteSelectedItems", 
                                  "/payment/result", "/payment/restoreStock", "/buy/checkoutPage", 
                                  "/wishlist/add", "/wishlist/remove", "/wishlist/check", "/reviews/**", "/inquiries/**",
-                                 "/cs/csMain", "/csMain").permitAll()
+                                 "/cs/csMain", "/csMain", "/guest/**", "/guest/order/**", "/guest/cart/**", "/payment/**").permitAll()
                 .anyRequest().hasAuthority("ROLE_USER"))
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
             .formLogin(formLogin -> formLogin

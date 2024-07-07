@@ -18,4 +18,8 @@ public interface OrderMapper {
 
 	List<CartInfoDTO> findItem(String productNumber);
 
+	Long getSalesPostIdByProductNumber(String productNumber);
+
+	List<CartInfoDTO> findGuestItemsByIds(Map<String, Object> params);
+
 }

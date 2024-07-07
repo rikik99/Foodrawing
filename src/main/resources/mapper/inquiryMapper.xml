@@ -35,5 +35,10 @@
     	FROM CUSTOMER_TB
     	WHERE ID = #{customerId}
     </select>
+    
+    <insert id="insertInquiry">
+        INSERT INTO INQUIRIES_TB (CUSTOMER_ID, SUBJECT, TYPE, SECRET, MESSAGE, SALES_POST_ID, RESOLVED_YN)
+        VALUES (#{customerId}, #{subject}, 1, #{secret}, #{message}, #{salesPostId}, 'N')
+    </insert>
 
 </mapper>

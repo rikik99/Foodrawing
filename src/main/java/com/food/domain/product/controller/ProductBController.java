@@ -21,21 +21,35 @@ import com.food.domain.sales.dto.SalesPostDTO;
 import com.food.domain.sales.mapper.DiscountMapper;
 import com.food.domain.sales.mapper.ReviewMapper;
 import com.food.domain.sales.mapper.SalesMapper;
+import com.food.domain.user.dto.CustomerDTO;
+import com.food.domain.user.dto.GuestDTO;
+import com.food.domain.user.dto.UserDTO;
+import com.food.domain.user.service.CustomerService;
+import com.food.domain.user.service.UserService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Controller
 public class ProductBController {
 	
 	@Autowired
-	ProductDetailMapper productDetailMapper;
+	private ProductDetailMapper productDetailMapper;
 
 	@Autowired
-	SalesMapper salesMapper;
+	private SalesMapper salesMapper;
 	
 	@Autowired
-	ReviewMapper reviewMapper;
+	private ReviewMapper reviewMapper;
 	
 	@Autowired
-	DiscountMapper discountMapper;
+	private DiscountMapper discountMapper;
+	
+	@Autowired
+	private UserService userService;
+	
+	@Autowired
+	private CustomerService customerService;
 	
     @RequestMapping("/best")
     public ModelAndView main() {
@@ -160,10 +174,31 @@ public class ProductBController {
        
        mv.addObject("ratingPercentages", ratingPercentageArray);
 	   
+       //로그인 가져오기
 	   Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
        boolean isLoggedIn = authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal());
        
        mv.addObject("isLoggedIn", isLoggedIn);
+       
+       String username = authentication.getName();
+       System.out.println("username: " + username);
+       CustomerDTO customerDTO = new CustomerDTO();
+       GuestDTO guestDTO = new GuestDTO();
+       if (isLoggedIn) {
+    	   UserDTO user = userService.loadUser(username);
+    	   log.info("product UserDTO = {}",user);
+    	   Long userId = user.getId();
+    	   customerDTO = customerService.findCustomerByUserId(userId);
+    	   log.info("customDTO = {}", customerDTO);
+    	   System.out.println("customerDTO: " + customerDTO);
+    	   
+    	   if (customerDTO == null) {
+	           log.info("customDTO is null, redirecting to login");
+	           //mv.setViewName();"redirect:/login"; // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
+	       }
+       }
+       mv.addObject("customer", customerDTO);
+       
 	   
        mv.setViewName("product/productDetail");
        return mv;

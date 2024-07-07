@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.food.domain.sales.dto.ProductInquiryDTO;
+import com.food.domain.support.dto.InquiriesDTO;
 import com.food.domain.support.dto.ResponseDTO;
 import com.food.domain.user.dto.CustomerDTO;
 
@@ -18,4 +19,6 @@ public interface InquiryMapper {
 	ResponseDTO getResponseByInquiriesId(Long inquiriesId);
 
 	CustomerDTO getCustomer(Long customerId);
+	
+	void insertInquiry(InquiriesDTO inquiry);
 }

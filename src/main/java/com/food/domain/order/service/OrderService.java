@@ -32,4 +32,18 @@ public class OrderService {
 	public List<CartInfoDTO> getProduct(String productNumber, int quantity) {
 		return orderMapper.findItem(productNumber);
 	}
+
+	public Long getSalesPostIdByProductNumber(String productNumber) {
+		return orderMapper.getSalesPostIdByProductNumber(productNumber);
+	}
+
+	public List<CartInfoDTO> getGuestSelectedItems(List<String> productIds, String guestId) {
+		Map<String, Object> params = new HashMap<>();
+        params.put("productIds", productIds);
+        params.put("guestId", guestId);
+        
+        System.out.println("params: " + params);
+
+        return orderMapper.findGuestItemsByIds(params);
+	}
 }

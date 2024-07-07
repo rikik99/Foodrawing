@@ -65,4 +65,17 @@ public class PaymentRestController {
                                  .body(Map.of("status", "error", "message", e.getMessage()));
         }
     }
+    
+    @PostMapping("guest/payment/result")
+    public ResponseEntity<?> handleGuestOrderResult(@RequestBody PaymentRequest paymentRequest) {
+    	try {
+    		System.out.println("paymentRequest:" + paymentRequest);
+    		paymentService.processGuestOrder(paymentRequest);
+    		return ResponseEntity.ok(new PaymentResponse("success", "Payment processed successfully"));
+        } catch (Exception e) {
+            // 오류 발생 시 오류 메시지와 함께 500 응답 반환
+        	e.printStackTrace();
+        	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new PaymentResponse("error", e.getMessage()));
+        }
+    }
 }

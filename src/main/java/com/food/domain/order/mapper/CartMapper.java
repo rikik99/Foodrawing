@@ -26,4 +26,6 @@ public interface CartMapper {
 	List<CartDTO> findItemsByIds(List<String> productNumber);
 
 	List<CartDTO> findAllItemsByCustomerId(Long customerId);
+
+	List<CartInfoDTO> getGuestCartListByGuestId(String guestId);
 }

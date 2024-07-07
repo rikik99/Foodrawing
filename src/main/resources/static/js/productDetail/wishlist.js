@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const wishIcon = document.getElementById('wish-icon');
     const salesPostId = document.getElementById('salesPostId').value;
-    const customerId = 1; // 설정해 줘야함
+    const loginCustomerId = document.getElementById('loginCustomerId').value;
     
     // 처음 로드 시 위시리스트 상태를 확인하여 아이콘 업데이트
     fetch('/wishlist/check', {
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         body: JSON.stringify({
             salesPostId: salesPostId,
-            customerId: customerId
+            customerId: loginCustomerId
         })
     })
         .then(response => {
@@ -37,6 +37,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const isWished = wishIcon.getAttribute('data-wished') === 'true';
         const url = isWished ? '/wishlist/remove' : '/wishlist/add';
         const newIconSrc = isWished ? '/images/svg/iconUtilWish.svg' : '/images/svg/iconUtilWishOn.svg';
+        
+        if (isWished) {
+            if (!confirm('위시리스트에서 삭제하시겠습니까?')) {
+                return; // 사용자가 취소를 누르면 함수 종료
+            }
+        }
 
         fetch(url, {
             method: 'POST',
@@ -45,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify({ 
                 salesPostId: salesPostId, 
-                customerId: customerId
+                customerId: loginCustomerId
             })
         })
         .then(response => response.json())

@@ -2,11 +2,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const quantityInputs = document.querySelectorAll('.quantity');
     const totalPriceElements = document.querySelectorAll('.total-price');
     const pricePerItem = parseInt(document.getElementById('productprice').value);
+    const discountPrice = parseInt(document.getElementById('discountPrice').value)
+    var totalPrice = 0;
 
     function updateTotalPrice() {
         const quantity = parseInt(quantityInputs[0].value);
         totalPriceElements.forEach(totalPriceElement => {
-            const totalPrice = quantity * pricePerItem;
+						if(discountPrice == 0) {
+							totalPrice = quantity * pricePerItem;
+						} else {
+							totalPrice = quantity * discountPrice;
+						}
             totalPriceElement.innerText = totalPrice.toLocaleString() + '원';
         });
         quantityInputs.forEach(input => {
@@ -34,3 +40,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     updateTotalPrice();
 });
+

@@ -1,5 +1,7 @@
 package com.food.domain.order.dto;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,4 +26,7 @@ public class CartInfoDTO {
     private int discountValue;
     private int maxDiscount;
     private int minPrice;
+    private int discountPrice;
+    private LocalDateTime lastDate;
+    private String guestId;
 }

@@ -3,7 +3,7 @@
 <mapper namespace="com.food.domain.user.mapper.CustomerMapper">
 
     <select id="findById" resultType="com.food.domain.user.dto.CustomerDTO">
-        SELECT * FROM CUSTOMER_TB WHERE ID = #{id}
+        SELECT ID, USER_ID, NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE, ADDRESS, ADDRESS_DETAIL, ZIPCODE FROM CUSTOMER_TB WHERE ID = #{id}
     </select>
 
     <insert id="insertCustomer" parameterType="com.food.domain.user.dto.CustomerDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
@@ -16,6 +16,6 @@
     </select>
 
     <select id="findCustomerById" parameterType="Long" resultType="com.food.domain.user.dto.CustomerDTO">
-        SELECT * FROM CUSTOMER_TB WHERE ID = #{userId}
+        SELECT * FROM CUSTOMER_TB WHERE USER_ID = #{userId}
     </select>
 </mapper>

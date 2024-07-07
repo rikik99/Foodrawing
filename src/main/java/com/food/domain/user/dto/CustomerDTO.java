@@ -21,5 +21,7 @@ public class CustomerDTO {
 	private String address;
 	private String addressDetail;
 	private String zipcode;
+	private String refundAccount;
+	private String refundBank;
 	private UserDTO userDTO;
 }

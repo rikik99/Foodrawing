@@ -19,6 +19,7 @@ public class PaymentRequest {
 	private String deliverName;
 	private String customerPhone;
 	private String deliverPhone;
+	private String email;
 
 	// 쿠폰 추가 해야함
 
@@ -33,5 +34,8 @@ public class PaymentRequest {
 
 	private List<DiscountDTO> discountDetails;
 	private List<OrderDetailDTO> orderDetails;
+	
+	private String guestId;
+	private String password;
 
 }
