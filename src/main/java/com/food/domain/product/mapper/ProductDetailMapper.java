@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.food.domain.product.dto.ProductCategoryDTO;
 import com.food.domain.product.dto.ProductDTO;
+import com.food.domain.product.dto.ProductDetailCategoryInfo;
 import com.food.domain.product.dto.ProductFileDTO;
 import com.food.domain.sales.dto.DiscountInfoDTO;
 
@@ -19,5 +20,7 @@ public interface ProductDetailMapper {
 	ProductCategoryDTO getCategoryByCategryCode(String categoryCode);
 
 	List<DiscountInfoDTO> getDiscount(ProductCategoryDTO productCategoryInfo, String productNumber);
+
+	List<ProductDetailCategoryInfo> getDiscountedProducts(String productNumber, String categoryCode);
 
 }

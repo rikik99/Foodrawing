@@ -35,4 +35,9 @@
 		WHERE
 		    sp.ID = #{id}
 	</select>
+	<select id="findSalesPostById">
+	SELECT *
+	FROM SALES_POST_TB
+	WHERE ID = #{id}
+	</select>
 </mapper>

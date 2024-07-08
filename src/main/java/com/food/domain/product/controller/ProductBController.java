@@ -7,11 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.food.domain.product.dto.ProductCategoryDTO;
 import com.food.domain.product.dto.ProductDTO;
+import com.food.domain.product.dto.ProductDetailCategoryInfo;
 import com.food.domain.product.dto.ProductFileDTO;
 import com.food.domain.product.mapper.ProductDetailMapper;
 import com.food.domain.sales.dto.DiscountDTO;
@@ -63,12 +67,14 @@ public class ProductBController {
         return mv;
     }
    
-   @RequestMapping("/ProductDetail")
-   public ModelAndView productDetail(SalesPostDTO salesPost) {
+   @PostMapping("/productDetail/{id}")
+   public ModelAndView productDetail(@PathVariable Long id) {
 	   ModelAndView mv = new ModelAndView();
 	   
 	   //salesPost 고정
-	   salesPost.setId(1L);
+	   //salesPost.setId(2L);
+	   SalesPostDTO salesPost = salesMapper.findSalesPostById(id);
+	   System.out.println("salesPost: " + salesPost);
 	   
 	   //SalesPostTb productNumber 가져오기
 	   salesPost.setProductNumber(salesMapper.getIdByProductNumber(salesPost));
@@ -124,6 +130,7 @@ public class ProductBController {
 	   
 	   //productDetailMapper.getDiscount(productCategoryInfo, salesPost.getProductNumber());
 	   int discountPrice = 0;
+	   String discountType = "";
 	   
 	   //할인가 계산
 	   if (discountInfo.size() == 1) {
@@ -131,8 +138,10 @@ public class ProductBController {
 		   
 		   if(discountInfo.get(0).getDiscountDTO().getDiscountType().equals("P")) {
 			   discountPrice = (int) (productInfo.getPrice() * (1 - (discountInfo.get(0).getDiscountDTO().getDiscountValue() * 0.01)));
+			   discountType = discountInfo.get(0).getDiscountDTO().getDiscountValue() + "%";
 		   } else if (discountInfo.get(0).getDiscountDTO().getDiscountType().equals("A")) {
 			   discountPrice = (int) (productInfo.getPrice() - discountInfo.get(0).getDiscountDTO().getDiscountValue());
+			   discountType = "-" + discountInfo.get(0).getDiscountDTO().getDiscountValue();
 		   }
 	   } else if (discountInfo.size() > 1) {
 		   mv.addObject("discountInfo", discountInfo);
@@ -142,8 +151,10 @@ public class ProductBController {
 		   for(DiscountInfoDTO discount : discountInfo) {
 			   if(discountInfo.get(0).getDiscountDTO().getDiscountType().equals("P")) {
 				   a = (int) (productInfo.getPrice() * (1 - (discountInfo.get(0).getDiscountDTO().getDiscountValue() * 0.01)));
+				   discountType = discountInfo.get(0).getDiscountDTO().getDiscountValue() + "%";
 			   } else if (discountInfo.get(0).getDiscountDTO().getDiscountType().equals("A")) {
 				   b = (int) (productInfo.getPrice() - discountInfo.get(0).getDiscountDTO().getDiscountValue());
+				   discountType = "-" + discountInfo.get(0).getDiscountDTO().getDiscountValue();
 			   }
 		   }
 		   
@@ -151,6 +162,7 @@ public class ProductBController {
 	   }
 	   
 	   mv.addObject("discountPrice", discountPrice);
+	   mv.addObject("discountType", discountType);
 	   
 	   //리뷰 사전 정보 가져오기
 	   //리뷰 개수
@@ -198,6 +210,14 @@ public class ProductBController {
 	       }
        }
        mv.addObject("customer", customerDTO);
+       
+       //비슷한 상품 6개 categoryCode
+       List<ProductDetailCategoryInfo> categoryProducts = productDetailMapper.getDiscountedProducts(salesPost.getProductNumber(), categoryCode);
+       mv.addObject("categoryProducts", categoryProducts);
+       
+       System.out.println("categoryProducts: " + categoryProducts);
+       
+       //베스트 최대 6개
        
 	   
        mv.setViewName("product/productDetail");

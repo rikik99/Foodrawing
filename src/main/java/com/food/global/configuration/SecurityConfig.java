@@ -105,14 +105,15 @@ public class SecurityConfig {
                                  "/checkDuplicateUsername", "/invalidateSession", "/linkAccount", 
                                  "/findUsername", "/verify-id-code", "/showUsername", 
                                  "/findPassword", "/sendPasswordResetCode", "/verify-password-code", 
-                                 "/passwordReset", "/main/best", "/ProductDetail", 
-                                 "/cart/checkStock", "/cart/addToCart", "/cart", 
+                                 "/passwordReset", "/main/best", "/ProductDetail", "/productDetail/**", 
+                                 "/cart/checkStock", "/cart/addToCart", "/cart", "/main/bestpage",
                                  "/cart/deleteCartItem", "/order/prepareCheckout", 
-                                 "/checkoutPage", "/order/prepareCheckoutAll", 
+                                 "/checkoutPage", "/order/prepareCheckoutAll", "/productDetail/*",
                                  "/cart/updateCartItem", "/cart/deleteSelectedItems", 
                                  "/payment/result", "/payment/restoreStock", "/buy/checkoutPage", 
                                  "/wishlist/add", "/wishlist/remove", "/wishlist/check", "/reviews/**", "/inquiries/**",
-                                 "/cs/csMain", "/csMain", "/guest/**", "/guest/order/**", "/guest/cart/**", "/payment/**", "/myPageInfo", "/myPage", "/user/myPageOrder", "/user/updateOrderStatus", "/discounts/discountpage").permitAll() // 추가
+                                 "/cs/csMain", "/csMain", "/guest/**", "/guest/order/**", "/guest/cart/**", "/payment/**", 
+                                 "/myPageInfo", "/myPage", "/user/myPageOrder", "/user/updateOrderStatus", "/discounts/discountpage").permitAll() // 추가
                 .anyRequest().hasAuthority("ROLE_USER"))
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
             .formLogin(formLogin -> formLogin

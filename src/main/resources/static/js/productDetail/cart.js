@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function prepareDirectPurchase(productNumber, quantity, customerId, isGuest) {
+        const data = isGuest ? { guestId: customerId, productNumber, quantity } : { customerId, productNumber, quantity };
         const url = isGuest ? '/guest/order/prepareCheckoutAll' : '/order/prepareCheckoutAll';
 
         fetch(url, {
@@ -99,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ productNumber, quantity, customerId }),
+            body: JSON.stringify(data),
         })
         .then(response => {
             const contentType = response.headers.get('content-type');
@@ -123,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const guestIdInput = document.createElement('input');
                 guestIdInput.type = 'hidden';
                 guestIdInput.name = 'guestId';
-                guestIdInput.value = customerId; // Assuming customerId is guestId for guest users
+                guestIdInput.value = customerId;
                 form.appendChild(guestIdInput);
             } else {
                 const customerIdInput = document.createElement('input');
@@ -154,13 +155,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-
     const cartButtons = document.querySelectorAll('.cart-button');
     const buyButtons = document.querySelectorAll('.buy-button');
     const quantityInputs = document.querySelectorAll('.quantity');
     const productNumberInput = document.getElementById('product_number');
     const loginCustomerId = document.getElementById('loginCustomerId').value;
     let cookieGuestId = getCookie('guestId');
+    const cartIcons = document.querySelectorAll('.cart-icon');
 
     cartButtons.forEach(cartButton => {
         cartButton.addEventListener('click', function () {
@@ -196,6 +197,27 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 const customerId = loginCustomerId || cookieGuestId;
                 prepareDirectPurchase(productNumber, quantity, customerId, !loginCustomerId);
+            }
+        });
+    });
+    
+    const cartIcon = document.querySelectorAll('.cart-icon');
+
+    cartIcon.forEach(cartButton => {
+        cartButton.addEventListener('click', function () {
+            const quantity = 1 // Update this according to your quantity input field
+            const productNumber = cartButton.getAttribute('data-product-number');
+
+            if (!loginCustomerId && !cookieGuestId) {
+                getGuestId().then(guestId => {
+                    console.log('Generated guestId:', guestId);
+                    cookieGuestId = guestId;
+                    setCookie('guestId', guestId, 7);
+                    checkStock(productNumber, quantity, guestId, true);
+                });
+            } else {
+                const customerId = loginCustomerId || cookieGuestId;
+                checkStock(productNumber, quantity, customerId, !loginCustomerId);
             }
         });
     });

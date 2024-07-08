@@ -46,4 +46,116 @@
 		        AND d.START_DATE &lt;= SYSDATE
 		        AND d.END_DATE &gt;= SYSDATE
 		</select>
+		
+		<resultMap id="ProductResultMap" type="com.food.domain.product.dto.ProductDetailCategoryInfo">
+        <id property="productNumber" column="PRODUCT_NUMBER"/>
+        <result property="name" column="NAME"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="price" column="PRICE"/>
+        <result property="quantity" column="QUANTITY"/>
+        <result property="filePath" column="FILE_PATH"/>
+        <result property="salesPostId" column="SALES_POST_ID"/>
+        <result property="salesPostTitle" column="SALES_POST_TITLE"/>
+        <result property="salesPostDescription" column="SALES_POST_DESCRIPTION"/>
+        <result property="createdDate" column="CREATED_DATE"/>
+        <result property="lastPostDate" column="LAST_POST_DATE"/>
+        <result property="updatedDate" column="UPDATED_DATE"/>
+        <result property="startPostDate" column="START_POST_DATE"/>
+        <result property="status" column="STATUS"/>
+        <result property="discountAmount" column="DISCOUNT_AMOUNT"/>
+        <result property="discountType" column="DISCOUNT_TYPE"/>
+        <result property="discountValue" column="DISCOUNT_VALUE"/>
+        <result property="minPrice" column="MIN_PRICE"/>
+        <result property="categoryName" column="CATEGORY_NAME"/>
+        <result property="categoryCode" column="CATEGORY_CODE"/>
+        <result property="nextVal" column="NEXT_VAL"/>
+    </resultMap>
+
+    <select id="getDiscountedProducts" resultMap="ProductResultMap">
+        WITH discounted_products AS (
+    SELECT 
+        dtt.TARGET_ID AS product_number,
+        dt.DISCOUNT_VALUE,
+        dt.DISCOUNT_TYPE,
+        dt.MIN_PRICE
+    FROM DISCOUNT_TB dt
+    JOIN DISCOUNT_TARGET_TB dtt ON dt.ID = dtt.DISCOUNT_ID
+    WHERE dt.ONSALE_YN = 'Y' 
+      AND dt.START_DATE &lt;= SYSDATE 
+      AND dt.END_DATE &gt;= SYSDATE
+),
+calculated_discounts AS (
+    SELECT 
+        dp.product_number,
+        dp.DISCOUNT_TYPE,
+        dp.DISCOUNT_VALUE,
+        CASE 
+            WHEN dp.DISCOUNT_TYPE = 'P' THEN p.PRICE * (dp.DISCOUNT_VALUE / 100)
+            WHEN dp.DISCOUNT_TYPE = 'A' THEN dp.DISCOUNT_VALUE
+            ELSE 0
+        END AS discount_amount
+    FROM 
+        discounted_products dp
+    JOIN 
+        PRODUCT_TB p ON dp.product_number = p.PRODUCT_NUMBER
+),
+max_discounts AS (
+    SELECT 
+        product_number,
+        MAX(discount_amount) AS max_discount_amount
+    FROM 
+        calculated_discounts
+    GROUP BY 
+        product_number
+)
+SELECT 
+    p.PRODUCT_NUMBER,
+    p.NAME,
+    p.DESCRIPTION,
+    p.PRICE,
+    p.QUANTITY,
+    pf.FILE_PATH,
+    sp.ID AS sales_post_id,
+    sp.TITLE AS sales_post_title,
+    sp.DESCRIPTION AS sales_post_description,
+    sp.CREATED_DATE,
+    sp.LAST_POST_DATE,
+    sp.UPDATED_DATE,
+    sp.START_POST_DATE,
+    sp.STATUS,
+    md.max_discount_amount AS DISCOUNT_AMOUNT,
+    dc.DISCOUNT_TYPE,
+    dc.DISCOUNT_VALUE,
+    dc.MIN_PRICE,
+    (p.PRICE - md.max_discount_amount) AS DISCOUNTED_PRICE, -- 할인된 가격
+    c.NAME AS category_name,
+    c.CATEGORY_CODE,
+    c.NEXT_VAL
+FROM 
+    PRODUCT_TB p
+LEFT JOIN 
+    PRODUCT_FILE_TB pf ON p.PRODUCT_NUMBER = pf.PRODUCT_NUMBER
+LEFT JOIN 
+    SALES_POST_TB sp ON p.PRODUCT_NUMBER = sp.PRODUCT_NUMBER
+LEFT JOIN 
+    PRODUCT_CATEGORY_MAPPING_TB pcm ON p.PRODUCT_NUMBER = pcm.PRODUCT_NUMBER
+LEFT JOIN 
+    PRODUCT_CATEGORY_TB c ON pcm.CATEGORY_ID = c.ID
+LEFT JOIN 
+    max_discounts md ON p.PRODUCT_NUMBER = md.product_number
+LEFT JOIN 
+    discounted_products dc ON p.PRODUCT_NUMBER = dc.product_number AND md.max_discount_amount = 
+    CASE 
+        WHEN dc.DISCOUNT_TYPE = 'P' THEN p.PRICE * (dc.DISCOUNT_VALUE / 100)
+        WHEN dc.DISCOUNT_TYPE = 'A' THEN dc.DISCOUNT_VALUE
+        ELSE 0
+    END
+WHERE 
+    p.PRODUCT_NUMBER != #{productNumber}  -- 현재 페이지의 상품 번호를 제외
+    AND c.CATEGORY_CODE = #{categoryCode}       -- 특정 카테고리 조건 추가
+    AND sp.STATUS = 1                -- 판매글 상태가 '판매 중'인 경우만
+ORDER BY 
+    p.CREATED_DATE DESC
+FETCH FIRST 6 ROWS ONLY
+    </select>
 </mapper>

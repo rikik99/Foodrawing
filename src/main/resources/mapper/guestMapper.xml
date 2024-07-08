@@ -83,7 +83,7 @@
     <!-- 게스트 카트에 상품 추가 -->
     <insert id="insertCart">
     	INSERT INTO GUEST_CART_TB (GUEST_ID, PRODUCT_NUMBER, QUANTITY)
-    	VALUES (#{guestId}, #{productNumber}, #{quantity})
+    	VALUES (TRIM(UPPER(#{guestId})), TRIM(UPPER(#{productNumber})), #{quantity})
     </insert>
     
     <!-- 주문 가져오기 -->
@@ -109,4 +109,10 @@
     	SELECT * FROM DELIVERY_TB
     	WHERE ORDER_ID = #{orderId}
     </select>
+    
+    <!-- 삭제 -->
+    <delete id="deleteByCustomerIdAndProductNumber">
+    	DELETE FROM GUEST_CART_TB
+    	WHERE GUEST_ID = #{guestId} AND PRODUCT_NUMBER = #{productNumber}
+    </delete>
 </mapper>
