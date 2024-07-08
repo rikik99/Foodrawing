@@ -4,9 +4,12 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.food.domain.user.mapper.CustomerMapper">
 
+
     <select id="findById" resultType="com.food.domain.user.dto.CustomerDTO">
         SELECT ID, USER_ID, NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE, ADDRESS, ADDRESS_DETAIL, ZIPCODE, REFUND_ACCOUNT, REFUND_BANK FROM CUSTOMER_TB WHERE ID = #{id}
     </select>
+
+
 
 
 	<update id="updateCustomer">
@@ -16,46 +19,51 @@
 		phone = #{phone}
 		WHERE id = #{id}
 	</update>
-    <insert id="insertCustomer" parameterType="com.food.domain.user.dto.CustomerDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
+
+     <insert id="insertCustomer" parameterType="com.food.domain.user.dto.CustomerDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
         INSERT INTO CUSTOMER_TB (USER_ID, NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE, ADDRESS, ADDRESS_DETAIL, ZIPCODE)
         VALUES (#{userId}, #{nickname}, #{name}, #{gender}, #{phone}, #{email}, #{birthDate}, #{address}, #{addressDetail}, #{zipcode})
     </insert>
+
 	<delete id="deleteCustomer">
 		DELETE FROM CUSTOMER_TB WHERE ID = #{id}
 	</delete>
+	
+
+
+
 
 	<select id="findCustomerByUserId"
 		resultType="com.food.domain.user.dto.CustomerDTO">
 		SELECT * FROM CUSTOMER_TB WHERE USER_ID = #{userId}
 	</select>
 
-	<select id="findCustomerById" parameterType="Long"
-		resultType="com.food.domain.user.dto.CustomerDTO">
-		SELECT * FROM CUSTOMER_TB WHERE USER_ID = #{userId}
-	</select>
-	
-	<select id="findOrdersByCustomerAndDateRange"
-		parameterType="map"
-		resultType="com.food.domain.user.dto.MyPageOrderDTO">
-		SELECT
-		o.ID as orderId,
-		o.ORDER_DATE as orderDate,
-		os.ORDER_STATUS as orderStatus,
-		o.TOTAL_AMOUNT as totalAmount,
-		od.UNIT_PRICE as unitPrice,
-		od.DISCOUNT_PRICE as discountPrice,
-		od.QUANTITY as quantity,
-		os.DESCRIPTION as deliveryStatus,
-		'dummy_carrier' as carrier,
-		'dummy_tracking_number' as trackingNumber,
-		CURRENT_DATE as estimatedArrivalDate
-		FROM ORDER_TB o
-		JOIN ORDER_DETAIL_TB od ON o.ID = od.ORDER_ID
-		JOIN ORDER_STATUS_TB os ON o.ID = os.ORDER_ID
-		WHERE o.IDENTIFIER_ID = #{customerId}
-		AND o.ORDER_DATE BETWEEN #{startDate} AND #{endDate}
-		ORDER BY o.ORDER_DATE DESC
-	</select>
+<select id="findOrdersByCustomerAndDateRange"
+    parameterType="map"
+    resultType="com.food.domain.user.dto.MyPageOrderDTO">
+    SELECT
+        o.ID as orderId,
+        o.ORDER_DATE as orderDate,
+        os.ORDER_STATUS as orderStatus,
+        o.TOTAL_AMOUNT as totalAmount,
+        od.UNIT_PRICE as unitPrice,
+        od.DISCOUNT_PRICE as discountPrice,
+        od.QUANTITY as quantity,
+        os.DESCRIPTION as orderStatus,
+        d.DELIVERY_STATUS as deliveryStatus,  <!-- 이 부분을 수정했습니다 -->
+        d.CARRIER as carrier,
+        d.TRACKING_NUMBER as trackingNumber,
+        d.ESTIMATED_ARRIVAL_DATE as estimatedArrivalDate
+    FROM ORDER_TB o
+    JOIN ORDER_DETAIL_TB od ON o.ID = od.ORDER_ID
+    JOIN ORDER_STATUS_TB os ON o.ID = os.ORDER_ID
+    LEFT JOIN DELIVERY_TB d ON o.ID = d.ORDER_ID
+    WHERE o.IDENTIFIER_ID = #{customerId}
+    AND o.ORDER_DATE BETWEEN #{startDate} AND #{endDate}
+    ORDER BY o.ORDER_DATE DESC
+</select>
+
+
 
 	<update id="updateCancelOrderStatus"
 		parameterType="com.food.domain.order.dto.OrderStatusDTO">
@@ -63,6 +71,30 @@
 		SET ORDER_STATUS = #{orderStatus}
 		WHERE ORDER_ID = #{orderId}
 	</update>
+
+<select id="getPendingPayment" parameterType="String" resultType="int">
+    SELECT COUNT(*)
+    FROM ORDER_TB O
+    JOIN ORDER_STATUS_TB S ON S.ORDER_ID = O.ID
+    WHERE O.IDENTIFIER_ID = #{customerId}
+    AND S.ORDER_STATUS = #{orderStatus}
+</select>
+<select id="countDeliveryStatus" parameterType="String" resultType="int">
+    SELECT COUNT(*)
+    FROM ORDER_TB O
+    JOIN DELIVERY_TB D ON D.ORDER_ID = O.ID
+    WHERE O.IDENTIFIER_ID = #{customerId}
+    AND D.DELIVERY_STATUS = #{deliveryStatus}
+</select>
+
+
+	<select id="findCustomerById" parameterType="Long"
+		resultType="com.food.domain.user.dto.CustomerDTO">
+		SELECT * FROM CUSTOMER_TB WHERE USER_ID = #{userId}
+	</select>
+	
+
+
 
 
 </mapper>

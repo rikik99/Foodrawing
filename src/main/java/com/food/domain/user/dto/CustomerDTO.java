@@ -1,3 +1,4 @@
+
 package com.food.domain.user.dto;
 
 import java.text.SimpleDateFormat;
@@ -47,3 +48,4 @@ public class CustomerDTO {
 		return birthDate != null ? birthDate : new Date(); // 기본값 설정, 필요에 따라 변경
 	}
 }
+
