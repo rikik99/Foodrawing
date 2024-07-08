@@ -12,31 +12,31 @@
 
 
 
-	<update id="updateCustomer">
-		UPDATE CUSTOMER_TB SET
-		name = #{name},
-		email = #{email},
-		phone = #{phone}
-		WHERE id = #{id}
-	</update>
+   <update id="updateCustomer">
+      UPDATE CUSTOMER_TB SET
+      name = #{name},
+      email = #{email},
+      phone = #{phone}
+      WHERE id = #{id}
+   </update>
 
      <insert id="insertCustomer" parameterType="com.food.domain.user.dto.CustomerDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
         INSERT INTO CUSTOMER_TB (USER_ID, NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE, ADDRESS, ADDRESS_DETAIL, ZIPCODE)
         VALUES (#{userId}, #{nickname}, #{name}, #{gender}, #{phone}, #{email}, #{birthDate}, #{address}, #{addressDetail}, #{zipcode})
     </insert>
 
-	<delete id="deleteCustomer">
-		DELETE FROM CUSTOMER_TB WHERE ID = #{id}
-	</delete>
-	
+   <delete id="deleteCustomer">
+      DELETE FROM CUSTOMER_TB WHERE ID = #{id}
+   </delete>
+   
 
 
 
 
-	<select id="findCustomerByUserId"
-		resultType="com.food.domain.user.dto.CustomerDTO">
-		SELECT * FROM CUSTOMER_TB WHERE USER_ID = #{userId}
-	</select>
+   <select id="findCustomerByUserId"
+      resultType="com.food.domain.user.dto.CustomerDTO">
+      SELECT * FROM CUSTOMER_TB WHERE USER_ID = #{userId}
+   </select>
 
 <select id="findOrdersByCustomerAndDateRange"
     parameterType="map"
@@ -65,12 +65,12 @@
 
 
 
-	<update id="updateCancelOrderStatus"
-		parameterType="com.food.domain.order.dto.OrderStatusDTO">
-		UPDATE ORDER_STATUS_TB
-		SET ORDER_STATUS = #{orderStatus}
-		WHERE ORDER_ID = #{orderId}
-	</update>
+   <update id="updateCancelOrderStatus"
+      parameterType="com.food.domain.order.dto.OrderStatusDTO">
+      UPDATE ORDER_STATUS_TB
+      SET ORDER_STATUS = #{orderStatus}
+      WHERE ORDER_ID = #{orderId}
+   </update>
 
 <select id="getPendingPayment" parameterType="String" resultType="int">
     SELECT COUNT(*)
@@ -88,11 +88,11 @@
 </select>
 
 
-	<select id="findCustomerById" parameterType="Long"
-		resultType="com.food.domain.user.dto.CustomerDTO">
-		SELECT * FROM CUSTOMER_TB WHERE USER_ID = #{userId}
-	</select>
-	
+   <select id="findCustomerById" parameterType="Long"
+      resultType="com.food.domain.user.dto.CustomerDTO">
+      SELECT * FROM CUSTOMER_TB WHERE USER_ID = #{userId}
+   </select>
+   
 
 
 

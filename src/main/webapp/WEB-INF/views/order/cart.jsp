@@ -131,10 +131,16 @@
 	margin-bottom: 20px;
 }
 
+.product-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+	justify-content: flex-start;
+}
+
 .product-card {
-	display: inline-block;
-	width: 23%;
-	margin: 1%;
+	width: 300px;
+	box-sizing: border-box;
 	text-align: center;
 	background-color: #fff;
 	border: 1px solid #ddd;
@@ -142,15 +148,18 @@
 	overflow: hidden;
 	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 	position: relative;
+	margin-bottom: 20px;
 }
 
 .product-card .product-top {
 	position: relative;
+	cursor: pointer;
 }
 
 .product-card img {
 	width: 100%;
-	height: auto;
+	object-fit: cover;
+	cursor: pointer;
 }
 
 .product-card .badge {
@@ -193,6 +202,7 @@
 .product-card .product-title {
 	font-size: 1.1em;
 	margin-bottom: 5px;
+	cursor: pointer;
 }
 
 .product-card .product-price {
@@ -253,66 +263,67 @@
 
 		<!-- 장바구니 아이템 -->
 		<c:forEach var="item" items="${cartItems}">
-			<input type="hidden" id="salesPostId" class="salesPostId"
-				name="salesPostId" value="${item.salesPostId}">
-			<div class="order-cart-item" data-item-id="${item.productNumber}">
-				<input type="checkbox" class="select-item"
-					onclick="toggleSelectItem()">
-				<div class="img-container">
-					<img src="${item.filePath}" alt="상품 이미지">
-					<c:if test="${item.productQuantity == 0}">
-						<div class="sold-out-overlay">품절</div>
-					</c:if>
+			<form action="/productDetail/${item.salesPostId}" method="POST">
+				<input type="hidden" name="salesPostId" value="${item.salesPostId}">
+				<div class="order-cart-item" data-item-id="${item.productNumber}">
+					<input type="checkbox" class="select-item"
+						onclick="toggleSelectItem()">
+					<div class="img-container" onclick="this.closest('form').submit()">
+						<img src="${item.filePath}" alt="상품 이미지">
+						<c:if test="${item.productQuantity == 0}">
+							<div class="sold-out-overlay">품절</div>
+						</c:if>
+					</div>
+					<div class="order-details" onclick="this.closest('form').submit()">
+						<input type="hidden" id="salesPostId" class="salesPostId"
+							name="salesPostId" value="${item.salesPostId}">
+						<h2>${item.name}</h2>
+						<p>${item.description}</p>
+					</div>
+					<div class="order-quantity">
+						<button type="button" data-product-number="${item.productNumber}"
+							onclick="changeQuantity(this, -1)">-</button>
+						<input type="text" class="quantity" value="${item.quantity}"
+							size="2" readonly> <input type="hidden"
+							class="productQuantity" value="${item.productQuantity}">
+						<button type="button" data-product-number="${item.productNumber}"
+							onclick="changeQuantity(this, 1)">+</button>
+					</div>
+					<div class="price-container">
+						<c:choose>
+							<c:when test="${item.discountPrice == 0}">
+								<div class="price">
+									<fmt:formatNumber type="number" value="${item.price}" />
+									원
+								</div>
+							</c:when>
+							<c:otherwise>
+								<div class="original-price">
+									<fmt:formatNumber type="number" value="${item.price}" />
+								</div>
+								<div class="price">
+									<fmt:formatNumber type="number" value="${item.discountPrice}" />
+									원
+								</div>
+							</c:otherwise>
+						</c:choose>
+					</div>
+					<div class="btn-container">
+						<c:if test="${item.productQuantity > 0}">
+							<button class="btn-update" type="button"
+								data-product-number="${item.productNumber}"
+								data-product-quantity="${item.productQuantity}"
+								onclick="updateCartItem(this)">수정</button>
+						</c:if>
+						<c:if test="${item.productQuantity == 0}">
+							<div class="btn-placeholder"></div>
+						</c:if>
+					</div>
+					<button class="btn-delete" type="button"
+						data-product-number="${item.productNumber}"
+						onclick="deleteCartItem(this)">삭제</button>
 				</div>
-				<div class="order-details">
-					<input type="hidden" id="salesPostId" class="salesPostId"
-						name="salesPostId" value="${item.salesPostId}">
-					<h2>${item.name}</h2>
-					<p>${item.description}</p>
-				</div>
-				<div class="order-quantity">
-					<button type="button" data-product-number="${item.productNumber}"
-						onclick="changeQuantity(this, -1)">-</button>
-					<input type="text" class="quantity" value="${item.quantity}"
-						size="2" readonly> <input type="hidden"
-						class="productQuantity" value="${item.productQuantity}">
-					<button type="button" data-product-number="${item.productNumber}"
-						onclick="changeQuantity(this, 1)">+</button>
-				</div>
-				<div class="price-container">
-					<c:choose>
-						<c:when test="${item.discountPrice == 0}">
-							<div class="price">
-								<fmt:formatNumber type="number" value="${item.price}" />
-								원
-							</div>
-						</c:when>
-						<c:otherwise>
-							<div class="original-price">
-								<fmt:formatNumber type="number" value="${item.price}" />
-							</div>
-							<div class="price">
-								<fmt:formatNumber type="number" value="${item.discountPrice}" />
-								원
-							</div>
-						</c:otherwise>
-					</c:choose>
-				</div>
-				<div class="btn-container">
-					<c:if test="${item.productQuantity > 0}">
-						<button class="btn-update" type="button"
-							data-product-number="${item.productNumber}"
-							data-product-quantity="${item.productQuantity}"
-							onclick="updateCartItem(this)">수정</button>
-					</c:if>
-					<c:if test="${item.productQuantity == 0}">
-						<div class="btn-placeholder"></div>
-					</c:if>
-				</div>
-				<button class="btn-delete" type="button"
-					data-product-number="${item.productNumber}"
-					onclick="deleteCartItem(this)">삭제</button>
-			</div>
+			</form>
 		</c:forEach>
 
 		<!-- 합계 -->
@@ -333,42 +344,47 @@
 		<!-- 최근 본 상품 -->
 		<div class="order-recently-viewed">
 			<h2>최근 본 상품</h2>
-			<c:forEach var="product" items="${recentViewedProducts}"
-				varStatus="status">
-				<a>
-					<div class="product-card">
-						<div class="product-top">
-							<input type="hidden" id="salesPostId" class="salesPostId"
-								name="salesPostId" value="${product.salesPostId}"> <input
-								type="hidden" id="productNumber" class="productNumber"
-								name="productNumber" value="${product.productNumber}"> <img
-								src="${product.filePath}" alt="Product Image">
-							<div class="cart-icon"
-								data-product-number="${product.productNumber}">
-								<img src="/images/basket-icon.png" alt="Cart Icon">
+			<div class="product-list">
+				<c:forEach var="product" items="${recentViewedProducts}"
+					varStatus="status">
+					<form action="/productDetail/${product.salesPostId}" method="POST">
+						<input type="hidden" name="salesPostId" value="${product.salesPostId}">
+						<a onclick="this.closest('form').submit()">
+							<div class="product-card">
+								<div class="product-top">
+									<input type="hidden" id="salesPostId" class="salesPostId"
+										name="id" value="${product.salesPostId}"> <input
+										type="hidden" id="productNumber" class="productNumber"
+										name="productNumber" value="${product.productNumber}"> <img
+										src="${product.filePath}" alt="Product Image">
+									<div class="cart-icon"
+										data-product-number="${product.productNumber}">
+										<img src="/images/basket-icon.png" alt="Cart Icon">
+									</div>
+								</div>
+								<div class="product-details">
+									<div class="product-title">${product.name}</div>
+									<div class="product-price">
+										<c:choose>
+											<c:when test="${product.discountPrice != 0}">
+												<span class="product-old-price"><fmt:formatNumber
+														type="number" value="${product.originalPrice}" />원</span>
+												<fmt:formatNumber type="number" value="${product.price}" />원
+			                            </c:when>
+											<c:otherwise>
+												<fmt:formatNumber type="number" value="${product.price}" />원
+			                            </c:otherwise>
+										</c:choose>
+									</div>
+									<div class="refrigeration-info">
+										<!-- 냉장 정보는 필요시 추가 -->
+									</div>
+								</div>
 							</div>
-						</div>
-						<div class="product-details">
-							<div class="product-title">${product.name}</div>
-							<div class="product-price">
-								<c:choose>
-									<c:when test="${product.discountPrice != 0}">
-										<span class="product-old-price"><fmt:formatNumber
-												type="number" value="${product.originalPrice}" />원</span>
-										<fmt:formatNumber type="number" value="${product.price}" />원
-	                            </c:when>
-									<c:otherwise>
-										<fmt:formatNumber type="number" value="${product.price}" />원
-	                            </c:otherwise>
-								</c:choose>
-							</div>
-							<div class="refrigeration-info">
-								<!-- 냉장 정보는 필요시 추가 -->
-							</div>
-						</div>
-					</div>
-				</a>
-			</c:forEach>
+						</a>
+					</form>
+				</c:forEach>
+			</div>
 		</div>
 
 		<%@include file="/WEB-INF/include/footer.jsp"%>
@@ -779,7 +795,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const cartButtons = document.querySelectorAll('.cart-icon');
 
     cartButtons.forEach(cartButton => {
-        cartButton.addEventListener('click', function () {
+        cartButton.addEventListener('click', function (event) {
+            event.stopPropagation(); // 폼 제출 방지
             var productNumber = cartButton.getAttribute('data-product-number');
             const customerId = 1;
             const quantity = 1;

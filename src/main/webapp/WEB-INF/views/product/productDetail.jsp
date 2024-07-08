@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
@@ -13,13 +12,13 @@
 	rel="stylesheet"
 	integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
 	crossorigin="anonymous">
-<link rel="stylesheet" href="css/common.css">
-<link rel="stylesheet" href="css/sidebar.css">
-<link rel="stylesheet" href="css/bestpage.css">
-<link rel="stylesheet" href="css/product/productimage.css">
-<link rel="stylesheet" href="css/product/slider.css">
-<link rel="stylesheet" href="css/product/cart.css">
-<link rel="stylesheet" href="css/product/reviewchartbox.css">
+<link rel="stylesheet" href="/css/common.css" type="text/css">
+<link rel="stylesheet" href="/css/sidebar.css" type="text/css">
+<link rel="stylesheet" href="/css/bestpage.css" type="text/css">
+<link rel="stylesheet" href="/css/product/productimage.css" type="text/css">
+<link rel="stylesheet" href="/css/product/slider.css" type="text/css">
+<link rel="stylesheet" href="/css/product/cart.css" type="text/css">
+<link rel="stylesheet" href="/css/product/reviewchartbox.css" type="text/css">
 <style>
 /* 스타일 추가 및 기존 스타일 유지 */
 .detail-top {
@@ -537,6 +536,10 @@
         .popup-close {
             cursor: pointer;
         }
+        
+        .detail-discription img {
+        	width: 1000px;
+        }
 </style>
 <script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
@@ -631,16 +634,16 @@
 							alt="bigimage">
 					</div>
 					<div class="mini">
-						<span data-image="images/20240517_CaTchWorkFavicon.png"><img
-							src="images/20240517_CaTchWorkFavicon.png" alt="1"></span> <span
+						<span data-image="/images/20240517_CaTchWorkFavicon.png"><img
+							src="/images/20240517_CaTchWorkFavicon.png" alt="1"></span> <span
 							data-image="images/logo_default.jpg"><img
-							src="images/logo_default.jpg" alt="2"></span> <span
+							src="/images/logo_default.jpg" alt="2"></span> <span
 							data-image="images/cblank_profile.jpg"><img
-							src="images/cblank_profile.jpg" alt="3"></span> <span
+							src="/images/cblank_profile.jpg" alt="3"></span> <span
 							data-image="images/cblank_profile.jpg"><img
-							src="images/cblank_profile.jpg" alt="4"></span> <span
+							src="/images/cblank_profile.jpg" alt="4"></span> <span
 							data-image="images/cblank_profile.jpg"><img
-							src="images/cblank_profile.jpg" alt="5"></span>
+							src="/images/cblank_profile.jpg" alt="5"></span>
 					</div>
 				</div>
 				<div class="right-column">
@@ -703,6 +706,7 @@
 									</div>
 								</c:when>
 								<c:otherwise>
+									<p>${discountType}</p>
 									<div class="item-price">
 										<fmt:formatNumber type="number" value="${discountPrice}" />
 										원
@@ -725,35 +729,80 @@
 			<div class="sliders-section">
 				<div class="slider-container">
 					<div class="slider-header">
-						<h2>다른 고객이 함께 구매한 상품</h2>
+						<h2>비슷한 상품</h2>
 						<div class="nav-buttons">
 							<button class="nav-button prev" onclick="prevSlide('slider1')">&#10094;</button>
 							<span class="page-indicator" id="page-indicator-slider1">1/1</span>
 							<button class="nav-button next" onclick="nextSlide('slider1')">&#10095;</button>
 						</div>
 					</div>
+					
 					<div class="slider" id="slider1">
-						<div class="slides">
-							<div class="slide"><%@include
-									file="/WEB-INF/include/productCard.jsp"%>1
-							</div>
-							<div class="slide"><%@include
-									file="/WEB-INF/include/productCard.jsp"%>2
-							</div>
-							<div class="slide"><%@include
-									file="/WEB-INF/include/productCard.jsp"%>3
-							</div>
-							<div class="slide"><%@include
-									file="/WEB-INF/include/productCard.jsp"%>4
-							</div>
-							<div class="slide"><%@include
-									file="/WEB-INF/include/productCard.jsp"%>5
-							</div>
-							<div class="slide"><%@include
-									file="/WEB-INF/include/productCard.jsp"%>6
-							</div>
-						</div>
-					</div>
+    <div class="slides">
+        <c:forEach var="product" items="${categoryProducts}">
+            <div class="slide" style="display: inline-block; width: calc(25% - 20px); vertical-align: top;">
+                <div class="product-card" style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative; background-color: white; text-align: center;">
+                    <div class="product-top" style="position: relative;">
+                        <form method="get" action="/productDetail/${product.salesPostId}" style="margin: 0;">
+                            <input type="hidden" id="salesPostId" class="salesPostId" name="id" value="${product.salesPostId}" />
+                            <button type="submit" class="product-card-href" style="border: none; padding: 0; background: none; cursor: pointer;">
+                                <img src="${product.filePath}" alt="${product.name}" style="width: 100%; height: auto; border-bottom: 1px solid #e0e0e0;">
+                            </button>
+                        </form>
+                       
+                    </div>
+                    <form method="post" action="/productDetail/${product.salesPostId}" style="margin: 0;">
+                        <input type="hidden" id="salesPostId" class="salesPostId" name="id" value="${product.salesPostId}" />
+                        <button type="submit" class="product-card-href product-details-button" style="border: none; padding: 0; background: none; cursor: pointer;">
+                            <div class="product-details" style="padding: 15px;">
+                                <div class="product-title" style="font-size: 14px; color: #333; margin: 10px 0;">
+                                    ${product.name}
+                                </div>
+                                <div class="product-price" style="font-size: 20px; color: #d32f2f; margin: 5px 0;">
+                                    <c:choose>
+                                        <c:when test="${product.discountedPrice != null}">
+                                            ${product.discountedPrice}원
+                                            <span class="product-old-price" style="text-decoration: line-through; color: #888; font-size: 14px; margin-left: 10px;">
+                                                ${product.price}원
+                                            </span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            ${product.price}원
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                                <c:if test="${product.discountValue != null}">
+                                    <div class="product-discount" style="font-size: 14px; color: #333;">
+                                        ${product.discountValue}% 할인
+                                    </div>
+                                </c:if>
+                                <div class="product-rating" style="font-size: 14px; color: #888;">
+                                    ${product.description}
+                                </div>
+                                <div class="delivery-info" style="font-size: 14px; color: #333; margin: 10px 0;">
+                                   
+                                </div>
+                                <div class="cart-icon" data-product-number="${product.productNumber}" style="position: absolute; bottom: 10px; right: 10px; background-color: white; padding: 10px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                            <img src="/images/basket-icon.png" alt="Cart Icon" style="width: 24px; height: 24px;">
+                        </div>
+                                <div class="refrigeration-info" style="display: flex; align-items: center; font-size: 14px; color: #333; margin-top: 10px; height: 35px;">
+                                    <!-- <img src="path/to/refrigeration-icon.png" alt="Refrigeration Icon" style="width: 20px; height: 20px; margin-right: 5px;"> -->
+                                    <!-- 냉장 -->
+                                </div>
+                            </div>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </c:forEach>
+    </div>
+</div>
+
+
+
+
+
+					
 				</div>
 				<div class="slider-container">
 					<div class="slider-header">
@@ -799,7 +848,7 @@
 						href="#detail-content">상세정보</a></li>
 					<li class="nav-item"><a class="nav-link" href="#review">리뷰(<fmt:formatNumber type="number" value="${totalReviews}" />)</a>
 					</li>
-					<li class="nav-item"><a class="nav-link" href="#purchase-info">구매정보</a>
+					<li class="nav-item"><a class="nav-link" href="#purchase-info">상품문의</a>
 					</li>
 				</ul>
 			</div>
@@ -808,7 +857,7 @@
 			<div class="contents">
 				<div id="detail-content" class="detail-content">
 					<h2>제품 상세 정보</h2>
-					<div>
+					<div class="detail-discription">
 						${salesInfo.description}
 					</div>
 				</div>
@@ -981,12 +1030,12 @@
 	<%@include file="/WEB-INF/include/footer.jsp"%>
 
 	<script src="/js/productDetail/main.js" defer></script>
-	<script src="js/productDetail/wishlist.js"></script>
-	<script src="js/productDetail/cart.js"></script>
-	<script src="js/productDetail/reviews.js"></script>
+	<script src="/js/productDetail/wishlist.js"></script>
+	<script src="/js/productDetail/cart.js"></script>
+	<script src="/js/productDetail/reviews.js"></script>
 	<script src="/js/productDetail/slider.js"></script>
-	<script src="js/productDetail/tabs.js"></script>
-	<script src="js/productDetail/totalPrice.js"></script>
-	<script src="js/productDetail/inquiries.js"></script>
+	<script src="/js/productDetail/tabs.js"></script>
+	<script src="/js/productDetail/totalPrice.js"></script>
+	<script src="/js/productDetail/inquiries.js"></script>
 </body>
 </html>

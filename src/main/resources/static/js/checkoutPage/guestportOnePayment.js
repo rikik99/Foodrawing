@@ -90,8 +90,8 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
             var randomPgProvider = pgProviders[Math.floor(Math.random() * pgProviders.length)];
 
             IMP.request_pay({
-            		//pg: randomPgProvider,
-                pg: "kicc.T5102001",
+            		pg: randomPgProvider,
+                //pg: "kicc.T5102001",
                 pay_method: "card",
                 merchant_uid: 'merchant_' + orderNumber,
                 name: '주문명:결제테스트',
@@ -496,7 +496,7 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
 		                buyer_email: customerEmail,
 		                buyer_name: customerName,
 		                buyer_tel: customerPhone,
-		                buyer_addr: address + ' ' + detailAddress,
+	                  buyer_addr: address + ' ' + detailAddress,
 		                buyer_postcode: zipCode,
 		                m_redirect_url:  "{모바일에서 결제 완료 후 리디렉션 될 URL}", // 실제 리디렉션 URL로 변경해야 합니다
             }, function(response) {

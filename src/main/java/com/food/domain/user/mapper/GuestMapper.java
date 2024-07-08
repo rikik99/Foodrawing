@@ -24,7 +24,7 @@ public interface GuestMapper {
 
 	void insertCart(GuestCartDTO cart);
 
-	void deleteByCustomerIdAndProductNumber(String string, String productNumber);
+	void deleteByCustomerIdAndProductNumber(String guestId, String productNumber);
 
 	int isInCart(String productNumber, String guestId);
 
