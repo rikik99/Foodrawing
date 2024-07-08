@@ -3,52 +3,78 @@
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.food.domain.user.mapper.CustomerMapper">
-    
-    <select id="findById" resultType="com.food.domain.user.dto.CustomerDTO">
-        SELECT * FROM CUSTOMER_TB WHERE ID = #{id}
-    </select>
 
-    <update id="updateCustomer">
-        UPDATE CUSTOMER_TB SET 
-        name = #{name},
-        email = #{email},
-        phone = #{phone}
-        WHERE id = #{id}
-    </update>
+	<select id="findById"
+		resultType="com.food.domain.user.dto.CustomerDTO">
+		SELECT * FROM CUSTOMER_TB WHERE ID = #{id}
+	</select>
 
-    <delete id="deleteCustomer">
-        DELETE FROM CUSTOMER_TB WHERE ID = #{id}
-    </delete>
+	<update id="updateCustomer">
+		UPDATE CUSTOMER_TB SET
+		name = #{name},
+		email = #{email},
+		phone = #{phone}
+		WHERE id = #{id}
+	</update>
 
-    <select id="findCustomerByUserId" resultType="com.food.domain.user.dto.CustomerDTO">
-        SELECT * FROM CUSTOMER_TB WHERE USER_ID = #{userId}
-    </select>
+	<delete id="deleteCustomer">
+		DELETE FROM CUSTOMER_TB WHERE ID = #{id}
+	</delete>
 
-    <select id="findOrdersByCustomerAndDateRange" parameterType="map" resultType="com.food.domain.user.dto.MyPageOrderDTO">
-        SELECT 
-            o.ID as orderId, 
-            o.ORDER_DATE as orderDate, 
-            os.ORDER_STATUS as orderStatus, 
-            o.TOTAL_AMOUNT as totalAmount, 
-            od.UNIT_PRICE as unitPrice, 
-            od.DISCOUNT_PRICE as discountPrice, 
-            od.QUANTITY as quantity, 
-            os.DESCRIPTION as deliveryStatus, 
-            'dummy_carrier' as carrier, -- Replace this with the actual carrier column if available 
-            'dummy_tracking_number' as trackingNumber, -- Replace this with the actual tracking number column if available 
-            CURRENT_DATE as estimatedArrivalDate -- Replace this with the actual estimated arrival date column if available 
-        FROM ORDER_TB o 
-        JOIN ORDER_DETAIL_TB od ON o.ID = od.ORDER_ID 
-        JOIN ORDER_STATUS_TB os ON o.ID = os.ORDER_ID 
-        WHERE o.IDENTIFIER_ID = #{customerId} 
-        AND o.ORDER_DATE BETWEEN #{startDate} AND #{endDate} 
-        ORDER BY o.ORDER_DATE DESC
-    </select>
-    
-    <update id="updateCancelOrderStatus" parameterType="com.food.domain.order.dto.OrderStatusDTO">
-        UPDATE ORDER_STATUS_TB
-        SET ORDER_STATUS = #{orderStatus}
-        WHERE ORDER_ID = #{orderId}
-    </update>
+	<select id="findCustomerByUserId"
+		resultType="com.food.domain.user.dto.CustomerDTO">
+		SELECT * FROM CUSTOMER_TB WHERE USER_ID = #{userId}
+	</select>
+
+<select id="findOrdersByCustomerAndDateRange"
+    parameterType="map"
+    resultType="com.food.domain.user.dto.MyPageOrderDTO">
+    SELECT
+        o.ID as orderId,
+        o.ORDER_DATE as orderDate,
+        os.ORDER_STATUS as orderStatus,
+        o.TOTAL_AMOUNT as totalAmount,
+        od.UNIT_PRICE as unitPrice,
+        od.DISCOUNT_PRICE as discountPrice,
+        od.QUANTITY as quantity,
+        os.DESCRIPTION as orderStatus,
+        d.DELIVERY_STATUS as deliveryStatus,  <!-- 이 부분을 수정했습니다 -->
+        d.CARRIER as carrier,
+        d.TRACKING_NUMBER as trackingNumber,
+        d.ESTIMATED_ARRIVAL_DATE as estimatedArrivalDate
+    FROM ORDER_TB o
+    JOIN ORDER_DETAIL_TB od ON o.ID = od.ORDER_ID
+    JOIN ORDER_STATUS_TB os ON o.ID = os.ORDER_ID
+    LEFT JOIN DELIVERY_TB d ON o.ID = d.ORDER_ID
+    WHERE o.IDENTIFIER_ID = #{customerId}
+    AND o.ORDER_DATE BETWEEN #{startDate} AND #{endDate}
+    ORDER BY o.ORDER_DATE DESC
+</select>
+
+
+
+	<update id="updateCancelOrderStatus"
+		parameterType="com.food.domain.order.dto.OrderStatusDTO">
+		UPDATE ORDER_STATUS_TB
+		SET ORDER_STATUS = #{orderStatus}
+		WHERE ORDER_ID = #{orderId}
+	</update>
+
+<select id="getPendingPayment" parameterType="String" resultType="int">
+    SELECT COUNT(*)
+    FROM ORDER_TB O
+    JOIN ORDER_STATUS_TB S ON S.ORDER_ID = O.ID
+    WHERE O.IDENTIFIER_ID = #{customerId}
+    AND S.ORDER_STATUS = #{orderStatus}
+</select>
+<select id="countDeliveryStatus" parameterType="String" resultType="int">
+    SELECT COUNT(*)
+    FROM ORDER_TB O
+    JOIN DELIVERY_TB D ON D.ORDER_ID = O.ID
+    WHERE O.IDENTIFIER_ID = #{customerId}
+    AND D.DELIVERY_STATUS = #{deliveryStatus}
+</select>
+
+
 
 </mapper>

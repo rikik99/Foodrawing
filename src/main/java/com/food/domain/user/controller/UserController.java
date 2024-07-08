@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.food.domain.order.dto.OrderDTO;
 import com.food.domain.order.dto.OrderStatusDTO;
 import com.food.domain.user.dto.CustomerDTO;
 import com.food.domain.user.dto.EmailResponseDTO;
@@ -31,6 +32,7 @@ import com.food.domain.user.service.CustomerService;
 import com.food.domain.user.service.EmailService;
 import com.food.domain.user.service.UserService;
 import com.food.domain.user.dto.CouponDTO;
+import com.food.domain.user.service.AdminService;
 import com.food.domain.user.service.CouponService;
 import com.food.global.auth.CustomUserDetails;
 import com.food.global.auth.Oauth2AttributesToModel;
@@ -59,6 +61,9 @@ public class UserController {
 
     @Autowired
     private CouponService couponService;
+    
+    @Autowired
+    private AdminService adminService;
 
     @GetMapping("/login")
     public ModelAndView login(Authentication authentication) {
@@ -418,11 +423,25 @@ public class UserController {
 
         if (customDTO != null) {
             model.addAttribute("customer", customDTO);
-
             List<CouponDTO> availableCoupons = couponService.getAvailableCoupons(customDTO.getId());
             int couponCount = couponService.getAvailableCouponCount(customDTO.getId());
             int totalReserves = customerService.getCustomerReserves(customDTO.getId());
-
+            String rating = customerService.getCustomerRating(customDTO.getUserId());
+            String customerId = String.valueOf(customDTO.getId());
+            int pendingPayment = customerService.getPendingPayment(customerId);
+            log.info("pendingPayment = {}",pendingPayment);
+            int completedPayment = customerService.getCompletedPayment(customerId);
+            int preparingShipment = customerService.getPreparingShipment(customerId);
+            int shipping = customerService.getShipping(customerId);
+            int shipmentCompleted = customerService.getShipmentCompleted(customerId);
+            
+            model.addAttribute("pendingPayment", pendingPayment);
+            model.addAttribute("completedPayment", completedPayment);
+            model.addAttribute("preparingShipment", preparingShipment);
+            model.addAttribute("shipmentCompleted", shipmentCompleted);
+            model.addAttribute("shipping", shipping);
+            model.addAttribute("rating", rating);
+            
             model.addAttribute("couponCount", couponCount);
             model.addAttribute("availableCoupons", availableCoupons);
             model.addAttribute("totalReserves", totalReserves);
@@ -438,7 +457,6 @@ public class UserController {
     public String myPageInfo(Model model, Authentication authentication) {
         if (authentication == null) {
             log.info("Authentication is null, redirecting to login");
-            return "redirect:/login";
 
         }
 
@@ -566,4 +584,5 @@ public class UserController {
         customerDTO.setBirthDate(customUserDetails.getUserDTO().getBirthDate());
         return customerDTO;
     }
+
 }

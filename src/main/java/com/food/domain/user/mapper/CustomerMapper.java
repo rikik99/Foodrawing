@@ -5,9 +5,9 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import com.food.domain.order.dto.OrderDTO;
 import com.food.domain.order.dto.OrderStatusDTO;
 import com.food.domain.user.dto.CustomerDTO;
+
 import com.food.domain.user.dto.MyPageOrderDTO;
 
 @Mapper
@@ -29,4 +29,12 @@ public interface CustomerMapper {
     List<MyPageOrderDTO> findOrdersByCustomerAndDateRange(Map<String, Object> params);
 
     void updateCancelOrderStatus(OrderStatusDTO orderStatusDTO);
+
+	int getPendingPayment(String customerId, String orderStatus);
+
+	int countDeliveryStatus(String customerId, String deliveryStatus);
+    
+
+
+
 }

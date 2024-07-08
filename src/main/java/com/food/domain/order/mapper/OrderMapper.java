@@ -22,4 +22,6 @@ public interface OrderMapper {
     List<CartInfoDTO> findItem(String productNumber);
 
     List<OrderDTO> updateCancelOrderStatus(Long customerId);
+    
+    
 }
