@@ -51,6 +51,7 @@ import com.food.domain.support.dto.InquiriesDTO;
 import com.food.domain.user.dto.AdminDTO;
 import com.food.domain.user.dto.CustomerDTO;
 import com.food.domain.user.dto.MemberRatingDTO;
+import com.food.domain.user.dto.UserDTO;
 import com.food.domain.user.service.AdminService;
 
 import jakarta.servlet.http.Cookie;
@@ -79,19 +80,31 @@ public class AdminController {
 		return mv;
 	}
 
-	@GetMapping("/mainContent")
-	public ModelAndView adminMain() {
-		ModelAndView mv = new ModelAndView();
-		// 익명 인증이거나 인증되지 않은 경우 로그인 페이지로 리다이렉트
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication == null || !authentication.isAuthenticated()
-				|| authentication instanceof AnonymousAuthenticationToken) {
-			mv.setViewName("redirect:/admin/login");
-			return mv;
-		}
-		mv.setViewName("admin/mainContent");
-		return mv;
-	}
+    @GetMapping("/mainContent")
+    public ModelAndView adminMain() {
+        ModelAndView mv = new ModelAndView();
+        // 익명 인증이거나 인증되지 않은 경우 로그인 페이지로 리다이렉트
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
+            mv.setViewName("redirect:/admin/login");
+            return mv;
+        }
+
+        Map<String, Object> adminData = adminService.adminMain();
+        List<Map<String, Object>> orderStatusCounts = (List<Map<String, Object>>) adminData.get("orderStatusCounts");
+        Long totalOrderAmount = (Long) adminData.get("totalOrderAmount");
+        List<OrderDTO> orderList = (List<OrderDTO>) adminData.get("orderList");
+        List<UserDTO> userList = (List<UserDTO>) adminData.get("userList");
+        log.info("ggorderStatusCounts = {}",orderStatusCounts);
+        mv.addObject("orderStatusCounts", orderStatusCounts);
+        mv.addObject("totalOrderAmount", totalOrderAmount);
+        mv.addObject("orderList", orderList);
+        mv.addObject("userList", userList);
+
+        mv.setViewName("admin/mainContent");
+        return mv;
+    }
 
 	@GetMapping("/productManagement")
 	public ModelAndView productManagement(@RequestParam Map<String, String> allParams) {
@@ -605,26 +618,26 @@ public class AdminController {
 		mv.setViewName("admin/couponList");
 		return mv;
 	}
-	
+
 	@PatchMapping("/updateDiscountStatus")
 	@ResponseBody
 	public Map<String, Object> updateDiscountStatus(@RequestBody Map<String, Object> request) {
-	    Map<String, Object> response = new HashMap<>();
-	    try {
-	        Long discountId = Long.parseLong(request.get("discountId").toString());
-	        String newStatus = request.get("onsaleYn").toString();
-	        
-	        // 할인 상태 업데이트 서비스 호출
-	        boolean success = adminService.updateDiscountStatus(discountId, newStatus);
-	        
-	        response.put("success", success);
-	        response.put("message", success ? "진행 여부 변경에 성공했습니다." : "진행 여부 변경에 실패했습니다.");
-	    } catch (Exception e) {
-	        response.put("success", false);
-	        response.put("message", "진행 여부 변경 중 오류가 발생했습니다.");
-	        e.printStackTrace();
-	    }
-	    return response;
+		Map<String, Object> response = new HashMap<>();
+		try {
+			Long discountId = Long.parseLong(request.get("discountId").toString());
+			String newStatus = request.get("onsaleYn").toString();
+
+			// 할인 상태 업데이트 서비스 호출
+			boolean success = adminService.updateDiscountStatus(discountId, newStatus);
+
+			response.put("success", success);
+			response.put("message", success ? "진행 여부 변경에 성공했습니다." : "진행 여부 변경에 실패했습니다.");
+		} catch (Exception e) {
+			response.put("success", false);
+			response.put("message", "진행 여부 변경 중 오류가 발생했습니다.");
+			e.printStackTrace();
+		}
+		return response;
 	}
 
 	@DeleteMapping("/couponList")
@@ -1036,7 +1049,7 @@ public class AdminController {
 			return ResponseEntity.status(500).body("상태 변경에 실패했습니다.");
 		}
 	}
-	
+
 	@GetMapping("/usersManagement")
 	public ModelAndView customerManagement(@RequestParam Map<String, String> allParams) {
 		ModelAndView mv = new ModelAndView();
@@ -1046,11 +1059,11 @@ public class AdminController {
 		allParams.put("page", String.valueOf(page));
 		allParams.put("size", String.valueOf(size));
 		Pageable pageable = PageRequest.of(page, size);
-		
+
 		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
 				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
-		
-		Page<CustomerDTO> customers; 
+
+		Page<CustomerDTO> customers;
 		if (hasSearchParams) {
 			// 검색 조건이 있을 경우
 			customers = adminService.findCustomersWithSearch(pageable, allParams);
@@ -1073,6 +1086,7 @@ public class AdminController {
 		mv.setViewName("admin/usersManagement");
 		return mv;
 	}
+
 	@GetMapping("/adminManagement")
 	public ModelAndView adminManagement(@RequestParam Map<String, String> allParams) {
 		ModelAndView mv = new ModelAndView();
@@ -1082,29 +1096,30 @@ public class AdminController {
 		allParams.put("page", String.valueOf(page));
 		allParams.put("size", String.valueOf(size));
 		Pageable pageable = PageRequest.of(page, size);
-		
+
 		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
 				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
-		
-		Page<AdminDTO> admins; 
+
+		Page<AdminDTO> admins;
 		if (hasSearchParams) {
 			// 검색 조건이 있을 경우
 			admins = adminService.findAdminsWithSearch(pageable, allParams);
-			
+
 		} else {
 			// 검색 조건이 없을 경우
 			admins = adminService.findAdmins(pageable, allParams);
 		}
-		
+
 		mv.addObject("admins", admins);
 		mv.addObject("currentPage", admins.getNumber());
 		mv.addObject("pageCount", admins.getTotalPages());
 		mv.addObject("totalElements", admins.getTotalElements());
 		mv.addObject("size", size);
-		
+
 		mv.setViewName("admin/adminManagement");
 		return mv;
 	}
+
 	@GetMapping("/createAdmin")
 	public ModelAndView createAdminForm() {
 		ModelAndView mv = new ModelAndView();
@@ -1123,4 +1138,47 @@ public class AdminController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("관리자 등록에 실패했습니다.");
 		}
 	}
+
+	@GetMapping("/getInquiries")
+	@ResponseBody
+	public List<InquiriesDTO> getInquiries(@RequestParam("customerId") Long customerId) {
+		return adminService.getInquiriesByCustomerId(customerId);
+	}
+
+	@GetMapping("/userWithdrawalManagement")
+	public ModelAndView userWithdrawalManagement(@RequestParam Map<String, String> allParams) {
+		log.info("allparams = {}", allParams);
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+
+		ModelAndView mv = new ModelAndView();
+
+		// 페이지 정보와 사이즈 정보를 allParams에 추가
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+
+		// 검색 조건이 있는지 확인
+		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
+				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
+
+		Page<UserDTO> users;
+		Pageable pageable = PageRequest.of(page, size);
+		if (hasSearchParams) {
+			// 검색 조건이 있을 경우
+			users = adminService.findWithdrawalUserListWithSearch(pageable, allParams);
+		} else {
+			// 검색 조건이 없을 경우
+			users = adminService.findWithdrawalUserList(pageable, allParams);
+		}
+		log.info("users = {}",users.getContent());
+		mv.addObject("user", users);
+		mv.addObject("currentPage", users.getNumber());
+		mv.addObject("pageCount", users.getTotalPages());
+		mv.addObject("totalElements", users.getTotalElements());
+		mv.addObject("size", size);
+		mv.addAllObjects(allParams); // 전달된 검색 조건을 다시 뷰로 전달
+		mv.setViewName("admin/userWithdrawalManagement");
+		return mv;
+	}
+
 }

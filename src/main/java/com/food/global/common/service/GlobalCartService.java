@@ -5,6 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.food.domain.user.controller.AdminController;
 import com.food.domain.user.dto.CustomerDTO;
 import com.food.domain.user.dto.GuestDTO;
 import com.food.domain.user.dto.UserDTO;
@@ -12,6 +13,9 @@ import com.food.domain.user.service.CustomerService;
 import com.food.domain.user.service.UserService;
 import com.food.global.common.mapper.GlobalCartMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class GlobalCartService {
 	@Autowired
@@ -38,10 +42,10 @@ public class GlobalCartService {
 		
 		if (isLoggedIn) {
 			UserDTO user = userService.loadUser(username);
-			// log.info("product UserDTO = {}",user);
+			log.info("product UserDTO = {}",user);
 			Long userId = user.getId();
 			customerDTO = customerService.findCustomerByUserId(userId);
-			// log.info("customDTO = {}", customerDTO);
+			log.info("customDTO = {}", customerDTO);
 			
 			count = cartMapper.getCartItemCount(customerDTO.getId());
 		} else {

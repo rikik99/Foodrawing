@@ -189,31 +189,39 @@ document.addEventListener('click', function(e) {
 		openWindow(`/admin/updateProduct/${productNumber}`, 'EditWindow');
 	}
 
-    if (e.target.classList.contains('discount-status-column')) {
-        let discountId = e.target.closest('tr').getAttribute('data-discountId');
-        let currentStatus = e.target.innerText.trim();
-        let newStatus = (currentStatus === 'Y') ? 'N' : 'Y';
-        fetch('/admin/updateDiscountStatus', {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ discountId: discountId, onsaleYn: newStatus })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('진행 여부 변경에 성공했습니다.');
-                loadContent('/admin/discountList', 'discountList', true);
-            } else {
-                alert('진행 여부 변경에 실패했습니다.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('진행 여부 변경 중 오류가 발생했습니다.');
-        });
-    }
+	if (e.target.classList.contains('discount-status-column')) {
+		let discountId = e.target.closest('tr').getAttribute('data-discountId');
+		let currentStatus = e.target.innerText.trim();
+		let newStatus = (currentStatus === 'Y') ? 'N' : 'Y';
+		fetch('/admin/updateDiscountStatus', {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ discountId: discountId, onsaleYn: newStatus })
+		})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					alert('진행 여부 변경에 성공했습니다.');
+					loadContent('/admin/discountList', 'discountList', true);
+				} else {
+					alert('진행 여부 변경에 실패했습니다.');
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				alert('진행 여부 변경 중 오류가 발생했습니다.');
+			});
+	}
+	if (e.target.classList.contains('userCoupon-count-column')) {
+		const customerId = e.target.getAttribute('data-customer-id');
+		loadContent(`/admin/couponList?searchInput=${customerId}&page=0&size=5`, 'couponList');
+	}
+	if (e.target.classList.contains('userOrder-count-column')) {
+		const customerId = e.target.getAttribute('data-customer-id');
+		loadContent(`/admin/orderList?searchInput=${customerId}&page=0&size=5`, 'orderList');
+	}
 
 });
 
@@ -410,7 +418,8 @@ function performSearch(urlPath) {
 		{ id: 'fr_min', name: 'fr_min' },
 		{ id: 'to_min', name: 'to_min' },
 		{ id: 'fr_max', name: 'fr_max' },
-		{ id: 'to_max', name: 'to_max' }
+		{ id: 'to_max', name: 'to_max' },
+		{ id: 'accessLevel', name: 'accessLevel' },
 	];
 
 	fields.forEach(field => {
@@ -821,6 +830,64 @@ function handleInquiryToggleClick(event) {
 		inquiryToggleMenu.classList.toggle('visible');
 	}
 }
+		function handleInquiryCountClick(event) {
+			const customerId = event.target.getAttribute('data-customer-id');
+			const inquiryListRow = document.querySelector(`.inquiry-list-row[data-customer-id="${customerId}"]`);
+			const inquiryListContainer = document.getElementById(`inquiry-list-${customerId}`);
+			
+			if (inquiryListRow.style.display === 'none') {
+				inquiryListRow.style.display = 'table-row';
+
+				fetch(`/admin/getInquiries?customerId=${customerId}`)
+					.then(response => response.json())
+					.then(data => {
+						inquiryListContainer.innerHTML = ''; // 기존 내용을 지우기
+
+						if (data.length > 0) {
+							const table = document.createElement('table');
+							table.classList.add('inquiry-table', 'custom-table', 'dark-mode');
+
+							const thead = document.createElement('thead');
+							thead.innerHTML = `
+								<tr>
+									<th>문의 ID</th>
+									<th>문의 제목</th>
+									<th>문의 타입</th>
+									<th>비밀글 여부</th>
+									<th>문의 내용</th>
+									<th>해결 여부</th>
+									<th>문의 날짜</th>
+								</tr>
+							`;
+							table.appendChild(thead);
+
+							const tbody = document.createElement('tbody');
+							data.forEach(inquiry => {
+								const tr = document.createElement('tr');
+								tr.innerHTML = `
+									<td>${inquiry.id}</td>
+									<td>${inquiry.subject}</td>
+									<td>${inquiry.type == '1' ? '1:1 문의' : '상품 문의'}</td>
+									<td>${inquiry.secret === '1' ? '공개' : '비공개'}</td>
+									<td>${inquiry.message}</td>
+									<td>${inquiry.resolvedYn === 'Y' ? '답변 완료' : '답변 대기'}</td>
+									<td>${inquiry.formattedCreatedDate}</td>
+								`;
+								tbody.appendChild(tr);
+							});
+							table.appendChild(tbody);
+							inquiryListContainer.appendChild(table);
+						} else {
+							inquiryListContainer.innerHTML = '<p>문의 내역이 없습니다.</p>';
+						}
+					})
+					.catch(error => {
+						console.error('Error fetching inquiry list:', error);
+					});
+			} else {
+				inquiryListRow.style.display = 'none';
+			}
+		}
 function handleReviewToggleClick(event) {
 	event.preventDefault();
 	const reviewToggle = event.target.closest('.reviewToggle');

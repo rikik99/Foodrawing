@@ -1,7 +1,6 @@
 /* 페이지 전용 스타일 */
 .stats-summary {
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
     margin-bottom: 20px;
 }
@@ -13,8 +12,8 @@
     margin: 10px;
     border-radius: 5px;
     text-align: center;
-    color: #ffffff; /* 글자 색을 흰색으로 변경 */
-    border: 1px solid #34495e; /* 테두리 추가 */
+    color: #ffffff;
+    border: 1px solid #34495e;
 }
 
 .stat-box.light-mode {
@@ -26,18 +25,18 @@
 .recent-orders table {
     width: 100%;
     border-collapse: collapse;
-    background: #1c2331; /* 다크 모드에서 테이블 배경색 어둡게 */
+    background: #1c2331;
 }
 
 .recent-orders.light-mode table {
-    background: #ffffff; /* 라이트 모드에서 테이블 배경색 흰색 */
+    background: #ffffff;
 }
 
 .recent-orders th, .recent-orders td {
     padding: 10px;
     text-align: left;
     border-bottom: 1px solid #34495e;
-    color: #ffffff; /* 기본 텍스트 색을 흰색으로 변경 */
+    color: #ffffff;
 }
 
 .recent-orders.light-mode th, .recent-orders.light-mode td {
@@ -55,8 +54,8 @@
     padding: 10px;
     margin-bottom: 10px;
     border-radius: 5px;
-    border: 1px solid #34495e; /* 테두리 추가 */
-    color: #ffffff; /* 기본 텍스트 색을 흰색으로 변경 */
+    border: 1px solid #34495e;
+    color: #ffffff;
 }
 
 .popular-products.light-mode li, .customer-reviews.light-mode li {
@@ -65,18 +64,16 @@
     border: 1px solid #ddd;
 }
 
-/* 추가된 스타일 */
 .summary-row {
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
-    margin-bottom: 20px; /* 간격 일정하게 */
+    margin-bottom: 20px;
 }
 
 .summary-box {
     flex: 1 1 30%;
     margin: 10px;
-    padding: 20px;
+    padding: 10px;
     border-radius: 5px;
     background: #1c2331;
     border: 1px solid #34495e;
@@ -97,20 +94,20 @@
 .summary-box table {
     width: 100%;
     border-collapse: collapse;
-    background: #1c2331; /* 다크 모드에서 테이블 배경색 어둡게 */
-    table-layout: fixed; /* 테이블 레이아웃 고정 */
+    background: #1c2331;
+    table-layout: fixed;
 }
 
 .summary-box.light-mode table {
-    background: #ffffff; /* 라이트 모드에서 테이블 배경색 흰색 */
+    background: #ffffff;
 }
 
 .summary-box th, .summary-box td {
     padding: 8px;
-    text-align: center; /* 텍스트 가운데 정렬 */
+    text-align: center;
     border-bottom: 1px solid #34495e;
     color: #ffffff;
-    font-size: 0.9em; /* 폰트 크기 줄이기 */
+    font-size: 0.9em;
 }
 
 .summary-box.light-mode th, .summary-box.light-mode td {
@@ -119,7 +116,33 @@
 }
 
 .summary-box th {
-    white-space: nowrap; /* 텍스트 줄 바꿈 방지 */
+    white-space: nowrap;
+}
+
+.recent-users {
+    margin-top: 20px;
+}
+
+.recent-users table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #1c2331;
+}
+
+.recent-users.light-mode table {
+    background: #ffffff;
+}
+
+.recent-users th, .recent-users td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #34495e;
+    color: #ffffff;
+}
+
+.recent-users.light-mode th, .recent-users.light-mode td {
+    color: #212529;
+    border-bottom: 1px solid #ddd;
 }
 
 @media (max-width: 768px) {
@@ -155,5 +178,10 @@
 
     .summary-box h2 {
         font-size: 1em;
+    }
+
+    .recent-users th, .recent-users td {
+        font-size: 0.8em;
+        padding: 5px;
     }
 }

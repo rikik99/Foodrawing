@@ -250,6 +250,14 @@ button.editButton:hover {
 	width: 100px;
 	cursor: pointer;
 }
+.custom-table .userOrder-count-column {
+	width: 100px;
+	cursor: pointer;
+}
+.custom-table .userCoupon-count-column {
+	width: 100px;
+	cursor: pointer;
+}
 
 .collapse-content {
 	display: none;

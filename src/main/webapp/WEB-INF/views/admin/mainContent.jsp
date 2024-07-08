@@ -1,14 +1,12 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" type="text/css"
-    href="<c:url value='/css/admin/adminMain.css'/>">
-<link rel="stylesheet" type="text/css"
-    href="<c:url value='/css/admin/common.css'/>">
+<link rel="stylesheet" type="text/css" href="<c:url value='/css/admin/adminMain.css'/>">
+<link rel="stylesheet" type="text/css" href="<c:url value='/css/admin/common.css'/>">
+<link rel="stylesheet" type="text/css" href="<c:url value='/css/admin/customStyles.css'/>">
 </head>
 <body class="dark-mode">
     <div class="dashboard-container">
@@ -24,86 +22,57 @@
                     <table>
                         <tr>
                             <th>주문 수</th>
-                            <th>주문액</th>
-                            <th>입금전</th>
-                            <th>입금완료</th>
-                            <th>배송중</th>
-                            <th>배송완료</th>
-                            <th>구매확정</th>
+                            <th>주문 총액</th>
                         </tr>
                         <tr>
-                            <td>36</td>
-                            <td>2,487,220</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>1</td>
-                            <td>0</td>
+                            <td>${orderList.size()}</td>
+                            <td>${totalOrderAmount != null ? totalOrderAmount : 0}</td>
                         </tr>
                     </table>
                 </div>
 
-                <!-- 주문 상태 현황 -->
+                <!-- 주문 상태 현황 (테이블 1) -->
                 <div class="summary-box dark-mode">
                     <h2>주문 상태 현황</h2>
                     <table>
                         <tr>
-                            <th>주문번호</th>
-                            <th>주문자명</th>
-                            <th>주문상태</th>
-                            <th>처리상태</th>
-                            <th>배송상태</th>
+                            <th>결제 완료</th>
+                            <th>상품 준비</th>
+                            <th>배송 준비</th>
+                            <th>배송 중</th>
+                            <th>배송 완료</th>
                         </tr>
-                        <tr>
-                            <td>#12345</td>
-                            <td>홍길동</td>
-                            <td>결제완료</td>
-                            <td>배송중</td>
-                            <td>배송준비</td>
-                        </tr>
-                        <tr>
-                            <td>#12344</td>
-                            <td>김철수</td>
-                            <td>결제완료</td>
-                            <td>배송중</td>
-                            <td>배송준비</td>
-                        </tr>
+                        <c:forEach var="statusMap" items="${orderStatusCounts}">
+                            <tr>
+                                <td>${statusMap['결제 완료']}</td>
+                                <td>${statusMap['상품 준비']}</td>
+                                <td>${statusMap['배송 준비']}</td>
+                                <td>${statusMap['배송 중']}</td>
+                                <td>${statusMap['배송 완료']}</td>
+                            </tr>
+                        </c:forEach>
                     </table>
                 </div>
 
-                <!-- 구매확정/클레임 현황 -->
+                <!-- 구매확정/클래임 현황 (테이블 2) -->
                 <div class="summary-box dark-mode">
-                    <h2>구매확정/클레임 현황</h2>
+                    <h2>구매확정/클래임 현황</h2>
                     <table>
                         <tr>
-                            <th>구매확정</th>
+                            <th>구매 확정 대기</th>
                             <th>취소</th>
-                            <th>환불</th>
                             <th>반품</th>
                             <th>교환</th>
                         </tr>
-                        <tr>
-                            <td>5</td>
-                            <td>2</td>
-                            <td>1</td>
-                            <td>0</td>
-                            <td>0</td>
-                        </tr>
+                        <c:forEach var="statusMap" items="${orderStatusCounts}">
+                            <tr>
+                                <td>${statusMap['구매 확정 대기']}</td>
+                                <td>${statusMap['취소']}</td>
+                                <td>${statusMap['반품']}</td>
+                                <td>${statusMap['교환']}</td>
+                            </tr>
+                        </c:forEach>
                     </table>
-                </div>
-            </div>
-
-            <!-- 실시간 알림 -->
-            <div class="notifications dark-mode">
-                <h2>실시간 알림</h2>
-                <div class="notification-box dark-mode">
-                    <p>재고가 부족한 상품이 있습니다.</p>
-                </div>
-                <div class="notification-box dark-mode">
-                    <p>새로운 고객 문의가 있습니다.</p>
-                </div>
-                <div class="notification-box dark-mode">
-                    <p>새로운 주문이 접수되었습니다.</p>
                 </div>
             </div>
 
@@ -118,18 +87,14 @@
                         <th>주문 상태</th>
                     </tr>
                     <!-- 최근 주문 데이터 -->
-                    <tr>
-                        <td>#12345</td>
-                        <td>홍길동</td>
-                        <td>2024-06-16</td>
-                        <td>처리 중</td>
-                    </tr>
-                    <tr>
-                        <td>#12344</td>
-                        <td>김철수</td>
-                        <td>2024-06-15</td>
-                        <td>완료</td>
-                    </tr>
+                    <c:forEach var="order" items="${orderList}">
+                        <tr>
+                            <td>${order.orderNumber}</td>
+                            <td>${order.customer.name}</td>
+                            <td>${order.orderDate}</td>
+                            <td>${order.orderStatus.orderStatus}</td>
+                        </tr>
+                    </c:forEach>
                 </table>
             </div>
 
@@ -143,17 +108,39 @@
                 </ul>
             </div>
 
+            <!-- 최근 가입 회원 -->
+            <div class="recent-users dark-mode">
+                <h2>최근 가입 회원</h2>
+                <table>
+                    <tr>
+                        <th>아이디</th>
+                        <th>이름</th>
+                        <th>성별</th>
+                        <th>이메일</th>
+                        <th>가입일</th>
+                    </tr>
+                    <c:forEach var="user" items="${userList}">
+                        <tr>
+                            <td>${user.username}</td>
+                            <td>${user.customer.name}</td>
+                            <td>${user.customer.gender}</td>
+                            <td>${user.customer.email}</td>
+                            <td>${user.formattedCreatedDate}</td>
+                        </tr>
+                    </c:forEach>
+                </table>
+            </div>
         </div>
         <button id="toggleMode">Toggle Mode</button>
-	<script src="<c:url value='/js/admin/productNumber.js'/>"></script>
-		<script src="<c:url value='/js/admin/editDiscount.js'/>"></script>
-		<script src="<c:url value='/js/admin/starRating.js'/>"></script>
-		<script src="<c:url value='/js/admin/sortTable.js'/>"></script>
-		<script src="<c:url value='/js/admin/toggleMode.js'/>"></script>
-		<script src="<c:url value='/js/admin/openWindow.js'/>"></script>
-		<script src="<c:url value='/js/admin/main.js'/>"></script>
-		<script src="<c:url value='/js/admin/ckeditor5/build/ckeditor.js'/>"></script>
-		<script src="<c:url value='/js/admin/UploadAdapter.js'/>"></script>
+        <script src="<c:url value='/js/admin/productNumber.js'/>"></script>
+        <script src="<c:url value='/js/admin/editDiscount.js'/>"></script>
+        <script src="<c:url value='/js/admin/starRating.js'/>"></script>
+        <script src="<c:url value='/js/admin/sortTable.js'/>"></script>
+        <script src="<c:url value='/js/admin/toggleMode.js'/>"></script>
+        <script src="<c:url value='/js/admin/openWindow.js'/>"></script>
+        <script src="<c:url value='/js/admin/main.js'/>"></script>
+        <script src="<c:url value='/js/admin/ckeditor5/build/ckeditor.js'/>"></script>
+        <script src="<c:url value='/js/admin/UploadAdapter.js'/>"></script>
     </div>
 </body>
 </html>

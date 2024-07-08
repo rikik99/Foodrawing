@@ -442,7 +442,9 @@
 			SELECT C.ID
 			FROM
 			CUSTOMER_TB C
-			WHERE C.NICKNAME LIKE '%' || #{searchInput} || '%'
+			JOIN USER_TB U ON U.ID = C.USER_ID
+			WHERE U.USERNAME LIKE
+			'%' || #{searchInput} || '%'
 			)
 			)
 		</if>
@@ -1143,6 +1145,18 @@
 		AND OS.ORDER_STATUS =
 		'구매 확정'
 	</select>
+	<select id="findMainTotalOrderAmount" resultType="Long">
+		SELECT
+		SUM(O.TOTAL_AMOUNT)
+		FROM ORDER_TB O
+		JOIN
+		ORDER_STATUS_TB OS ON O.ID =
+		OS.ORDER_ID
+		WHERE
+		O.IDENTIFIER_TYPE = 'CUSTOMER'
+		AND OS.ORDER_STATUS =
+		'구매 확정'
+	</select>
 	<select id="findTotalReservesByCustomerId" parameterType="Long"
 		resultType="Long">
 		SELECT SUM(CASE
@@ -1172,9 +1186,69 @@
 		#{accessLevel})
 	</insert>
 	<update id="updateDiscountStatus" parameterType="map">
-		UPDATE DISCOUNT_TB
+		UPDATE
+		DISCOUNT_TB
 		SET ONSALE_YN = #{newStatus}
 		WHERE ID = #{discountId}
 	</update>
-
+	<select id="getInquiriesByCustomerId">
+		SELECT *
+		FROM INQUIRIES_TB
+		WHERE CUSTOMER_ID =
+		#{customerId}
+	</select>
+	<select id="findAdminsWithSearch" parameterType="map">
+		SELECT A.ID, A.NAME, A.USER_ID, A.ACCESS_LEVEL
+		FROM ADMIN_TB A
+		JOIN
+		USER_TB U ON U.ID = A.USER_ID
+		WHERE 1=1
+		<if test="searchInput != null and searchInput != ''">
+			AND (U.USERNAME LIKE '%' || #{searchInput} || '%'
+			OR
+			A.NAME
+			LIKE '%' || #{searchInput} || '%')
+		</if>
+		<if test="register_fr_date != null and register_fr_date != ''">
+			AND TRUNC(U.CREATED_DATE) &gt;=
+			TO_DATE(#{register_fr_date},
+			'YYYY-MM-DD')
+		</if>
+		<if test="register_to_date != null and register_to_date != ''">
+			AND TRUNC(U.CREATED_DATE) &lt;=
+			TO_DATE(#{register_to_date},
+			'YYYY-MM-DD')
+		</if>
+		<if test="accessLevel != null and accessLevel != ''">
+			AND A.ACCESS_LEVEL = #{accessLevel}
+		</if>
+	</select>
+	<select id="findUserListWhereDeletedY">
+		SELECT ID, USERNAME, PASSWORD, ROLE, CREATED_DATE,
+		DELETED_YN, DELETED_DATE
+		FROM USER_TB
+		WHERE DELETED_YN = 'Y'
+	</select>
+	<select id="findCustomerByUserId">
+		SELECT ID, USER_ID, NICKNAME, NAME, GENDER, PHONE,
+		EMAIL, BIRTHDATE, ADDRESS, ADDRESS_DETAIL, ZIPCODE, REFUND_ACCOUNT,
+		REFUND_BANK
+		FROM CUSTOMER_TB
+		WHERE USER_ID = #{userId}
+	</select>
+	<select id="findAdminDTOByUserId">
+		SELECT ID, NAME, USER_ID, ACCESS_LEVEL
+		FROM ADMIN_TB
+		WHERE USER_ID = #{userId}
+	</select>
+	<select id="findAllUsers">
+		SELECT * FROM USER_TB 
+		WHERE ROLE = 1
+		ORDER BY CREATED_DATE
+	</select>
+	<select id="findOrderStatusCounts" resultType="java.util.Map">
+		SELECT ORDER_STATUS, COUNT(*) AS statusCount
+		FROM ORDER_STATUS_TB
+		GROUP BY ORDER_STATUS
+	</select>
 </mapper>
