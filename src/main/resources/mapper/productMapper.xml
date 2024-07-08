@@ -56,5 +56,11 @@
     	FROM PRODUCT_FILE_TB
     	WHERE PRODUCT_NUMBER = #{productNumber}
     </select>
+    
+    <select id="getproductBySalesPostId">
+    	SELECT PRODUCT_NUMBER
+    	FROM SALES_POST_TB
+    	WHERE ID = #{salesPostId}
+    </select>
 
 </mapper>

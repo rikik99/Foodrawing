@@ -1,5 +1,7 @@
 package com.food.domain.order.dto;
 
+import com.food.domain.sales.dto.SalesPostDTO;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,4 +18,6 @@ public class OrderDetailDTO {
     private Long unitPrice;
     private Long discountPrice;
     private Long quantity;
+    
+    private SalesPostDTO sales;
 }

@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -168,6 +169,18 @@
             display: none;
             margin-top: 10px;
         }
+
+        .original-price {
+            color: gray;
+            text-decoration: line-through;
+            font-size: 1em;
+            display: block;
+        }
+
+        .discount-price {
+            color: #333;
+            font-size: 1.2em;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/portone-js/dist/portone.min.js"></script>
@@ -178,14 +191,14 @@
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <!-- iamport.payment.js -->
 <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
-<script src="/js/checkoutPage/postCode.js"></script> <!-- 우편번호 -->
-<script src="/js/checkoutPage/totalPrice.js"></script> <!-- 가격계산 -->
-<script src="/js/checkoutPage/portOnePayment.js"></script> <!-- 결제 관련 -->
+
 </head>
 <body>
 <%@include file="/WEB-INF/include/header.jsp"%>
 <%@include file="/WEB-INF/include/nav.jsp"%>
 <%@include file="/WEB-INF/include/sidebar.jsp"%>
+
+<input type="hidden" id="loginCustomerId" class="loginCustomerId" name="loginCustomerId" value="${customer.id}">
 
 <div class="container">
     <div class="header">
@@ -226,11 +239,11 @@
             <div class="form-group">
                 <label for="zipCode">우편번호</label>
                 <input type="text" id="zipCode" name="zipCode" placeholder="우편번호" required>
-                <input type="button" onclick="sample4_execDaumPostcode()" value="우편번호 찾기">
+                <input type="button" onclick="sample4_execDaumPostcode()" value="우편번호 찾기" readonly>
             </div>
             <div class="form-group">
                 <label for="address">주소</label>
-                <input type="text" id="address" name="address" placeholder="도로명주소" required>
+                <input type="text" id="address" name="address" placeholder="도로명주소" required readonly>
             </div>
             <div class="form-group">
                 <label for="detailAddress">상세 주소</label>
@@ -272,14 +285,25 @@
                         <p>${item.description}</p>
                         <p >수량: <span class="quantity">${item.quantity}</span></p>
                     </div>
-                    <div class="price"><span class="originalPrice">${item.price}</span>원</div>
-                    <c:if test="${item.discountType}">
-                    	<div class="discountValue">할인: ${item.discountValue}원</div>
-                    </c:if>
-                    <input type="hidden" class="discountType" value="${item.discountType}">
-                    <input type="hidden" class="discountValue" value="${item.discountValue}">
-                    <input type="hidden" class="maxDiscount" value="${item.maxDiscount}">
-                    <input type="hidden" class="minPrice" value="${item.minPrice}">
+                    <div>
+                    		<input type="hidden" id="original-price" value="${item.price}">
+                    		<input type="hidden" id="discount-price" value="${item.discountPrice}">
+                        <c:choose>
+                            <c:when test="${item.discountPrice != 0}">
+                                <div class="original-price">
+                                    <fmt:formatNumber type="number" value="${item.price}" />원
+                                </div>
+                                <div class="discount-price price">
+                                    <fmt:formatNumber type="number" value="${item.discountPrice}" />원
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="price">
+                                    <fmt:formatNumber type="number" value="${item.price}" />원
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
                 </div>
             </c:forEach>
             
@@ -301,9 +325,9 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="installment">적립금</label>
-                    <input type="number">
-                    <div>적립금: </div>
+                		<input type="hidden" id="total-reserves" value="${reserves}">
+                    <label for="installment">적립금: <fmt:formatNumber type="number" value="${reserves}" />점</label>
+                    <input type="number" id="usePoint" class="usePoint" min="0" max="${reserves}" value="" placeholder="사용할 적립금">
                 </div>
             </div>
         </div>
@@ -312,16 +336,16 @@
             <h3>최종 결제 정보</h3>
             <div class="order-summary">
                 <div class="order-total">
-                    <span>상품금액: </span>
-                    <span id="totalPrice">${totalPrice}원</span>
+                    <span>금액 합계: </span>
+                    <span id="totalPrice"><fmt:formatNumber type="number" value="${totalOriginalPrice}" />원</span>
                 </div>
                 <div class="order-total">
-                    <span>할인금액: </span>
-                    <span id="discountPrice">${discountPrice}원</span>
+                    <span>할인 금액: </span>
+                    <span id="totalDiscountPrice"><fmt:formatNumber type="number" value="${totalDiscountPrice}" />원</span>
                 </div>
                 <div class="order-total total-price">
-                    <span>최종 결제금액: </span>
-                    <span id="finalPrice">${finalPrice}원</span>
+                    <span>최종 결제 금액: </span>
+                    <span id="finalPrice"><fmt:formatNumber type="number" value="${finalPrice}" />원</span>
                 </div>
             </div>
             <button class="btn btn-primary btn-pay" onclick="pay()">결제하기</button>
@@ -332,52 +356,52 @@
 <%@include file="/WEB-INF/include/footer.jsp"%>
 
 <script>    
-    //핸드폰 번호 처리   
-    var customerPhoneEl = document.getElementById('customerPhone');
-    var deliverPhoneEl = document.getElementById('deliverPhone');
-        
-    customerPhoneEl.addEventListener('input', function() {
-    	var value = customerPhone.value.replace(/[^0-9]/g, ''); // 숫자 이외의 문자 제거
-
-        if (value.length > 0 && !value.startsWith('010')) {
-            value = '010' + value;
-        }
-
-        if (value.length > 3 && value.length <= 7) {
-            value = value.slice(0, 3) + '-' + value.slice(3);
-        } else if (value.length > 7) {
-            value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7);
-        }
-
-        customerPhone.value = value;
-    });
+//핸드폰 번호 처리   
+var customerPhoneEl = document.getElementById('customerPhone');
+var deliverPhoneEl = document.getElementById('deliverPhone');
     
-    deliverPhoneEl.addEventListener('input', function() {
-    	var value = deliverPhone.value.replace(/[^0-9]/g, ''); // 숫자 이외의 문자 제거
+customerPhoneEl.addEventListener('input', function() {
+	var value = customerPhoneEl.value.replace(/[^0-9]/g, ''); // 숫자 이외의 문자 제거
 
-        if (value.length > 0 && !value.startsWith('010')) {
-            value = '010' + value;
-        }
+    if (value.length > 0 && !value.startsWith('010')) {
+        value = '010' + value;
+    }
 
-        if (value.length > 3 && value.length <= 7) {
-            value = value.slice(0, 3) + '-' + value.slice(3);
-        } else if (value.length > 7) {
-            value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7);
-        }
+    if (value.length > 3 && value.length <= 7) {
+        value = value.slice(0, 3) + '-' + value.slice(3);
+    } else if (value.length > 7) {
+        value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7);
+    }
 
-        deliverPhone.value = value;
-    });
-    
- // 주문자와 동일 체크박스 처리
-    document.getElementById('sameAsOrderer').addEventListener('change', function () {
-        if (this.checked) {
-            document.getElementById('deliverName').value = document.getElementById('customerName').value;
-            document.getElementById('deliverPhone').value = document.getElementById('customerPhone').value;
-        } else {
-            document.getElementById('deliverName').value = '';
-            document.getElementById('deliverPhone').value = '010-';
-        }
-    });
+    customerPhoneEl.value = value;
+});
+
+deliverPhoneEl.addEventListener('input', function() {
+	var value = deliverPhoneEl.value.replace(/[^0-9]/g, ''); // 숫자 이외의 문자 제거
+
+    if (value.length > 0 && !value.startsWith('010')) {
+        value = '010' + value;
+    }
+
+    if (value.length > 3 && value.length <= 7) {
+        value = value.slice(0, 3) + '-' + value.slice(3);
+    } else if (value.length > 7) {
+        value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7);
+    }
+
+    deliverPhoneEl.value = value;
+});
+
+// 주문자와 동일 체크박스 처리
+document.getElementById('sameAsOrderer').addEventListener('change', function () {
+    if (this.checked) {
+        document.getElementById('deliverName').value = document.getElementById('customerName').value;
+        document.getElementById('deliverPhone').value = document.getElementById('customerPhone').value;
+    } else {
+        document.getElementById('deliverName').value = '';
+        document.getElementById('deliverPhone').value = '010-';
+    }
+});
  
  // 배송 요청 사항 기타 선택 시 텍스트 입력란 표시
     document.getElementById('deliveryRequest').addEventListener('change', function () {
@@ -447,5 +471,8 @@ function restoreStock() {
       });
 }
 </script>
+<script src="/js/checkoutPage/postCode.js"></script> <!-- 우편번호 -->
+<!-- <script src="/js/checkoutPage/totalPrice.js"></script> --> <!-- 가격계산 -->
+<script src="/js/checkoutPage/portOnePayment.js"></script> <!-- 결제 관련 -->
 </body>
 </html>

@@ -30,7 +30,6 @@
                             <option value="ALL">전체</option>
                             <option value="PRODUCT">상품</option>
                             <option value="MEMBER_RATING">회원 등급</option>
-                            <option value="CUSTOMER">회원</option>
                             <option value="CATEGORY">카테고리</option>
                         </select>
                     </td>

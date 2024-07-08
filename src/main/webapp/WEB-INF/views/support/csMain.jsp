@@ -87,6 +87,24 @@
         .arrow img {
             width: 20px;
         }
+        .contact-btn {
+            display: flex;
+            justify-content: right;
+            margin-top: 20px;
+        }
+        .contact-btn button {
+            background-color: #white;
+            color: black;
+            padding: 9px 15px;
+            border: 3px solid #5dad52;
+            border-radius: 5px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .contact-btn button:hover {
+            background-color: #5dad52;
+        }
     </style>
 </head>
 <body>
@@ -116,6 +134,9 @@
             <!-- 페이지네이션 버튼이 여기에 비동기적으로 추가됩니다 -->
         </ul>
     </nav>
+    <div class="contact-btn">
+        <button id="contactButton">1:1 문의</button>
+    </div>
 </div>
 
 <%@include file="/WEB-INF/include/sidebar.jsp"%>

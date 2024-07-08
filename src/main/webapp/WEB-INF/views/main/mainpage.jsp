@@ -350,14 +350,8 @@
                                         </div>
                                         <div class="product-price">
                                             ${product.price}원
-                                            <span class="product-old-price">7,980원</span>
                                         </div>
-                                        <div class="product-discount">35% 할인</div>
-                                        <div class="product-rating">★ 4.7 (64)</div>
-                                        <div class="delivery-info">
-                                            내일 <span>꼭! 도착</span><br>
-                                            내일 06/08 (토) 도착예정
-                                        </div>
+
                                     </div>
                                 </a>
                             </div>

@@ -5,7 +5,7 @@
 <html>
 <head>
 <link rel="stylesheet" href="/css/admin/common.css" />
-<link rel="stylesheet" href="/css/admin/adminSales.css" />
+<link rel="stylesheet" href="/css/admin/consolidated.css" />
 </head>
 <body class="dark-mode">
 	<div class="dashboard-container">
@@ -69,7 +69,7 @@
 				</div>
 				<div class="full-width">
 					<div class="half-width number-group">
-						<label for="stock_min">상품 재고</label> <input type="number"
+						<label for="stock_min">진열 수량</label> <input type="number"
 							name="stock_min" id="stock_min" placeholder="이상"
 							class="secondary"> <input type="number" name="stock_max"
 							id="stock_max" placeholder="이하" class="secondary">
@@ -102,16 +102,16 @@
 			</div>
 
 			<!-- 상품 목록 -->
-			<div class="product-list-header">
+			<div class="custom-table-header">
 				<div>
 					<span>조회된 판매글 수 : <strong>${totalElements}</strong>개</span>
 				</div>
 				<div class="search-buttons">
 					<button id="deleteSelectedButton" class="danger">선택 삭제</button>
-					<button id="addSalesButton" class="primary">판매글 등록</button>
+					<button id="addSalesButton" class="primary" data-target="insertSalesPost">판매글 등록</button>
 				</div>
 			</div>
-			<table class="product-list dark-mode">
+			<table class="custom-table dark-mode">
 				<thead>
 					<tr>
 						<th><input type="checkbox" id="selectAll" class="secondary"></th>
@@ -119,7 +119,7 @@
 						<th>작성자</th>
 						<th>상품코드</th>
 						<th>가격</th>
-						<th>재고수량</th>
+						<th>진열 수량</th>
 						<th>상태</th>
 						<th>판매 마감일</th>
 						<th>등록일</th>

@@ -50,6 +50,11 @@ document.addEventListener('click', function(e) {
 		const urlPath = e.target.getAttribute('data-url');
 		performSearch(urlPath);
 	}
+	if (e.target.id === 'addSalesButton') {
+		const url = '/admin/insertSalesPost'
+		const target = e.target.getAttribute('data-target');
+		loadContent(url, target, true);
+	}
 	if (e.target.classList.contains('page-link')) {
 		const page = e.target.getAttribute('data-page');
 		const size = e.target.getAttribute('data-size');
@@ -60,6 +65,10 @@ document.addEventListener('click', function(e) {
 		const urlPath = e.target.getAttribute('data-url');
 		const pageType = e.target.getAttribute('data-pageType');
 		deleteSelectedProducts(urlPath, pageType);
+	}
+	if (e.target.id === 'progressButton') {
+		const urlPath = e.target.getAttribute('data-url');
+		progressSelectedOrder(urlPath);
 	}
 	if (e.target.classList.contains('stock-range-btn')) {
 		const stockType = e.target.getAttribute('data-stock');
@@ -175,6 +184,37 @@ document.addEventListener('click', function(e) {
 				alert('답변 작성 중 오류가 발생했습니다.');
 			});
 	}
+	if (e.target.classList.contains(('editButton'))) {
+		const productNumber = e.target.getAttribute('data-productNumber');
+		openWindow(`/admin/updateProduct/${productNumber}`, 'EditWindow');
+	}
+
+    if (e.target.classList.contains('discount-status-column')) {
+        let discountId = e.target.closest('tr').getAttribute('data-discountId');
+        let currentStatus = e.target.innerText.trim();
+        let newStatus = (currentStatus === 'Y') ? 'N' : 'Y';
+        fetch('/admin/updateDiscountStatus', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ discountId: discountId, onsaleYn: newStatus })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('진행 여부 변경에 성공했습니다.');
+                loadContent('/admin/discountList', 'discountList', true);
+            } else {
+                alert('진행 여부 변경에 실패했습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('진행 여부 변경 중 오류가 발생했습니다.');
+        });
+    }
+
 });
 
 document.addEventListener('click', async function(event) {
@@ -223,14 +263,127 @@ document.addEventListener('click', async function(event) {
 			console.error('Error:', error);
 		}
 	}
+	else if (event.target.classList.contains('salesUpdateBtn')) {
+		const insertSalsePostForm = document.querySelector('.updateSalsePostForm');
+		// CKEditor의 내용을 textarea 요소로 업데이트
+		if (window.editor) {
+			insertSalsePostForm.querySelector('#description').value = window.editor.getData();
+		}
+
+		// 각 요소의 값을 수집하여 객체에 저장
+		const data = {
+			salesPostId: document.getElementById('salesPostId').value,
+			productList: document.getElementById('updateProductList').value,
+			productNumber: document.getElementById('productNumber').value,
+			title: document.getElementById('title').value,
+			startPostDate: document.getElementById('startPostDate').value,
+			lastPostDate: document.getElementById('lastPostDate').value,
+			description: document.getElementById('description').value,
+			status: document.querySelector('input[name="status"]:checked').value, // 라디오 버튼 값 추가
+			fileDTOList: JSON.parse(localStorage.getItem('fileDTOList')) || []
+		};
+
+		// 객체를 JSON 문자열로 변환
+		const jsonData = JSON.stringify(data);
+
+		try {
+			const response = await fetch('/admin/updateSalesPost', {
+				method: 'PUT',
+				body: jsonData,
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+
+			if (response.ok) {
+				const message = await response.text();
+				alert(message);
+
+				// salesPost 페이지로 이동
+				loadContent('/admin/salesPost', 'salesPost', true);
+				localStorage.removeItem('fileDTOList'); // 파일 리스트 초기화
+			} else {
+				console.error('Failed to submit form');
+			}
+		} catch (error) {
+			console.error('Error:', error);
+		}
+	}
 });
 
 document.addEventListener('change', function(e) {
 	if (e.target && e.target.id === 'productList') {
 		console.log("상품명 선택했어요");
 		updateProductDetails('productList');
+	} else if (e.target && e.target.id === 'updateProductList') {
+		console.log("수정할 상품명 선택");
+		const productName = e.target.value;
+		if (productName) {
+			fetchProductInfo(productName);
+		}
 	}
 });
+
+function fetchProductInfo(productName) {
+	fetch('/admin/getProductInfo', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({ name: productName })
+	})
+		.then(response => response.json())
+		.then(data => fillFormFields(data))
+		.catch(error => console.error('Error fetching product info:', error));
+}
+
+function fillFormFields(data) {
+	document.getElementById('productNumber').value = data.productNumber || '';
+	document.getElementById('title').value = data.title || '';
+	document.getElementById('startPostDate').value = data.startPostDate || '';
+	document.getElementById('lastPostDate').value = data.lastPostDate || '';
+	document.getElementById('salesPostId').value = data.salesPostId || '';
+
+	const statusRadio = document.querySelector(`input[name="status"][value="${data.status}"]`);
+	if (statusRadio) {
+		statusRadio.checked = true;
+	}
+
+	if (window.editorInstance) {
+		window.editorInstance.setData(data.description || '');
+	}
+
+	const previewArea = document.querySelector('.previewArea');
+	previewArea.src = data.imagePath || '/images/FooDrawing_Logo.png';
+}
+
+document.addEventListener('blur', function(e) {
+	if (e.target.id === 'lastPostDate' || e.target.id === 'startPostDate') {
+		adjustDate(e.target);
+	}
+}, true);
+
+function adjustDate(input) {
+	const today = new Date();
+	let date = new Date(input.value);
+	const maxYear = 2099;
+
+	if (isNaN(date.getTime())) {
+		date = new Date();
+		date.setFullYear(maxYear);
+	}
+
+	if (date < today) {
+		date = today;
+	}
+
+	if (date.getFullYear() > maxYear) {
+		date.setFullYear(maxYear);
+	}
+
+	input.value = date.toISOString().split('T')[0];
+}
+
 
 function performSearch(urlPath) {
 	const params = new URLSearchParams();
@@ -246,6 +399,12 @@ function performSearch(urlPath) {
 		{ id: 'price_max', name: 'price_max' },
 		{ id: 'last_fr_date', name: 'last_fr_date' },
 		{ id: 'last_to_date', name: 'last_to_date' },
+		{ id: 'discount_fr_date', name: 'discount_fr_date' },
+		{ id: 'discount_to_date', name: 'discount_to_date' },
+		{ id: 'order_fr_date', name: 'order_fr_date' },
+		{ id: 'order_to_date', name: 'order_to_date' },
+		{ id: 'Issued_fr_date', name: 'Issued_fr_date' },
+		{ id: 'Issued_to_date', name: 'Issued_to_date' },
 		{ id: 'register_fr_date', name: 'register_fr_date' },
 		{ id: 'register_to_date', name: 'register_to_date' },
 		{ id: 'fr_min', name: 'fr_min' },
@@ -269,9 +428,10 @@ function performSearch(urlPath) {
 		{ name: 'replyYn', paramName: 'replyYn' },
 		{ name: 'discountType', paramName: 'discountType' },
 		{ name: 'sale_status', paramName: 'sale_status' },
-		{ name: 'onsaleYn', paramName:'onsaleYn'},
-		{ name: 'type', paramName:'type'},
-		{ name:'targetType', paramName:'targetType'}
+		{ name: 'onsaleYn', paramName: 'onsaleYn' },
+		{ name: 'type', paramName: 'type' },
+		{ name: 'usedYn', paramName: 'usedYn' },
+		{ name: 'targetType', paramName: 'targetType' }
 	];
 
 	radioButtonGroups.forEach(group => {
@@ -297,6 +457,21 @@ function performSearch(urlPath) {
 	}
 	if (ratingValue) params.append('rating', ratingValue);
 
+	// Adding checkbox parameters
+	const checkboxGroups = [
+		{ name: 'orderStatus', paramName: 'orderStatus' },
+		{ name: 'paymentType', paramName: 'paymentType' }
+	];
+
+	checkboxGroups.forEach(group => {
+		const checkboxes = document.querySelectorAll(`input[name="${group.name}"]:checked`);
+		checkboxes.forEach(checkbox => {
+			if (checkbox.value !== 'all') {
+				params.append(group.paramName, checkbox.value);
+			}
+		});
+	});
+
 	params.append('page', '0'); // 검색 시 첫 페이지로 이동
 	params.append('size', '5'); // 기본 페이지 크기 설정
 
@@ -315,6 +490,7 @@ function performSearch(urlPath) {
 		})
 		.catch(error => console.error('Error:', error));
 }
+
 
 
 
@@ -446,68 +622,129 @@ function loadContent(url, target, pushState = true) {
 
 function setupCheckboxEventListeners() {
 	const selectAllCheckbox = document.getElementById('selectAll');
+	const orderCheckboxes = document.querySelectorAll('.selectOrder');
 	const productCheckboxes = document.querySelectorAll('.selectProduct');
 
 	if (selectAllCheckbox) {
 		selectAllCheckbox.addEventListener('change', function() {
+			orderCheckboxes.forEach(function(checkbox) {
+				checkbox.checked = selectAllCheckbox.checked;
+			});
 			productCheckboxes.forEach(function(checkbox) {
 				checkbox.checked = selectAllCheckbox.checked;
 			});
 		});
 	}
 
+	const updateSelectAllCheckboxState = function() {
+		const allChecked = Array.from(orderCheckboxes).every(chk => chk.checked) && Array.from(productCheckboxes).every(chk => chk.checked);
+		selectAllCheckbox.checked = allChecked;
+	};
+
+	orderCheckboxes.forEach(function(checkbox) {
+		checkbox.addEventListener('change', function() {
+			if (!checkbox.checked) {
+				selectAllCheckbox.checked = false;
+			} else {
+				updateSelectAllCheckboxState();
+			}
+		});
+	});
+
 	productCheckboxes.forEach(function(checkbox) {
 		checkbox.addEventListener('change', function() {
 			if (!checkbox.checked) {
 				selectAllCheckbox.checked = false;
 			} else {
-				const allChecked = Array.from(productCheckboxes).every(chk => chk.checked);
-				selectAllCheckbox.checked = allChecked;
+				updateSelectAllCheckboxState();
 			}
 		});
 	});
 }
 
 function deleteSelectedProducts(urlPath, pageType) {
-    const productCheckboxes = document.querySelectorAll('.selectProduct:checked');
-    let selectedItems;
-    let bodyContent;
+	const productCheckboxes = document.querySelectorAll('.selectProduct:checked');
+	let selectedItems;
+	let bodyContent;
 
-    if (pageType === 'productManagement') {
-        const selectedProductNumbers = Array.from(productCheckboxes).map(checkbox => {
-            return checkbox.closest('tr').querySelector('td:nth-child(3) p').textContent;
-        });
-        selectedItems = selectedProductNumbers;
-        bodyContent = { productNumbers: selectedItems };
-    } else if (pageType === 'discountList') {
-        const selectedDiscountIds = Array.from(productCheckboxes).map(checkbox => {
-            return checkbox.closest('tr').getAttribute('data-discountId');
-        });
-        selectedItems = selectedDiscountIds;
-        bodyContent = { discountIds: selectedItems };
-    }
+	if (pageType === 'productManagement') {
+		const selectedProductNumbers = Array.from(productCheckboxes).map(checkbox => {
+			return checkbox.closest('tr').querySelector('td:nth-child(3) p').textContent;
+		});
+		selectedItems = selectedProductNumbers;
+		bodyContent = { productNumbers: selectedItems };
+	} else if (pageType === 'discountList') {
+		const selectedDiscountIds = Array.from(productCheckboxes).map(checkbox => {
+			return checkbox.closest('tr').getAttribute('data-discountId');
+		});
+		selectedItems = selectedDiscountIds;
+		bodyContent = { discountIds: selectedItems };
+	} else if (pageType === 'discountTarget') {
+		const selectedDiscountTargetIds = Array.from(productCheckboxes).map(checkbox => {
+			return checkbox.closest('tr').getAttribute('data-discountId');
+		});
+		selectedItems = selectedDiscountTargetIds;
+		bodyContent = { discountTargetIds: selectedItems };
+	} else if (pageType === 'couponList') {
+		const selectedCouponListIds = Array.from(productCheckboxes).map(checkbox => {
+			return checkbox.closest('tr').getAttribute('data-issuanceId');
+		});
+		selectedItems = selectedCouponListIds;
+		bodyContent = { couponIssuanceIds: selectedItems };
+	}
 
-    if (selectedItems.length > 0) {
-        const endpoint = pageType === 'productManagement' ? '/admin/deleteProducts' : '/admin/deleteDiscounts';
+	if (selectedItems.length > 0) {
+		const endpoint = pageType === 'productManagement' ? '/admin/deleteProducts' :
+			pageType === 'discountList' ? '/admin/deleteDiscounts' :
+				pageType === 'discountTarget' ? '/admin/discountTarget' : '/admin/deleteCoupons';
 
-        fetch(endpoint, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(bodyContent)
-        })
-            .then(response => response.ok ? response.text() : Promise.reject('Failed to delete items'))
-            .then(message => {
-                alert(message);
-                loadContent(urlPath, urlPath.split('/').pop(), false);
-            })
-            .catch(error => console.error('Error:', error));
-    } else {
-        alert('삭제할 항목을 선택해주세요.');
-    }
+		fetch(endpoint, {
+			method: 'DELETE',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(bodyContent)
+		})
+			.then(response => response.ok ? response.text() : Promise.reject('Failed to delete items'))
+			.then(message => {
+				alert(message);
+				loadContent(urlPath, urlPath.split('/').pop(), false);
+			})
+			.catch(error => console.error('Error:', error));
+	} else {
+		alert('삭제할 항목을 선택해주세요.');
+	}
 }
 
+function progressSelectedOrder(urlPath) {
+	const productCheckboxes = document.querySelectorAll('.selectOrder:checked');
+
+	let selectedItems = Array.from(productCheckboxes).map(checkbox => {
+		return checkbox.closest('tr').getAttribute('data-orderId');
+	});
+	let progress = document.querySelector('.selectOrder:checked').closest('tr').getAttribute('data-progress');
+
+	if (selectedItems.length > 0) {
+		const bodyContent = { orderIds: selectedItems, progress: progress };
+
+		fetch('/admin/progressOrder', {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(bodyContent)
+		})
+			.then(response => response.ok ? response.text() : Promise.reject('Failed to update items'))
+			.then(message => {
+				alert(message);
+				loadContent(urlPath, urlPath.split('/').pop(), false);
+			})
+			.catch(error => console.error('Error:', error));
+	} else {
+		alert('변경할 항목을 선택해주세요.');
+	}
+
+}
 
 function setDateRange(range, group) {
 	const today = new Date();

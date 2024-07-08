@@ -1,3 +1,4 @@
+
 package com.food.domain.user.dto;
 
 import java.text.SimpleDateFormat;
@@ -5,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.food.domain.order.dto.OrderDTO;
+import com.food.domain.sales.dto.CouponIssuanceDTO;
 import com.food.domain.support.dto.InquiriesDTO;
 
 import lombok.AllArgsConstructor;
@@ -31,6 +33,7 @@ public class CustomerDTO {
 
 	private UserDTO userDTO;
 	private MemberRatingDTO member;
+	private List<CouponIssuanceDTO> couponIssuances;
 	private List<OrderDTO> orders;
 	private List<InquiriesDTO> Inquiries;
 	private Long totalOrderAmount;
@@ -45,3 +48,4 @@ public class CustomerDTO {
 		return birthDate != null ? birthDate : new Date(); // 기본값 설정, 필요에 따라 변경
 	}
 }
+

@@ -43,6 +43,8 @@ public class CartService {
         if (product == null) {
             return new CartResponseDTO(false, false, false);
         }
+        System.out.println("cartRequest: " + cartRequest);
+        System.out.println("product: " + product);
 
         CustomerDTO customer = customerMapper.findById(cartRequest.getCustomerId());
         if (customer == null) {
@@ -61,6 +63,7 @@ public class CartService {
                 .quantity((long) cartRequest.getQuantity())
                 .lastDate(LocalDateTime.now())
                 .build();
+            System.out.println("cart: " + cart);
             cartMapper.insertCart(cart);
         }
 

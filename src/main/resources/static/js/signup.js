@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var signin5 = true;
     var signin6 = true;
     var signin7 = true; // 비밀번호 확인 필드 유효성 검사 결과 추가
+    var signin8 = true; // 주소 유효성 검사 결과 추가
+    var signin9 = true; // 상세 주소 유효성 검사 결과 추가
 
     var username = document.getElementById('username');
     var password = document.getElementById('password');
@@ -14,12 +16,14 @@ document.addEventListener('DOMContentLoaded', function() {
     var email = document.getElementById('email');
     var phone = document.getElementById('phone');
     var name = document.getElementById('name');
+    var address = document.getElementById('address');
+    var addressDetail = document.getElementById('addressDetail');
     var btnSignin = document.getElementById('signup-btn');
     var authCheckBtn = document.getElementById('auth-check');
     var referrerCheckBtn = document.getElementById('referrer-check');
 
     function updateButtonStatus() {
-        btnSignin.disabled = !(signin1 && signin2 && signin3 && signin4 && signin5 && signin6 && signin7);
+        btnSignin.disabled = !(signin1 && signin2 && signin3 && signin4 && signin5 && signin6 && signin7 && signin8 && signin9);
     }
 
     function validateField(field, regex, invalidId, errorMsg) {
@@ -76,6 +80,12 @@ document.addEventListener('DOMContentLoaded', function() {
             feedbackElement.style.display = 'block';
             return false;
         }
+    }
+
+    function validateAddress() {
+        signin8 = address.value.trim() !== '';
+        signin9 = addressDetail.value.trim() !== '';
+        updateButtonStatus();
     }
 
     username.addEventListener('blur', function() {
@@ -146,9 +156,12 @@ document.addEventListener('DOMContentLoaded', function() {
         updateButtonStatus();
     });
 
+    address.addEventListener('blur', validateAddress);
+    addressDetail.addEventListener('blur', validateAddress);
+
     btnSignin.addEventListener('click', function(event) {
-        if (!signin1 || !signin2 || !signin3 || !signin4 || !signin5 || !signin6 || !signin7) {
-            console.log(signin1, signin2, signin3, signin4, signin5, signin6, signin7);
+        if (!signin1 || !signin2 || !signin3 || !signin4 || !signin5 || !signin6 || !signin7 || !signin8 || !signin9) {
+            console.log(signin1, signin2, signin3, signin4, signin5, signin6, signin7, signin8, signin9);
             event.preventDefault(); // 폼 제출 방지
             return false;
         } else {
@@ -186,7 +199,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     };
-   
 });
 
 function execDaumPostcode() {

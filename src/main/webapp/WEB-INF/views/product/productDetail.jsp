@@ -502,6 +502,41 @@
 .product-title .wish-icon {
 	cursor: pointer; /* 커서를 포인터로 변경하여 클릭 가능 표시 */
 }
+
+.popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .popup {
+            position: absolute;
+            width: 700px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+        }
+
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .popup-close {
+            cursor: pointer;
+        }
 </style>
 <script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
@@ -522,6 +557,7 @@
         const salesPostId = '${salesInfo.id}';
         var discountPrice = '${discountPrice}';
         const price = '${productInfo.price}';
+        var productNumber = document.getElementById('product_number').value
         
         if(discountPrice == 0) {
             discountPrice = price;
@@ -532,7 +568,8 @@
             name: '${productInfo.name}',
             filePath: '${productFileInfo.filePath}',
             originalPrice: '${productInfo.price}',
-            price: discountPrice
+            price: discountPrice,
+            productNumber: productNumber
         };
 
         // 쿠키에 저장된 최근 본 상품 목록을 가져옴
@@ -543,9 +580,9 @@
         recentViewedProducts.unshift(productInfo);
 
         // 최대 5개의 최근 본 상품만 저장
-        if (recentViewedProducts.length > 5) {
+        /*if (recentViewedProducts.length > 5) {
             recentViewedProducts.pop();
-        }
+        }*/
 
         // 쿠키에 저장
         setCookie('recentViewedProducts', btoaUtf8(JSON.stringify(recentViewedProducts)), 7); // Base64 인코딩
@@ -573,11 +610,13 @@
     });
 
     </script>
-
+	<script src="js/guestorder/guestid.js"></script>
 </head>
 <body>
 	<c:set var="totalReviews" value="${totalReviews}" />
 	<c:set var="ratingPercentages" value="${ratingPercentages}" />
+	
+	<input type="hidden" id="loginCustomerId" class="loginCustomerId" name="loginCustomerId" value="${customer.id}">
 
 	<div class="header-wrap">
 		<%@include file="/WEB-INF/include/header.jsp"%>
@@ -769,29 +808,9 @@
 			<div class="contents">
 				<div id="detail-content" class="detail-content">
 					<h2>제품 상세 정보</h2>
-					<img src="path_to_image1.jpg" alt="제품 이미지 1">
-					<p>비비고 왕교자는 신선한 재료로 만든 고급 만두입니다. 한국에서 1등을 차지한 만두로, 쫄깃한 피와 풍부한
-						속을 자랑합니다.</p>
-
-					<h3>영양 정보</h3>
-					<p>1회 제공량: 100g</p>
-					<ul>
-						<li>칼로리: 200kcal</li>
-						<li>단백질: 8g</li>
-						<li>지방: 10g</li>
-						<li>탄수화물: 22g</li>
-						<li>나트륨: 500mg</li>
-					</ul>
-
-					<h3>조리 방법</h3>
-					<img src="path_to_image2.jpg" alt="조리 방법 이미지">
-					<p>프라이팬에 식용유를 두르고 중불에서 7분간 조리하세요. 만두가 노릇해질 때까지 구워줍니다.</p>
-
-					<h3>원재료</h3>
-					<p>돼지고기, 부추, 양배추, 대파, 마늘, 생강, 간장, 참기름</p>
-
-					<h3>보관 방법</h3>
-					<p>영하 18도 이하 냉동 보관</p>
+					<div>
+						${salesInfo.description}
+					</div>
 				</div>
 				<div id="review" class="detail-content">
 					<h2>리뷰</h2>
@@ -869,48 +888,13 @@
 					<div class="inquiry-section">
 						<div class="inquiry-header">
 							<h2>상품문의 1건</h2>
-							<button class="btn btn-primary">상품문의 하기</button>
+							<button class="btn btn-primary" onclick="showInquiryPopup()">상품문의 하기</button>
 						</div>
 
 						<div id="inquiry-section" class="inquiry-section"></div>
 						<ul id="inquiry-pagination" class="pagination"></ul>
 
-						<!-- Inquiry Item -->
-						<!-- <div class="inquiry-item" onclick="toggleInquiryAnswer(1)">
-							<div class="inquiry-info">
-								<span class="inquiry-badge text-dark">답변완료</span> <span
-									class="inquiry-content">배송문의입니다.</span>
-							</div>
-							<div class="inquiry-meta">
-								<span class="inquiry-author">artr *****</span> <span
-									class="inquiry-date">2024.05.15</span>
-							</div>
-							<div id="inquiry-answer-1" class="inquiry-answer">
-								<p>4월 29일에 주문한 제품이 아직도 도착을 안하고 있습니다. 주문 누락인가요? 빠른 처리 바랍니다.</p>
-								<div class="inquiry-answer-content">
-									<p>
-										<strong>마이셰프</strong>
-									</p>
-									<p>안녕하세요, 마이셰프입니다.</p>
-									<p>먼저 배송으로 이용에 불편을 드려 죄송합니다.</p>
-									<p>
-										주문하신 상품 4월 30일 정상 출고 진행하였으나,<br> 출고 진행 과정 중 송장 탈착으로 정상
-										배송이 불가했던 것으로 확인됩니다.
-									</p>
-									<p>주문하신 상품은 금일 재생산, 출고 진행 예정입니다. (5/17 수령)</p>
-									<p>
-										문의사항 있으시면 카카오톡 채팅으로 상담 부탁드립니다.<br> 감사합니다.
-									</p>
-								</div>
-							</div>
-						</div> -->
-
-						<!-- Pagination -->
-						<!-- <ul class="pagination">
-							<li class="page-item"><a class="page-link" href="#">&#60;</a></li>
-							<li class="page-item"><a class="page-link" href="#">1</a></li>
-							<li class="page-item"><a class="page-link" href="#">&#62;</a></li>
-						</ul> -->
+						
 					</div>
 				</div>
 			</div>
@@ -919,8 +903,25 @@
 					<div class="cart-item">
 						<div class="item-info">비비고 왕교자 1.05kg</div>
 						<div class="item-price">
-							<fmt:formatNumber type="number" value="${productInfo.price}" />
-							원
+							<c:choose>
+
+							<c:when test="${discountPrice == 0}">
+								<span class="price">
+									<fmt:formatNumber type="number" value="${productInfo.price}" />
+									원
+								</span>
+							</c:when>
+							<c:otherwise>
+								<span class="original-price">
+									<fmt:formatNumber type="number" value="${productInfo.price}" />
+									원
+								</span>
+								<span class="price" style="margin-left: 10px;">
+									<fmt:formatNumber type="number" value="${discountPrice}" />
+									원
+								</span>
+							</c:otherwise>
+						</c:choose>
 						</div>
 						<div class="item-quantity">
 							<button class="decrement">-</button>
@@ -952,228 +953,32 @@
 			</div>
 		</div>
 	</div>
+	
+	<!-- 팝업 오버레이 -->
+    <div class="popup-overlay" id="inquiryPopupOverlay">
+        <div class="popup">
+            <div class="popup-header">
+                <h3>상품 문의</h3>
+                <span class="popup-close" onclick="hideInquiryPopup()">×</span>
+            </div>
+            <div class="form-group">
+                <label for="inquirySubject">제목</label>
+                <input type="text" id="inquirySubject" class="form-control" placeholder="제목">
+            </div>
+            <div class="form-group">
+                <label for="inquiryMessage">내용</label>
+                <textarea id="inquiryMessage" class="form-control" rows="4" placeholder="내용"></textarea>
+            </div>
+            <div class="form-group">
+                <input type="checkbox" id="inquirySecret" class="form-check-input">
+                <label for="inquirySecret">비밀글로 설정</label>
+            </div>
+            <button class="btn btn-primary mt-3" onclick="submitInquiry()">등록</button>
+        </div>
+    </div>
 
 	<%@include file="/WEB-INF/include/sidebar.jsp"%>
 	<%@include file="/WEB-INF/include/footer.jsp"%>
-
-	<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        loadReviews(1);
-
-        function loadReviews(page) {
-            const salesPostId = document.getElementById('salesPostId').value;
-            fetch(`/reviews/\${salesPostId}?page=\${page}&size=5`)
-                .then(response => response.json())
-                .then(data => {
-                    displayReviews(data.reviews);
-                    setupPagination(data.totalPages, data.currentPage);
-                })
-                .catch(error => console.error('Error fetching reviews:', error));
-        }
-
-        function displayReviews(reviews) {
-            const reviewSection = document.getElementById('review-section');
-            reviewSection.innerHTML = '';
-
-            reviews.forEach((review, index) => {
-                const reviewItem = document.createElement('div');
-                reviewItem.className = 'review-item';
-
-                let reviewContent = `
-                    <div class="review-details">
-                        <div class="review-info">
-                            <span class="review-rating">\${'★'.repeat(review.rating)}</span>
-                            <span class="review-author">\${review.customer.nickname}</span>
-                            <span class="review-date">\${new Date(review.createdDate).toLocaleDateString()}</span>
-                        </div>
-                        <div class="review-content">
-                            <div class="review-comment">
-                                <p>\${review.message}</p>
-                            </div>
-                `;
-
-                if (review.files && review.files.filePath) {
-                    reviewContent += `
-                        <div class="review-thumbnail">
-                            <img id="thumbnail-\${index}" src="\${review.files.filePath}" alt="Review Image" onclick="toggleReviewMoreContent(\${index})">
-                        </div>
-                        <div id="more-content-\${index}" class="more-content">
-                            <img src="\${review.files.filePath}" class="full-size-img" alt="Full Review Image">
-                    `;
-                }
-
-                if (review.reply) {
-                    reviewContent += `
-                        <div class="review-answer">
-                            <p>\${review.reply.message}</p>
-                        </div>
-                    `;
-                }
-
-                if (review.files || review.reply) {
-                    reviewContent += `</div><div id="more-btn-\${index}" class="more-btn" onclick="toggleReviewMoreContent(\${index})">더보기</div>`;
-                }
-
-                reviewContent += `
-                        </div>
-                    </div>
-                `;
-
-                reviewItem.innerHTML = reviewContent;
-                reviewSection.appendChild(reviewItem);
-            });
-        }
-
-        function setupPagination(totalPages, currentPage) {
-            const pagination = document.querySelector('.pagination');
-            pagination.innerHTML = '';
-
-            for (let i = 1; i <= totalPages; i++) {
-                const pageItem = document.createElement('li');
-                pageItem.className = 'page-item' + (i == currentPage ? ' active' : '');
-                pageItem.innerHTML = `<a class="page-link" href="#">\${i}</a>`;
-                pageItem.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    loadReviews(i);
-                });
-                pagination.appendChild(pageItem);
-            }
-        }
-    });
-
-    function toggleReviewMoreContent(index) {
-        const moreContent = document.getElementById(`more-content-\${index}`);
-        const moreBtn = document.getElementById(`more-btn-\${index}`);
-        const thumbnail = document.getElementById(`thumbnail-\${index}`);
-
-        if (moreContent.style.display == 'none' || moreContent.style.display == '') {
-            moreContent.style.display = 'flex';
-            moreBtn.textContent = '닫기';
-            thumbnail.style.display = 'none';
-        } else {
-            moreContent.style.display = 'none';
-            moreBtn.textContent = '더보기';
-            thumbnail.style.display = 'block';
-        }
-    }
-    
-    function toggleInquiryAnswer(id) {
-        var answer = document.getElementById('inquiry-answer-' + id);
-        if (answer.style.display == 'none' || answer.style.display == '') {
-            answer.style.display = 'flex';
-        } else {
-            answer.style.display = 'none';
-        }
-    }
-</script>
-
-	<script>
-	document.addEventListener('DOMContentLoaded', function () {
-	    //const userId = '${user != null ? user.id : ""}'; // 로그인된 사용자 ID, 없으면 빈 문자열
-	    const customerId = 1;
-
-	    loadInquiries(1);
-
-	    function loadInquiries(page) {
-	        const salesPostId = document.getElementById('salesPostId').value;
-	        fetch(`/inquiries/\${salesPostId}?page=\${page}&size=5`)
-	            .then(response => {
-	                if (!response.ok) {
-	                    throw new Error('Network response was not ok ' + response.statusText);
-	                }
-	                return response.json();
-	            })
-	            .then(data => {
-	                console.log('Received data:', data);
-	                displayInquiries(data.inquiries);
-	                setupInquiryPagination(data.totalPages, data.currentPage);
-	            })
-	            .catch(error => {
-	                console.error('Error fetching inquiries:', error);
-	                alert('상품 문의를 가져오는 중 오류가 발생했습니다.');
-	            });
-	    }
-
-	    function displayInquiries(inquiries) {
-	        const inquirySection = document.getElementById('inquiry-section');
-	        inquirySection.innerHTML = '';
-
-	        inquiries.forEach((inquiry, index) => {
-	            const reply = inquiry.responses ? inquiry.responses.message : null;
-	            const isSecret = inquiry.secret === '2';
-	            const isOwner = customerId && inquiry.customerId == customerId;
-	            const canView = !isSecret || isOwner;
-	            const inquiryItem = document.createElement('div');
-	            inquiryItem.className = 'inquiry-item';
-
-	            if (canView) {
-	                inquiryItem.setAttribute('onclick', `toggleInquiryAnswer(\${index})`);
-	                inquiryItem.innerHTML = `
-	                    <div class="inquiry-info">
-	                        \${inquiry.resolvedYn === 'Y' ? '<span class="inquiry-badge text-dark">답변완료</span>' : '<span class="inquiry-badge text-dark">미답변</span>'}
-	                        \${isSecret ? '<span class="lock-icon">🔒</span>' : ''}
-	                        <span class="inquiry-content">\${inquiry.subject}</span>
-	                    </div>
-	                    <div class="inquiry-meta">
-	                        <span class="inquiry-author">\${inquiry.customer.nickname}</span>
-	                        <span class="inquiry-date">\${new Date(inquiry.createdDate).toLocaleDateString()}</span>
-	                    </div>
-	                    <div id="inquiry-answer-\${index}" class="inquiry-answer" style="display: none;">
-	                        <p>\${inquiry.message}</p>
-	                        \${reply ? `
-	                            <div class="inquiry-answer-content">
-	                                <p><strong>관리자</strong></p>
-	                                <p>\${reply}</p>
-	                            </div>
-	                        ` : ''}
-	                    </div>
-	                `;
-	            } else {
-	                inquiryItem.innerHTML = `
-	                    <div class="inquiry-info">
-	                        \${inquiry.resolvedYn === 'Y' ? '<span class="inquiry-badge text-dark">답변완료</span>' : '<span class="inquiry-badge text-dark">미답변</span>'}
-	                        <span class="lock-icon">🔒</span>
-	                        <span class="inquiry-content">비밀글입니다.</span>
-	                    </div>
-	                    <div class="inquiry-meta">
-	                        <span class="inquiry-author">\${inquiry.customer.nickname}</span>
-	                        <span class="inquiry-date">\${new Date(inquiry.createdDate).toLocaleDateString()}</span>
-	                    </div>
-	                `;
-	            }
-
-	            inquirySection.appendChild(inquiryItem);
-	        });
-	    }
-
-	    function setupInquiryPagination(totalPages, currentPage) {
-	        const pagination = document.getElementById('inquiry-pagination');
-	        pagination.innerHTML = '';
-
-	        for (let i = 1; i <= totalPages; i++) {
-	            const pageItem = document.createElement('li');
-	            pageItem.className = 'page-item' + (i === currentPage ? ' active' : '');
-	            pageItem.innerHTML = `<a class="page-link" href="#">\${i}</a>`;
-	            pageItem.addEventListener('click', (e) => {
-	                e.preventDefault();
-	                loadInquiries(i);
-	            });
-	            pagination.appendChild(pageItem);
-	        }
-	    }
-
-	    window.toggleInquiryAnswer = function (index) {
-	        const answer = document.getElementById(`inquiry-answer-\${index}`);
-	        if (answer) {
-	            if (answer.style.display === 'none' || answer.style.display === '') {
-	                answer.style.display = 'block';
-	            } else {
-	                answer.style.display = 'none';
-	            }
-	        }
-	    };
-	});
-</script>
 
 	<script src="/js/productDetail/main.js" defer></script>
 	<script src="js/productDetail/wishlist.js"></script>
@@ -1182,5 +987,6 @@
 	<script src="/js/productDetail/slider.js"></script>
 	<script src="js/productDetail/tabs.js"></script>
 	<script src="js/productDetail/totalPrice.js"></script>
+	<script src="js/productDetail/inquiries.js"></script>
 </body>
 </html>

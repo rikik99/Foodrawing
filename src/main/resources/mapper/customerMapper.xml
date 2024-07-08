@@ -4,10 +4,13 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.food.domain.user.mapper.CustomerMapper">
 
-	<select id="findById"
-		resultType="com.food.domain.user.dto.CustomerDTO">
-		SELECT * FROM CUSTOMER_TB WHERE ID = #{id}
-	</select>
+
+    <select id="findById" resultType="com.food.domain.user.dto.CustomerDTO">
+        SELECT ID, USER_ID, NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE, ADDRESS, ADDRESS_DETAIL, ZIPCODE, REFUND_ACCOUNT, REFUND_BANK FROM CUSTOMER_TB WHERE ID = #{id}
+    </select>
+
+
+
 
 	<update id="updateCustomer">
 		UPDATE CUSTOMER_TB SET
@@ -17,9 +20,17 @@
 		WHERE id = #{id}
 	</update>
 
+     <insert id="insertCustomer" parameterType="com.food.domain.user.dto.CustomerDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
+        INSERT INTO CUSTOMER_TB (USER_ID, NICKNAME, NAME, GENDER, PHONE, EMAIL, BIRTHDATE, ADDRESS, ADDRESS_DETAIL, ZIPCODE)
+        VALUES (#{userId}, #{nickname}, #{name}, #{gender}, #{phone}, #{email}, #{birthDate}, #{address}, #{addressDetail}, #{zipcode})
+    </insert>
+
 	<delete id="deleteCustomer">
 		DELETE FROM CUSTOMER_TB WHERE ID = #{id}
 	</delete>
+
+
+
 
 	<select id="findCustomerByUserId"
 		resultType="com.food.domain.user.dto.CustomerDTO">
@@ -74,6 +85,14 @@
     WHERE O.IDENTIFIER_ID = #{customerId}
     AND D.DELIVERY_STATUS = #{deliveryStatus}
 </select>
+
+
+	<select id="findCustomerById" parameterType="Long"
+		resultType="com.food.domain.user.dto.CustomerDTO">
+		SELECT * FROM CUSTOMER_TB WHERE USER_ID = #{userId}
+	</select>
+	
+
 
 
 

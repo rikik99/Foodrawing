@@ -1,6 +1,7 @@
 package com.food.domain.user.dto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import lombok.AllArgsConstructor;
@@ -11,17 +12,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {
-    private Long id;
-    private String username;
-    private String password;
-    private Long role;
-    private LocalDateTime createdDate;
-    private String deletedYn;
-    private Date birthDate; // birthDate 필드 추가
+	private Long id;
+	private String username;
+	private String password;
+	private Long role;
+	private LocalDateTime createdDate;
+	private String deletedYn;
+	private Date birthDate;
+	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
 
-    // 기타 필드와 메서드들
-
-    public Date getBirthDate() {
-        return birthDate;
-    }
+	public String getFormattedCreatedDate() {
+		if (createdDate != null) {
+			return createdDate.format(formatter);
+		}
+		return "";
+	}
 }

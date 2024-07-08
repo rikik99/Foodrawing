@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class GuestCartDTO {
 	private Long id;
-	private String identifier;
+	private String guestId;
 	private String productNumber;
 	private Long quantity;
 	private LocalDateTime lastDate;

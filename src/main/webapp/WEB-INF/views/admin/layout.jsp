@@ -31,6 +31,7 @@
 			<ul class="dropdown-menu">
 				<li><a data-target="salesPost">판매글 관리</a></li>
 				<li><a data-target="insertSalesPost">판매글 등록</a></li>
+				<li><a data-target="updateSalesPost">판매글 수정</a></li>
 				<li><a data-target="salesInquiry">판매글 문의 관리</a></li>
 				<li><a data-target="salesReview">판매글 후기 관리</a></li>
 			</ul>
@@ -60,13 +61,13 @@
 			</ul>
 			<ul class="dropdown-menu">
 				<li><a data-target="orderList">전체 주문 조회</a></li>
-				<li><a data-target="paymentManagement">입급 관리</a></li>
-				<li><a data-target="productPreparationManagement">상품
+				<li><a data-target="paymentCompleted">결제 완료 관리</a></li>
+				<li><a data-target="productPreparation">상품
 						준비 관리</a></li>
-				<li><a data-target="shippingPreparationManagement">배송
+				<li><a data-target="shippingPreparation">배송
 						준비 관리</a></li>
-				<li><a data-target="shippingManagement">배송 중 관리</a></li>
-				<li><a data-target="deliveryManagement">배송 완료 관리</a></li>
+				<li><a data-target="shipping">배송 중 관리</a></li>
+				<li><a data-target="shippingCompleted">배송 완료 관리</a></li>
 				<li><a data-target="purchaseConfirmationManagement">구매
 						확정 관리</a></li>
 				<li><a data-target="cancelRefundManagement">취소/환불

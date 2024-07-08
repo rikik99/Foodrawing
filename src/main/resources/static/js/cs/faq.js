@@ -124,6 +124,10 @@ document.addEventListener('DOMContentLoaded', function() {
             loadFaqs(currentFilter, 1);
         });
     });
+    
+    document.getElementById('contactButton').addEventListener('click', function() {
+        window.location.href = '/mypage/contact'; // 1:1 문의 페이지로 이동
+    });
 
     loadFaqs('', 1); // 초기 로딩
 });

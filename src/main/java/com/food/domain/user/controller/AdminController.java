@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,7 +21,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,15 +33,24 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.food.domain.order.dto.OrderDTO;
 import com.food.domain.product.dto.ProductCategoryDTO;
 import com.food.domain.product.dto.ProductDTO;
 import com.food.domain.product.dto.StockTransactionDTO;
+import com.food.domain.sales.dto.CouponIssuanceDTO;
 import com.food.domain.sales.dto.DiscountDTO;
 import com.food.domain.sales.dto.DiscountTargetDTO;
 import com.food.domain.sales.dto.ReviewDTO;
 import com.food.domain.sales.dto.SalesPostDTO;
 import com.food.domain.sales.dto.SalesPostFileDTO;
 import com.food.domain.support.dto.InquiriesDTO;
+import com.food.domain.user.dto.AdminDTO;
+import com.food.domain.user.dto.CustomerDTO;
+import com.food.domain.user.dto.MemberRatingDTO;
 import com.food.domain.user.service.AdminService;
 
 import jakarta.servlet.http.Cookie;
@@ -398,33 +412,114 @@ public class AdminController {
 
 	@GetMapping("/discountTarget")
 	public ModelAndView discountTarget(@RequestParam Map<String, String> allParams) {
-	    ModelAndView mv = new ModelAndView();
-	    int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
-	    int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
 
-	    allParams.put("page", String.valueOf(page));
-	    allParams.put("size", String.valueOf(size));
-	    Pageable pageable = PageRequest.of(page, size);
-	    Page<DiscountTargetDTO> discountTargets;
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		Page<DiscountTargetDTO> discountTargets;
 
-	    boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
-	            && allParams.get(key) != null && !allParams.get(key).isEmpty());
+		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
+				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
 
-	    if (hasSearchParams) {
-	        discountTargets = adminService.findDiscountTargetListWithSearch(pageable, allParams);
-	    } else {
-	        discountTargets = adminService.findDiscountTargetList(pageable, allParams);
-	    }
+		if (hasSearchParams) {
+			discountTargets = adminService.findDiscountTargetListWithSearch(pageable, allParams);
+		} else {
+			discountTargets = adminService.findDiscountTargetList(pageable, allParams);
+		}
 
-	    mv.addObject("discounts", discountTargets);
-	    mv.addObject("currentPage", discountTargets.getNumber());
-	    mv.addObject("pageCount", discountTargets.getTotalPages());
-	    mv.addObject("totalElements", discountTargets.getTotalElements());
-	    mv.addObject("size", size);
-	    mv.setViewName("admin/discountTarget");
-	    return mv;
+		mv.addObject("discounts", discountTargets);
+		mv.addObject("currentPage", discountTargets.getNumber());
+		mv.addObject("pageCount", discountTargets.getTotalPages());
+		mv.addObject("totalElements", discountTargets.getTotalElements());
+		mv.addObject("size", size);
+		mv.setViewName("admin/discountTarget");
+		return mv;
 	}
 
+	@DeleteMapping("/discountTarget")
+	@ResponseBody
+	public ResponseEntity<String> deleteDiscountTarget(@RequestBody Map<String, List<Long>> requestBody) {
+		List<Long> discountTargetIds = requestBody.get("discountTargetIds");
+		log.info("discountTargetIds = {}", discountTargetIds);
+		if (discountTargetIds == null || discountTargetIds.isEmpty()) {
+			return ResponseEntity.badRequest().body("삭제할 대상 정보가 없습니다.");
+		}
+
+		try {
+			adminService.deleteDiscountTargetById(discountTargetIds);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ResponseEntity.ok("선택된 항목이 성공적으로 삭제되었습니다.");
+	}
+
+	@GetMapping("/updateTarget")
+	public ModelAndView updateTargetForm(@RequestParam Map<String, String> allParams) {
+		ModelAndView mv = new ModelAndView();
+
+		mv.setViewName("admin/updateDiscountTarget");
+		return mv;
+	}
+
+	@PostMapping("/updateTarget")
+	@ResponseBody
+	public ResponseEntity<Map<String, String>> updateTarget(@RequestBody Map<String, Object> allParams) {
+		System.out.println("Request Parameters: " + allParams);
+
+		String targetType = (String) allParams.get("targetType");
+		List<Map<String, Object>> discountData = (List<Map<String, Object>>) allParams.get("discountData");
+
+		for (Map<String, Object> discount : discountData) {
+			Long discountId = Long.valueOf((String) discount.get("discountId"));
+			String discountTargetType = (String) discount.get("targetType");
+			Object targetIdObj = discount.get("targetId");
+			String targetId;
+
+			if (targetIdObj instanceof Integer) {
+				targetId = String.valueOf(targetIdObj);
+			} else {
+				targetId = (String) targetIdObj;
+			}
+
+			adminService.updateDiscountTarget(discountId, discountTargetType, targetId);
+		}
+
+		Map<String, String> response = new HashMap<>();
+		response.put("message", "Discount targets added successfully");
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/getDiscountTargets")
+	@ResponseBody
+	public List<DiscountTargetDTO> getDiscountTargets(@RequestParam String targetType) {
+		return adminService.getDiscountTargetsByType(targetType);
+	}
+
+	@GetMapping("/getTargetOptions")
+	@ResponseBody
+	public List<Map<String, String>> getTargetOptions(@RequestParam String targetType) {
+		List<Map<String, String>> options = new ArrayList<>();
+
+		switch (targetType) {
+		case "PRODUCT":
+			options = adminService.getAllProducts();
+			break;
+		case "CATEGORY":
+			options = adminService.getAllCategories();
+			break;
+		case "MEMBER_RATING":
+			options = adminService.getAllMemberRatings();
+			break;
+		default:
+			break;
+		}
+		log.info("getTargetOptions = {}", options);
+		return options;
+	}
 
 	@PostMapping("/discountUpdate")
 	@ResponseBody
@@ -450,25 +545,23 @@ public class AdminController {
 		return mv;
 	}
 
-    @PostMapping("/insertDiscountTarget")
-    @ResponseBody
-    public ResponseEntity<String> insertDiscountTarget(@RequestBody Map<String, Object> allParams) {
-        // 디버깅 로그 추가
-        System.out.println("Request Parameters: " + allParams);
+	@PostMapping("/insertDiscountTarget")
+	@ResponseBody
+	public ResponseEntity<String> insertDiscountTarget(@RequestBody Map<String, Object> allParams) {
+		// 디버깅 로그 추가
+		System.out.println("Request Parameters: " + allParams);
 
-        adminService.insertDiscountTarget(allParams);
-        return ResponseEntity.ok("Discount targets added successfully");
-    }
+		adminService.insertDiscountTarget(allParams);
+		return ResponseEntity.ok("Discount targets added successfully");
+	}
 
 	@GetMapping("/getTargets")
 	public ResponseEntity<Page<?>> getTargets(@RequestParam String targetType,
-	                                          @RequestParam(required = false) String keyword,
-	                                          @RequestParam int page,
-	                                          @RequestParam int size) {
-	    Pageable pageable = PageRequest.of(page, size);
-	    Page<?> targets = adminService.findTargetsByTypeAndQuery(targetType, keyword, pageable);
-	    log.info("targets = {}",targets.getContent());
-	    return ResponseEntity.ok(targets);
+			@RequestParam(required = false) String keyword, @RequestParam int page, @RequestParam int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<?> targets = adminService.findTargetsByTypeAndQuery(targetType, keyword, pageable);
+		log.info("targets = {}", targets.getContent());
+		return ResponseEntity.ok(targets);
 	}
 
 	@PostMapping("/insertDiscount")
@@ -485,23 +578,288 @@ public class AdminController {
 	}
 
 	@GetMapping("/couponList")
-	public ModelAndView couponList() {
+	public ModelAndView couponList(@RequestParam Map<String, String> allParams) {
 		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+		log.info("couponList allParams = {}", allParams);
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		Page<CouponIssuanceDTO> couponIssuances;
+
+		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
+				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
+
+		if (hasSearchParams) {
+			couponIssuances = adminService.findCouponIssuancesWithSearch(pageable, allParams);
+		} else {
+			couponIssuances = adminService.findCouponIssuances(pageable, allParams);
+		}
+
+		mv.addObject("couponIssuances", couponIssuances);
+		mv.addObject("currentPage", couponIssuances.getNumber());
+		mv.addObject("pageCount", couponIssuances.getTotalPages());
+		mv.addObject("totalElements", couponIssuances.getTotalElements());
+		mv.addObject("size", size);
 		mv.setViewName("admin/couponList");
 		return mv;
 	}
+	
+	@PatchMapping("/updateDiscountStatus")
+	@ResponseBody
+	public Map<String, Object> updateDiscountStatus(@RequestBody Map<String, Object> request) {
+	    Map<String, Object> response = new HashMap<>();
+	    try {
+	        Long discountId = Long.parseLong(request.get("discountId").toString());
+	        String newStatus = request.get("onsaleYn").toString();
+	        
+	        // 할인 상태 업데이트 서비스 호출
+	        boolean success = adminService.updateDiscountStatus(discountId, newStatus);
+	        
+	        response.put("success", success);
+	        response.put("message", success ? "진행 여부 변경에 성공했습니다." : "진행 여부 변경에 실패했습니다.");
+	    } catch (Exception e) {
+	        response.put("success", false);
+	        response.put("message", "진행 여부 변경 중 오류가 발생했습니다.");
+	        e.printStackTrace();
+	    }
+	    return response;
+	}
 
-	@GetMapping("/couponManagement")
-	public ModelAndView couponManagement() {
+	@DeleteMapping("/couponList")
+	@ResponseBody
+	public ResponseEntity<String> deleteCouponList(@RequestBody Map<String, List<Long>> requestBody) {
+		List<Long> couponIssuanceIds = requestBody.get("couponIssuanceIds");
+		if (couponIssuanceIds == null || couponIssuanceIds.isEmpty()) {
+			return ResponseEntity.badRequest().body("삭제할 쿠폰 정보가 없습니다.");
+		}
+
+		try {
+			adminService.deleteCouponIssuancesById(couponIssuanceIds);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ResponseEntity.ok("선택된 항목이 성공적으로 삭제되었습니다.");
+	}
+
+	@GetMapping("/insertCoupon")
+	public ModelAndView insertCouponForm() {
 		ModelAndView mv = new ModelAndView();
-		mv.setViewName("admin/couponManagement");
+		List<DiscountDTO> couponList = adminService.findDiscountListWithType();
+		mv.addObject("coupon", couponList);
+
+		// ObjectMapper에 JavaTimeModule을 추가하여 날짜/시간 형식을 처리
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.registerModule(new JavaTimeModule());
+		objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+		String couponDetailsJson = null;
+		try {
+			couponDetailsJson = objectMapper.writeValueAsString(
+					couponList.stream().collect(Collectors.toMap(DiscountDTO::getId, Function.identity())));
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		List<CustomerDTO> customerList = adminService.findCustomerList();
+		log.info("insertCoupon customerList = {}", customerList);
+		mv.addObject("customer", customerList);
+		mv.addObject("couponDetailsJson", couponDetailsJson);
+		mv.setViewName("admin/insertCoupon");
 		return mv;
 	}
 
+	@PostMapping("/insertCoupon")
+	@ResponseBody
+	public ResponseEntity<String> insertCoupon(@RequestBody Map<String, Object> requestData) {
+		try {
+			List<Long> couponIds = ((List<?>) requestData.get("couponIds")).stream()
+					.map(id -> Long.parseLong(id.toString())).toList();
+			String targetType = requestData.get("targetType").toString();
+			String customerIds = requestData.get("customerIds").toString();
+			int issueCount = Integer.parseInt(requestData.get("issueCount").toString());
+
+			adminService.issueCoupons(couponIds, targetType, customerIds, issueCount);
+
+			return ResponseEntity.ok("쿠폰 발행 성공");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("쿠폰 발행 실패");
+		}
+	}
+
 	@GetMapping("/orderList")
-	public ModelAndView orderList() {
+	public ModelAndView orderList(@RequestParam Map<String, String> allParams) {
 		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+		log.info("orderList allParams = {}", allParams);
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		Page<OrderDTO> orders = adminService.findOrders(pageable, allParams);
+
+		mv.addObject("orders", orders);
+		mv.addObject("currentPage", orders.getNumber());
+		mv.addObject("pageCount", orders.getTotalPages());
+		mv.addObject("totalElements", orders.getTotalElements());
+		mv.addObject("size", size);
 		mv.setViewName("admin/orderList");
+		return mv;
+	}
+
+	@GetMapping("/paymentCompleted")
+	public ModelAndView paymentCompleted(@RequestParam Map<String, String> allParams) {
+		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+		String status = "결제 완료";
+		allParams.put("status", String.valueOf(status));
+		log.info("orderList allParams = {}", allParams);
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		Page<OrderDTO> orders = adminService.findPaymentCompletedOrders(pageable, allParams);
+
+		mv.addObject("orders", orders);
+		mv.addObject("currentPage", orders.getNumber());
+		mv.addObject("pageCount", orders.getTotalPages());
+		mv.addObject("totalElements", orders.getTotalElements());
+		mv.addObject("size", size);
+		mv.setViewName("admin/paymentCompleted");
+		return mv;
+	}
+
+	@GetMapping("/productPreparation")
+	public ModelAndView productPreparation(@RequestParam Map<String, String> allParams) {
+		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+		String status = "상품 준비";
+		allParams.put("status", String.valueOf(status));
+		log.info("orderList allParams = {}", allParams);
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		Page<OrderDTO> orders = adminService.findPaymentCompletedOrders(pageable, allParams);
+
+		mv.addObject("orders", orders);
+		mv.addObject("currentPage", orders.getNumber());
+		mv.addObject("pageCount", orders.getTotalPages());
+		mv.addObject("totalElements", orders.getTotalElements());
+		mv.addObject("size", size);
+		mv.setViewName("admin/productPreparation");
+		return mv;
+	}
+
+	@GetMapping("/shippingPreparation")
+	public ModelAndView shippingPreparation(@RequestParam Map<String, String> allParams) {
+		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+		String status = "배송 준비";
+		allParams.put("status", String.valueOf(status));
+		log.info("orderList allParams = {}", allParams);
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		Page<OrderDTO> orders = adminService.findPaymentCompletedOrders(pageable, allParams);
+
+		mv.addObject("orders", orders);
+		mv.addObject("currentPage", orders.getNumber());
+		mv.addObject("pageCount", orders.getTotalPages());
+		mv.addObject("totalElements", orders.getTotalElements());
+		mv.addObject("size", size);
+		mv.setViewName("admin/shippingPreparation");
+		return mv;
+	}
+
+	@GetMapping("/shipping")
+	public ModelAndView shipping(@RequestParam Map<String, String> allParams) {
+		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+		String status = "배송 중";
+		allParams.put("status", String.valueOf(status));
+		log.info("orderList allParams = {}", allParams);
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		Page<OrderDTO> orders = adminService.findPaymentCompletedOrders(pageable, allParams);
+
+		mv.addObject("orders", orders);
+		mv.addObject("currentPage", orders.getNumber());
+		mv.addObject("pageCount", orders.getTotalPages());
+		mv.addObject("totalElements", orders.getTotalElements());
+		mv.addObject("size", size);
+		mv.setViewName("admin/shipping");
+		return mv;
+	}
+
+	@GetMapping("/shippingCompleted")
+	public ModelAndView shippingCompleted(@RequestParam Map<String, String> allParams) {
+		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+		String status = "배송 완료";
+		allParams.put("status", String.valueOf(status));
+		log.info("orderList allParams = {}", allParams);
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		Page<OrderDTO> orders = adminService.findPaymentCompletedOrders(pageable, allParams);
+
+		mv.addObject("orders", orders);
+		mv.addObject("currentPage", orders.getNumber());
+		mv.addObject("pageCount", orders.getTotalPages());
+		mv.addObject("totalElements", orders.getTotalElements());
+		mv.addObject("size", size);
+		mv.setViewName("admin/shippingCompleted");
+		return mv;
+	}
+
+	@GetMapping("/purchaseConfirmationManagement")
+	public ModelAndView purchaseConfirmationManagement(@RequestParam Map<String, String> allParams) {
+		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+		String status = "구매 확정 대기,구매 확정";
+		allParams.put("status", String.valueOf(status));
+		log.info("orderList allParams = {}", allParams);
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		Page<OrderDTO> orders = adminService.findPaymentCompletedOrders(pageable, allParams);
+
+		mv.addObject("orders", orders);
+		mv.addObject("currentPage", orders.getNumber());
+		mv.addObject("pageCount", orders.getTotalPages());
+		mv.addObject("totalElements", orders.getTotalElements());
+		mv.addObject("size", size);
+		mv.setViewName("admin/purchaseConfirmationManagement");
+		return mv;
+	}
+
+	@GetMapping("/cancelRefundManagement")
+	public ModelAndView cancelRefundManagement(@RequestParam Map<String, String> allParams) {
+		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+		String status = "취소,반품,교환,교환 준비";
+		allParams.put("status", String.valueOf(status));
+		log.info("orderList allParams = {}", allParams);
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		Page<OrderDTO> orders = adminService.findPaymentCompletedOrders(pageable, allParams);
+
+		mv.addObject("orders", orders);
+		mv.addObject("currentPage", orders.getNumber());
+		mv.addObject("pageCount", orders.getTotalPages());
+		mv.addObject("totalElements", orders.getTotalElements());
+		mv.addObject("size", size);
+		mv.setViewName("admin/cancelRefundManagement");
 		return mv;
 	}
 
@@ -547,10 +905,27 @@ public class AdminController {
 		return mv;
 	}
 
+	@GetMapping("/updateSalesPost")
+	public ModelAndView updateSalesPostForm() {
+		ModelAndView mv = new ModelAndView();
+		List<ProductDTO> productList = adminService.findProducts();
+		mv.addObject("productList", productList);
+		mv.setViewName("admin/updateSalesPost");
+		return mv;
+	}
+
 	@ResponseBody
 	@GetMapping("/getProductDetails")
 	public ResponseEntity<Map<String, String>> getProductDetails(@RequestParam String name) {
 		Map<String, String> productDetails = adminService.getProductDetails(name);
+		return ResponseEntity.ok(productDetails);
+	}
+
+	@ResponseBody
+	@PostMapping("/getProductInfo")
+	public ResponseEntity<Map<String, String>> getProductInfo(@RequestBody Map<String, String> requestBody) {
+		String name = requestBody.get("name");
+		Map<String, String> productDetails = adminService.getProductInfo(name);
 		return ResponseEntity.ok(productDetails);
 	}
 
@@ -596,4 +971,156 @@ public class AdminController {
 		}
 	}
 
+	@PutMapping("/updateSalesPost")
+	@ResponseBody
+	public ResponseEntity<?> updateSalesPost(@RequestBody Map<String, Object> allParams) {
+		try {
+			List<Map<String, Object>> fileDTOListRaw = (List<Map<String, Object>>) allParams.get("fileDTOList");
+			if (fileDTOListRaw == null) {
+				throw new IllegalArgumentException("fileDTOList is missing in request");
+			}
+
+			List<SalesPostFileDTO> fileDTOList = new ArrayList<>();
+			for (Map<String, Object> fileDTOMap : fileDTOListRaw) {
+				SalesPostFileDTO fileDTO = new SalesPostFileDTO();
+				fileDTO.setOriginalName(String.valueOf(fileDTOMap.get("originalName")));
+				fileDTO.setFilePath(String.valueOf(fileDTOMap.get("filePath")));
+				fileDTO.setFileType(String.valueOf(fileDTOMap.get("fileType")));
+				fileDTO.setUploadDate(LocalDateTime.parse(String.valueOf(fileDTOMap.get("uploadDate"))));
+				fileDTOList.add(fileDTO);
+			}
+
+			adminService.updateSalesPost(allParams, fileDTOList);
+			return ResponseEntity.ok("판매글이 성공적으로 수정되었습니다.");
+		} catch (Exception e) {
+			e.printStackTrace(); // Print the stack trace to see the error
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("판매글 수정에 실패했습니다.");
+		}
+	}
+
+	@GetMapping("/updateProduct/{productNumber}")
+	public ModelAndView updateProductForm(@PathVariable String productNumber) {
+		ModelAndView mv = new ModelAndView();
+		ProductDTO product = adminService.updateProductForm(productNumber);
+		List<ProductCategoryDTO> categoryList = adminService.findCategoryList();
+
+		mv.addObject("product", product);
+		mv.addObject("categoryList", categoryList);
+		mv.setViewName("admin/updateProduct");
+		return mv;
+	}
+
+	@PutMapping("/updateProduct/{oldProductNumber}")
+	@ResponseBody
+	public ResponseEntity<?> updateProduct(@RequestParam Map<String, String> allParams,
+			@RequestPart("file") MultipartFile file, @PathVariable String oldProductNumber) {
+
+		allParams.put("oldProductNumber", oldProductNumber);
+		adminService.updateProduct(allParams, file);
+		return ResponseEntity.ok("상품이 성공적으로 수정되었습니다.");
+	}
+
+	@PatchMapping("/progressOrder")
+	@ResponseBody
+	public ResponseEntity<String> progressOrder(@RequestBody Map<String, Object> allParams) {
+		List<Long> orderIds = ((List<?>) allParams.get("orderIds")).stream().map(id -> Long.valueOf((String) id))
+				.collect(Collectors.toList());
+		log.info("orderIds = {}", orderIds);
+		String progress = String.valueOf(allParams.get("progress"));
+		log.info("progress = {}", progress);
+		boolean updated = adminService.updateOrderStatus(orderIds, progress);
+
+		if (updated) {
+			return ResponseEntity.ok("상태가 성공적으로 변경되었습니다.");
+		} else {
+			return ResponseEntity.status(500).body("상태 변경에 실패했습니다.");
+		}
+	}
+	
+	@GetMapping("/usersManagement")
+	public ModelAndView customerManagement(@RequestParam Map<String, String> allParams) {
+		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+		log.info("customer allParams = {}", allParams);
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		
+		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
+				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
+		
+		Page<CustomerDTO> customers; 
+		if (hasSearchParams) {
+			// 검색 조건이 있을 경우
+			customers = adminService.findCustomersWithSearch(pageable, allParams);
+
+		} else {
+			// 검색 조건이 없을 경우
+			customers = adminService.findCustomers(pageable, allParams);
+		}
+		// 데이터를 확인하기 위해 로그 추가
+		log.info("Customer List: {}", customers);
+		List<MemberRatingDTO> memberRatings = adminService.findAllMemberRatings();
+		// ModelAndView에 데이터 추가
+		mv.addObject("customers", customers);
+		mv.addObject("memberRatings", memberRatings);
+		mv.addObject("currentPage", customers.getNumber());
+		mv.addObject("pageCount", customers.getTotalPages());
+		mv.addObject("totalElements", customers.getTotalElements());
+		mv.addObject("size", size);
+
+		mv.setViewName("admin/usersManagement");
+		return mv;
+	}
+	@GetMapping("/adminManagement")
+	public ModelAndView adminManagement(@RequestParam Map<String, String> allParams) {
+		ModelAndView mv = new ModelAndView();
+		int page = Integer.parseInt(allParams.getOrDefault("page", "0"));
+		int size = Integer.parseInt(allParams.getOrDefault("size", "5"));
+		log.info("customer allParams = {}", allParams);
+		allParams.put("page", String.valueOf(page));
+		allParams.put("size", String.valueOf(size));
+		Pageable pageable = PageRequest.of(page, size);
+		
+		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
+				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
+		
+		Page<AdminDTO> admins; 
+		if (hasSearchParams) {
+			// 검색 조건이 있을 경우
+			admins = adminService.findAdminsWithSearch(pageable, allParams);
+			
+		} else {
+			// 검색 조건이 없을 경우
+			admins = adminService.findAdmins(pageable, allParams);
+		}
+		
+		mv.addObject("admins", admins);
+		mv.addObject("currentPage", admins.getNumber());
+		mv.addObject("pageCount", admins.getTotalPages());
+		mv.addObject("totalElements", admins.getTotalElements());
+		mv.addObject("size", size);
+		
+		mv.setViewName("admin/adminManagement");
+		return mv;
+	}
+	@GetMapping("/createAdmin")
+	public ModelAndView createAdminForm() {
+		ModelAndView mv = new ModelAndView();
+		mv.setViewName("admin/createAdmin");
+		return mv;
+	}
+
+	@PostMapping("/createAdmin")
+	@ResponseBody
+	public ResponseEntity<?> createAdmin(@RequestBody Map<String, Object> allParams) {
+		try {
+			adminService.createAdmin(allParams);
+			return ResponseEntity.ok("관리자가 성공적으로 등록되었습니다.");
+		} catch (Exception e) {
+			e.printStackTrace(); // Print the stack trace to see the error
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("관리자 등록에 실패했습니다.");
+		}
+	}
 }

@@ -236,9 +236,12 @@ button.editButton:hover {
 }
 
 .product-list .review-content-column {
-	width: 300px;
-	word-wrap: break-word;
-	white-space: normal;
+    width: 500px; 
+    word-wrap: break-word;
+    white-space: normal;
+}
+.product-list .review-rating-column {
+    width: 100px; /* Decrease width for review rating */
 }
 
 .product-list .review-date-column {

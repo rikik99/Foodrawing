@@ -18,7 +18,7 @@
                 <div class="full-width dark-mode">
                     <table class="form-table">
                         <tr>
-                            <td><label for="productList">상품 카테고리</label></td>
+                            <td><label for="productList">상품</label></td>
                             <td><select id="productList" name="productList" class="productList">
                                     <option value="">전체</option>
                                     <c:forEach items="${productList}" var="product">
