@@ -4,8 +4,8 @@
 <div class="product-card">
 	  		<div class="product-top">
 		  		<a class="product-card-href" href="/ProductDetail">
-		         <div class="badge">BEST</div>
-		         <img src="images/20240517_CaTchWorkFavicon.png" alt="Product Image">
+		         <!-- <div class="badge">BEST</div> -->
+		         <img src="/images/20240517_CaTchWorkFavicon.png" alt="Product Image">
 		      </a>
 		      <a class="product-card-cart-href" href="#">
 			      <div class="cart-icon">

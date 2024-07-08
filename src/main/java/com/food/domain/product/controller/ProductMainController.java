@@ -3,6 +3,7 @@ package com.food.domain.product.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,14 +30,16 @@ public class ProductMainController {
     }
 
     @GetMapping("/mainpage")
-    public String getAllProducts(@RequestParam("category") int category, Model model) {
+    public String getAllProducts(@RequestParam("category") int category, Model model, Authentication authentication) {
         List<ProductDTO> recommendedProducts = productMainService.getProductsByCategory(category);
         List<ProductDTO> allProducts = productMainService.getAllProducts();
         List<ProductFileDTO> productFiles = productMainService.getAllProductFiles();
         List<ProductCategoryDTO> allCategories = productMainService.getAllCategories();
         List<BestDTO> bestSellingProducts = productMainService.getBestSellingProducts();
         List<Discount2DTO> discountProducts = productMainService.getDiscountProducts(); // 추가된 부분
-
+        boolean isLoggedIn = (authentication != null && authentication.isAuthenticated());
+        log.info("isLoggedIn = {}",isLoggedIn);
+        model.addAttribute("isLoggedIn", isLoggedIn);
         model.addAttribute("category", category);
         log.info("category = {}", category);
         model.addAttribute("recommendedProducts", recommendedProducts);

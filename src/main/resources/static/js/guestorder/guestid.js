@@ -1,13 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
-    window.setCookie = function(name, value, days) {
-        let expires = "";
-        if (days) {
-            const date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            expires = "; expires=" + date.toUTCString();
-        }
-        document.cookie = name + "=" + (value || "") + expires + "; path=/";
-        console.log(`Set cookie: ${name}=${value}; expires=${expires}`);
+    window.setCookie = function(name, value) {
+        document.cookie = name + "=" + (value || "") + "; path=/";
+        console.log(`Set cookie: ${name}=${value}`);
     }
 
     window.getCookie = function(name) {
@@ -37,11 +31,21 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             console.log('Fetched guest ID:', data.guestId);
+            // 쿠키에 게스트 아이디를 세션 동안만 저장
+            setCookie('guestId', data.guestId);
             return data.guestId;
         })
         .catch(error => {
             console.error('Error fetching guest ID:', error);
             throw error;
         });
+    }
+
+    // 페이지 로드 시 쿠키에서 게스트 아이디를 확인하고 없으면 새로 가져오기
+    const guestId = getCookie('guestId');
+    if (!guestId) {
+        window.getGuestId();
+    } else {
+        console.log('Existing guest ID:', guestId);
     }
 });

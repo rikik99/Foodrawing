@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +39,12 @@ public class DiscountController {
 
     @GetMapping("/discountpage")
     public String getDiscountProducts(Model model) {
+    	// 로그인 가져오기
+    			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    			boolean isLoggedIn = authentication != null && authentication.isAuthenticated()
+    					&& !"anonymousUser".equals(authentication.getPrincipal());
+
+    			model.addAttribute("isLoggedIn", isLoggedIn);
         List<Discount2DTO> discountProducts = discountService.getDiscountProducts();
         model.addAttribute("discountProducts", discountProducts);
         return "main/discountpage";
