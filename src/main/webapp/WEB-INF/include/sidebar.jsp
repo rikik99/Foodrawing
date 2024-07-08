@@ -74,7 +74,7 @@
             const slidesToShow = 1; // 한 번에 보여줄 슬라이드 수
 
             if (sidebarCurrentIndex < totalSlides - slidesToShow) {
-            		sidebarCurrentIndex++;
+                  sidebarCurrentIndex++;
                 updateSlider(slidesContainer, sidebarCurrentIndex);
                 updatePageIndicator(sliderId);
             }
@@ -85,7 +85,7 @@
             const slidesToShow = 1;
 
             if (sidebarCurrentIndex > 0) {
-            		sidebarCurrentIndex--;
+                  sidebarCurrentIndex--;
                 updateSlider(slidesContainer, sidebarCurrentIndex);
                 updatePageIndicator(sliderId);
             }

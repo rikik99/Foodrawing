@@ -28,7 +28,12 @@ setupOpenWindow('addDiscountTarget', '/admin/insertDiscountTarget');
 setupOpenWindow('addDiscount', '/admin/insertDiscount');
 
 // 쿠폰 추가 윈도우 열기 설정
-setupOpenWindow('addCounpon', '/admin/couponManagement');
+setupOpenWindow('addCounpon', '/admin/insertCoupon');
 
 // 상품 추가 윈도우 열기 설정
 setupOpenWindow('addProduct', '/admin/insertProduct');
+
+// 타겟 수정 윈도우 열기 설정
+setupOpenWindow('editDiscountTarget', '/admin/updateTarget');
+
+setupOpenWindow('addAdmin', '/admin/createAdmin');

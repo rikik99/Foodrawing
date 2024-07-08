@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 import com.food.domain.order.dto.OrderStatusDTO;
 import com.food.domain.user.dto.CustomerDTO;
 import com.food.domain.user.dto.CustomerReservesDTO;
+
 import com.food.domain.user.dto.MyPageOrderDTO;
 import com.food.domain.user.mapper.CustomerMapper;
+import com.food.domain.user.mapper.CustomerRatingMapper;
 import com.food.domain.user.mapper.CustomerReservesMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,9 @@ public class CustomerService {
 
     @Autowired
     private CustomerReservesMapper customerReservesMapper;
+    
+    @Autowired
+    private CustomerRatingMapper customerRatingMapper;
 
     public CustomerDTO getCustomerById(Long id) {
         return customerMapper.findById(id);
@@ -75,5 +80,38 @@ public class CustomerService {
         }
         return totalReserves;
     }
+    public String getCustomerRating(Long customerId) {
+        Long totalAmount = customerRatingMapper.getTotalAmountByCustomerId(customerId);
+        if (totalAmount == null) {
+            totalAmount = 0L;
+        }
+        return customerRatingMapper.getCustomerRating(customerId);
+    }
 
-}
+	public int getPendingPayment(String customerId) {
+		String orderStatus = "결제 대기";
+		return customerMapper.getPendingPayment(customerId, orderStatus);
+	}
+
+	public int getCompletedPayment(String customerId) {
+		String orderStatus = "결제 완료";
+		return customerMapper.getPendingPayment(customerId, orderStatus);
+	}
+
+	public int getPreparingShipment(String customerId) {
+		String deliveryStatus = "배송 준비";
+		return customerMapper.countDeliveryStatus(customerId, deliveryStatus);
+	}
+
+	public int getShipping(String customerId) {
+		String deliveryStatus = "배송 중";
+		return customerMapper.countDeliveryStatus(customerId, deliveryStatus);
+	}
+
+	public int getShipmentCompleted(String customerId) {
+		String deliveryStatus = "배송 완료";
+		return customerMapper.countDeliveryStatus(customerId, deliveryStatus);
+	}
+
+    }
+

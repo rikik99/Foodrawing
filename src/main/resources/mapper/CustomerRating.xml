@@ -1,0 +1,61 @@
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.food.domain.user.mapper.CustomerRatingMapper">
+
+    <!-- 결과 매핑 -->
+  <resultMap id="customerResultMap" type="com.food.domain.user.dto.CustomerRatingDTO">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="nickname" column="nickname"/>
+        <result property="name" column="name"/>
+        <result property="gender" column="gender"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="birthdate" column="birthdate"/>
+        <result property="address" column="address"/>
+        <result property="addressDetail" column="address_detail"/>
+        <result property="zipcode" column="zipcode"/>
+        <result property="refundAccount" column="refund_account"/>
+        <result property="refundBank" column="refund_bank"/>
+        <result property="rating" column="rating"/>
+    </resultMap>
+
+    <select id="getTotalAmountByCustomerId" resultType="java.lang.Long">
+        SELECT SUM(TOTAL_AMOUNT)
+        FROM ORDER_TB
+        WHERE IDENTIFIER_ID = #{customerId}
+          AND IDENTIFIER_TYPE = 'CUSTOMER'
+          AND ORDER_DATE >= ADD_MONTHS(SYSDATE, -3)
+    </select>
+
+    <select id="getMemberRatingByTotalAmount" resultType="com.food.domain.user.dto.MemberRatingDTO">
+        SELECT *
+        FROM MEMBER_RATING_TB
+        WHERE #{totalAmount} BETWEEN MIN_AMOUNT AND MAX_AMOUNT
+    </select>
+
+    <select id="getCustomerRating" parameterType="long" resultType="string">
+        SELECT CASE
+                 WHEN NVL(total.total_amount, 0) >= 300000 THEN 'VIP'
+                 WHEN NVL(total.total_amount, 0) >= 200000 THEN '프리미엄'
+                 WHEN NVL(total.total_amount, 0) >= 100000 THEN '우수회원'
+                 ELSE '일반회원'
+               END AS rating
+        FROM customer_tb c
+        LEFT JOIN (
+            SELECT 
+                identifier_id,
+                SUM(total_amount) AS total_amount
+            FROM 
+                order_tb
+            GROUP BY 
+                identifier_id
+        ) total ON TO_CHAR(c.user_id) = total.identifier_id
+        WHERE c.user_id = #{userId}
+    </select>
+
+
+
+</mapper>

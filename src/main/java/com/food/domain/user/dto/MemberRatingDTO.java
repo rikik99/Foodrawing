@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class MemberRatingDTO {
     private Long id;
     private String rating;
-    private Integer minAmount;
-    private Integer maxAmount;
+    private Long minAmount;
+    private Long maxAmount;
 }

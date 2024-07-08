@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nutrient Graph</title>
+
 <style>
 /* 새로운 애니메이션 속성 및 변수 설정 */
 @property --hue {

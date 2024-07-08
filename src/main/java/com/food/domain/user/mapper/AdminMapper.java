@@ -1,5 +1,6 @@
 package com.food.domain.user.mapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -7,11 +8,16 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.food.domain.order.dto.OrderDTO;
+import com.food.domain.order.dto.OrderDetailDTO;
+import com.food.domain.order.dto.OrderStatusDTO;
 import com.food.domain.product.dto.ProductCategoryDTO;
+import com.food.domain.product.dto.ProductCategoryMappingDTO;
 import com.food.domain.product.dto.ProductDTO;
 import com.food.domain.product.dto.ProductFileDTO;
 import com.food.domain.product.dto.StockDTO;
 import com.food.domain.product.dto.StockTransactionDTO;
+import com.food.domain.sales.dto.CouponIssuanceDTO;
 import com.food.domain.sales.dto.DiscountDTO;
 import com.food.domain.sales.dto.DiscountTargetDTO;
 import com.food.domain.sales.dto.ReviewDTO;
@@ -25,6 +31,7 @@ import com.food.domain.user.dto.AdminDTO;
 import com.food.domain.user.dto.CustomerDTO;
 import com.food.domain.user.dto.MemberRatingDTO;
 import com.food.domain.user.dto.UserDTO;
+
 @Mapper
 public interface AdminMapper {
 
@@ -46,12 +53,11 @@ public interface AdminMapper {
 
 	void insertProductFile(ProductFileDTO productFile);
 
-	void updateCategoryById(Long categoryId);
+	void updateCategoryById(int categoryId);
 
-	void insertProductCategoryMapping(String productNumber, Long categoryId);
+	void insertProductCategoryMapping(String productNumber, int categoryId);
 
 	void deleteProductByProductNumber(String productNumber);
-
 
 	StockDTO findStockListByProductNumber(String productNumber);
 
@@ -151,5 +157,88 @@ public interface AdminMapper {
 
 	List<DiscountTargetDTO> findDiscountTargetById(Long discountId);
 
+	void deleteDiscountTargetById(Long discountTargetId);
+
+	List<DiscountTargetDTO> findDiscountTargetByType(String targetType);
+
+	List<MemberRatingDTO> findAllMemberRatings();
+
+	void updateDiscountTarget(Map<String, Object> params);
+
+	List<CouponIssuanceDTO> findCouponIssuancesWithSearch(Map<String, String> allParams);
+
+	List<CouponIssuanceDTO> findCouponIssuances();
+
+	void deleteCouponIssuancesById(Long couponIssuanceId);
+
+	List<DiscountDTO> findDiscountListWithType();
+
+	List<CustomerDTO> findCustomerList();
+
+	Long getTotalAmountByCustomerId(Long customerId);
+
+	MemberRatingDTO getMemberRatingByTotalAmount(Long totalAmount);
+
+	void insertCouponToCustomer(Long couponId, Long customerId, String couponNumber);
+
+	List<Long> findAllCustomerIds();
+
+	OrderStatusDTO findOrderStatusByOrderId(Long orderId);
+
+	List<OrderDetailDTO> findOrderDetailListByOrderId(Long orderId);
+
+	List<OrderDTO> findOrders();
+
+	List<OrderDTO> findOrdersWithSearch(Map<String, String> allParams);
+
+	List<OrderDTO> findPaymentCompletedOrders();
+
+	List<OrderDTO> findPaymentCompletedOrdersWithSearch(Map<String, String> allParams);
+
+	int updateOrderStatus(Long orderId, String status);
+
+	List<Long> findOrdersToConfirm(LocalDateTime oneWeekAgo);
+
+	void updateSalesPost(SalesPostDTO salesPost);
+
+	void deleteSalesPostFile(Long salesPostId);
+
+	void updateProduct(Map<String, String> allParams);
+
+	void deleteProductFile(String productNumber);
+
+	void updateProductCategoryMapping(String productNumber, int categoryId);
+
+	void updateProductCategoryMapping(ProductCategoryMappingDTO mapping);
+
+	Integer findCategoryIdByProductNumber(String productNumber);
+
+	void updateProductNumberInCategoryMapping(String oldProductNumber, String newProductNumber);
+
+	void updateProductNumber(String oldProductNumber, String newProductNumber);
+
+	void updateProductCategoryMappingNumber(String oldProductNumber, String newProductNumber);
+
+	void updateProductFileNumber(String oldProductNumber, String newProductNumber);
+
+	void insertStockByProductNumber(String productNumber);
+
+	List<CouponIssuanceDTO> findCouponIssuancesByCustomerId(Long customerId);
+
+	List<OrderDTO> findOrdersByCustomerId(Long customerId);
+
+	List<InquiriesDTO> findInquiriesByCustomerId(Long customerId);
+
+	Long findTotalOrderAmount(Long customerId);
+
+	Long findTotalReservesByCustomerId(Long customerId);
+
+	List<AdminDTO> findAdminList();
+
+	void createAdmin(Map<String, Object> allParams);
+
+	void createAdminUser(Map<String, Object> allParams);
+
+	void updateDiscountStatus(Long discountId, String newStatus);
 
 }

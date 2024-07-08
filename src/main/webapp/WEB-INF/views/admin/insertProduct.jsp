@@ -66,5 +66,7 @@
 		</form>
 	</div>
 	<script src="<c:url value='/js/admin/productNumber.js'/>"></script>
+	<script src="<c:url value='/js/admin/productNumber.js'/>"></script>
+	
 </body>
 </html>
