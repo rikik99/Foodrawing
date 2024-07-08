@@ -1328,85 +1328,92 @@ public class AdminService {
 	}
 
 	public Map<String, Object> adminMain() {
-	    Map<String, Object> adminMain = new HashMap<>();
-	    
-	    // orderStatusCounts를 로그로 확인
-	    List<Map<String, Object>> orderStatusCounts = adminMapper.findOrderStatusCounts();
-	    log.info("orderStatusCounts = {}", orderStatusCounts);
-	    
-	    Long totalOrderAmount = adminMapper.findMainTotalOrderAmount();
-	    List<OrderDTO> orderList = adminMapper.findOrders();
-	    List<UserDTO> userList = adminMapper.findAllUsers();
-	    
-	    // 사용자 리스트 초기화
-	    for (UserDTO user : userList) {
-	        Long userId = user.getId();
-	        CustomerDTO customerDTO = adminMapper.findCustomerByUserId(userId);
-	        user.setCustomer(customerDTO);
-	    }
-	    
-	    // 주문 리스트 초기화
-	    for (OrderDTO order : orderList) {
-	        Long identifierId;
-	        if ("CUSTOMER".equals(order.getIdentifierType())) {
-	            Long orderId = order.getId();
-	            identifierId = Long.valueOf(order.getIdentifierId());
-	            CustomerDTO customer = adminMapper.findCustomerByCustomerId(identifierId);
-	            Long userId = customer.getUserId();
-	            UserDTO user = adminMapper.findUserById(userId);
-	            customer.setUserDTO(user);
-	            OrderStatusDTO orderStatus = adminMapper.findOrderStatusByOrderId(orderId);
-	            List<OrderDetailDTO> orderDetailList = adminMapper.findOrderDetailListByOrderId(orderId);
+		Map<String, Object> adminMain = new HashMap<>();
 
-	            for (OrderDetailDTO orderDetail : orderDetailList) {
-	                Long salesPostId = orderDetail.getSalesPostId();
-	                SalesPostDTO salesPostDto = adminMapper.findSalesPostById(salesPostId);
-	                String productNumber = salesPostDto.getProductNumber();
-	                ProductDTO product = adminMapper.findProductByProductNumber(productNumber);
-	                salesPostDto.setProductDTO(product);
-	                orderDetail.setSales(salesPostDto);
-	            }
+		// orderStatusCounts를 로그로 확인
+		List<Map<String, Object>> orderStatusCounts = adminMapper.findOrderStatusCounts();
 
-	            order.setOrderDetailList(orderDetailList);
-	            order.setOrderStatus(orderStatus);
-	            order.setCustomer(customer);
-	        }
-	    }
+		Long totalOrderAmount = adminMapper.findMainTotalOrderAmount();
+		List<OrderDTO> orderList = adminMapper.findOrders();
+		List<UserDTO> userList = adminMapper.findAllUsers();
 
-	    // 모든 가능한 주문 상태를 0으로 초기화
-	    Map<String, Integer> statusCountsMap = new HashMap<>();
-	    statusCountsMap.put("결제 완료", 0);
-	    statusCountsMap.put("상품 준비", 0);
-	    statusCountsMap.put("배송 준비", 0);
-	    statusCountsMap.put("배송 중", 0);
-	    statusCountsMap.put("배송 완료", 0);
-	    statusCountsMap.put("구매 확정 대기", 0);
-	    statusCountsMap.put("취소", 0);
-	    statusCountsMap.put("반품", 0);
-	    statusCountsMap.put("교환", 0);
+		// 사용자 리스트 초기화
+		for (UserDTO user : userList) {
+			Long userId = user.getId();
+			CustomerDTO customerDTO = adminMapper.findCustomerByUserId(userId);
+			user.setCustomer(customerDTO);
+		}
 
-	    List<Map<String, Integer>> statusCountsMapList = new ArrayList<>();
+		// 주문 리스트 초기화
+		for (OrderDTO order : orderList) {
+			Long identifierId;
+			if ("CUSTOMER".equals(order.getIdentifierType())) {
+				Long orderId = order.getId();
+				identifierId = Long.valueOf(order.getIdentifierId());
+				CustomerDTO customer = adminMapper.findCustomerByCustomerId(identifierId);
+				Long userId = customer.getUserId();
+				UserDTO user = adminMapper.findUserById(userId);
+				customer.setUserDTO(user);
+				OrderStatusDTO orderStatus = adminMapper.findOrderStatusByOrderId(orderId);
+				List<OrderDetailDTO> orderDetailList = adminMapper.findOrderDetailListByOrderId(orderId);
 
-	    // 데이터베이스에서 상태별 주문 수 업데이트
-	    for (Map<String, Object> statusCount : orderStatusCounts) {
-	        String status = (String) statusCount.get("ORDER_STATUS");
-	        Integer count = ((Number) statusCount.get("STATUSCOUNT")).intValue();
+				for (OrderDetailDTO orderDetail : orderDetailList) {
+					Long salesPostId = orderDetail.getSalesPostId();
+					SalesPostDTO salesPostDto = adminMapper.findSalesPostById(salesPostId);
+					String productNumber = salesPostDto.getProductNumber();
+					ProductDTO product = adminMapper.findProductByProductNumber(productNumber);
+					salesPostDto.setProductDTO(product);
+					orderDetail.setSales(salesPostDto);
+				}
 
-	        // 기존의 statusCountsMap를 복사하여 새로운 맵 객체 생성
-	        Map<String, Integer> singleStatusCountMap = new HashMap<>(statusCountsMap);
-	        singleStatusCountMap.put(status, count);
+				order.setOrderDetailList(orderDetailList);
+				order.setOrderStatus(orderStatus);
+				order.setCustomer(customer);
+			}
+		}
 
-	        // 리스트에 추가
-	        statusCountsMapList.add(singleStatusCountMap);
-	    }
-	    log.info("statusCountsMapList = {}", statusCountsMapList);
-	    
-	    adminMain.put("orderStatusCounts", statusCountsMapList);  
-	    adminMain.put("totalOrderAmount", totalOrderAmount != null ? totalOrderAmount : 0);
-	    adminMain.put("orderList", orderList);
-	    adminMain.put("userList", userList);
+		// 모든 가능한 주문 상태를 0으로 초기화
+		Map<String, Integer> statusCountsMap = new HashMap<>();
+		statusCountsMap.put("결제 완료", 0);
+		statusCountsMap.put("상품 준비", 0);
+		statusCountsMap.put("배송 준비", 0);
+		statusCountsMap.put("배송 중", 0);
+		statusCountsMap.put("배송 완료", 0);
+		statusCountsMap.put("구매 확정 대기", 0);
+		statusCountsMap.put("취소", 0);
+		statusCountsMap.put("반품", 0);
+		statusCountsMap.put("교환", 0);
 
-	    return adminMain;
+		// 데이터베이스에서 상태별 주문 수 업데이트
+		for (Map<String, Object> statusCount : orderStatusCounts) {
+			String status = (String) statusCount.get("ORDER_STATUS");
+			Integer count = ((BigDecimal) statusCount.get("STATUSCOUNT")).intValue();
+
+			statusCountsMap.put(status, count);
+		}
+		log.info("statusCountsMapList = {}", statusCountsMap);
+
+		adminMain.put("orderStatusCounts", statusCountsMap);
+		adminMain.put("totalOrderAmount", totalOrderAmount != null ? totalOrderAmount : 0);
+		adminMain.put("orderList", orderList);
+		adminMain.put("userList", userList);
+
+		return adminMain;
 	}
 
+	public List<SalesPostDTO> getPopularProducts() {
+		List<SalesPostDTO> popularProducts = adminMapper.findPopularProducts();
+
+		for (SalesPostDTO sales : popularProducts) {
+			String productNumber = sales.getProductNumber();
+			ProductDTO product = adminMapper.findProductByProductNumber(productNumber);
+			sales.setProductDTO(product);
+		}
+
+		return popularProducts;
+	}
+
+	public List<Map<String, Object>> getRecentOrderStatusCounts() {
+		return adminMapper.findRecentOrderStatusCounts();
+	}
 }

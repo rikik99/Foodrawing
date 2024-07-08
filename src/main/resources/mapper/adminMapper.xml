@@ -1251,4 +1251,26 @@
 		FROM ORDER_STATUS_TB
 		GROUP BY ORDER_STATUS
 	</select>
+	    <select id="findPopularProducts" resultType="com.food.domain.sales.dto.SalesPostDTO">
+        SELECT * FROM (
+            SELECT sp.*
+            FROM SALES_POST_TB sp
+            JOIN (
+                SELECT od.SALES_POST_ID, SUM(od.QUANTITY) AS total_quantity
+                FROM ORDER_DETAIL_TB od
+                JOIN ORDER_STATUS_TB os ON od.ORDER_ID = os.ORDER_ID
+                WHERE os.ORDER_STATUS = '구매 확정'
+                GROUP BY od.SALES_POST_ID
+                ORDER BY total_quantity DESC
+            ) popular ON sp.ID = popular.SALES_POST_ID
+        )
+        WHERE ROWNUM &lt;= 3
+    </select>
+        <select id="findRecentOrderStatusCounts" resultType="map">
+        SELECT os.ORDER_STATUS, COUNT(*) AS STATUSCOUNT
+        FROM ORDER_STATUS_TB os
+        JOIN ORDER_TB o ON os.ORDER_ID = o.ID
+        WHERE os.ORDER_STATUS IN ('결제 완료', '상품 준비', '배송 준비', '배송 중', '배송 완료', '구매 확정 대기', '구매 확정')
+        GROUP BY os.ORDER_STATUS
+    </select>
 </mapper>

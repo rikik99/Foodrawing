@@ -80,31 +80,38 @@ public class AdminController {
 		return mv;
 	}
 
-    @GetMapping("/mainContent")
-    public ModelAndView adminMain() {
-        ModelAndView mv = new ModelAndView();
-        // 익명 인증이거나 인증되지 않은 경우 로그인 페이지로 리다이렉트
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()
-                || authentication instanceof AnonymousAuthenticationToken) {
-            mv.setViewName("redirect:/admin/login");
-            return mv;
-        }
+	@GetMapping("/mainContent")
+	public ModelAndView adminMain() {
+	    ModelAndView mv = new ModelAndView();
+	    // 익명 인증이거나 인증되지 않은 경우 로그인 페이지로 리다이렉트
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    if (authentication == null || !authentication.isAuthenticated()
+	            || authentication instanceof AnonymousAuthenticationToken) {
+	        mv.setViewName("redirect:/admin/login");
+	        return mv;
+	    }
 
-        Map<String, Object> adminData = adminService.adminMain();
-        List<Map<String, Object>> orderStatusCounts = (List<Map<String, Object>>) adminData.get("orderStatusCounts");
-        Long totalOrderAmount = (Long) adminData.get("totalOrderAmount");
-        List<OrderDTO> orderList = (List<OrderDTO>) adminData.get("orderList");
-        List<UserDTO> userList = (List<UserDTO>) adminData.get("userList");
-        log.info("ggorderStatusCounts = {}",orderStatusCounts);
+	    Map<String, Object> adminData = adminService.adminMain();
+	    Map<String, Object> orderStatusCounts = (Map<String, Object>) adminData.get("orderStatusCounts");
+	    Long totalOrderAmount = (Long) adminData.get("totalOrderAmount");
+	    List<OrderDTO> orderList = (List<OrderDTO>) adminData.get("orderList");
+	    List<UserDTO> userList = (List<UserDTO>) adminData.get("userList");
+	    List<SalesPostDTO> popularProducts = adminService.getPopularProducts();
+	    List<Map<String, Object>> recentOrderStatusCounts = adminService.getRecentOrderStatusCounts();
+	    log.info("orderStatusCounts = {}", orderStatusCounts);
+	    log.info("recentOrderStatusCounts = {}", recentOrderStatusCounts);
+	    
         mv.addObject("orderStatusCounts", orderStatusCounts);
         mv.addObject("totalOrderAmount", totalOrderAmount);
         mv.addObject("orderList", orderList);
         mv.addObject("userList", userList);
+        mv.addObject("popularProducts", popularProducts);
+        mv.addObject("recentOrderStatusCounts", recentOrderStatusCounts);
 
         mv.setViewName("admin/mainContent");
-        return mv;
-    }
+	    return mv;
+	}
+
 
 	@GetMapping("/productManagement")
 	public ModelAndView productManagement(@RequestParam Map<String, String> allParams) {

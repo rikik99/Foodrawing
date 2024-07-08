@@ -257,4 +257,7 @@ public interface AdminMapper {
 
 	List<Map<String, Object>> findOrderStatusCounts();
 
+	List<SalesPostDTO> findPopularProducts();
+
+	List<Map<String, Object>> findRecentOrderStatusCounts();
 }

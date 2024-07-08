@@ -1,12 +1,16 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" type="text/css" href="<c:url value='/css/admin/adminMain.css'/>">
-<link rel="stylesheet" type="text/css" href="<c:url value='/css/admin/common.css'/>">
-<link rel="stylesheet" type="text/css" href="<c:url value='/css/admin/customStyles.css'/>">
+<link rel="stylesheet" type="text/css"
+    href="<c:url value='/css/admin/adminMain.css'/>">
+<link rel="stylesheet" type="text/css"
+    href="<c:url value='/css/admin/common.css'/>">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="dark-mode">
     <div class="dashboard-container">
@@ -41,16 +45,18 @@
                             <th>배송 준비</th>
                             <th>배송 중</th>
                             <th>배송 완료</th>
+                            <th>구매 확정</th>
+                            <th>구매 확정 대기</th>
                         </tr>
-                        <c:forEach var="statusMap" items="${orderStatusCounts}">
-                            <tr>
-                                <td>${statusMap['결제 완료']}</td>
-                                <td>${statusMap['상품 준비']}</td>
-                                <td>${statusMap['배송 준비']}</td>
-                                <td>${statusMap['배송 중']}</td>
-                                <td>${statusMap['배송 완료']}</td>
-                            </tr>
-                        </c:forEach>
+                        <tr>
+                            <td>${orderStatusCounts['결제 완료']}</td>
+                            <td>${orderStatusCounts['상품 준비']}</td>
+                            <td>${orderStatusCounts['배송 준비']}</td>
+                            <td>${orderStatusCounts['배송 중']}</td>
+                            <td>${orderStatusCounts['배송 완료']}</td>
+                            <td>${orderStatusCounts['구매 확정']}</td>
+                            <td>${orderStatusCounts['구매 확정 대기']}</td>
+                        </tr>
                     </table>
                 </div>
 
@@ -64,14 +70,12 @@
                             <th>반품</th>
                             <th>교환</th>
                         </tr>
-                        <c:forEach var="statusMap" items="${orderStatusCounts}">
-                            <tr>
-                                <td>${statusMap['구매 확정 대기']}</td>
-                                <td>${statusMap['취소']}</td>
-                                <td>${statusMap['반품']}</td>
-                                <td>${statusMap['교환']}</td>
-                            </tr>
-                        </c:forEach>
+                        <tr>
+                            <td>${orderStatusCounts['구매 확정 대기']}</td>
+                            <td>${orderStatusCounts['취소']}</td>
+                            <td>${orderStatusCounts['반품']}</td>
+                            <td>${orderStatusCounts['교환']}</td>
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -99,17 +103,48 @@
             </div>
 
             <!-- 인기 상품 -->
-            <div class="popular-products dark-mode">
+            <div class="recent-orders dark-mode">
                 <h2>인기 상품</h2>
-                <ul>
-                    <li>상품 1</li>
-                    <li>상품 2</li>
-                    <li>상품 3</li>
-                </ul>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>제목</th>
+                            <th>상품 번호</th>
+                            <th>가격</th>
+                            <th>상태</th>
+                            <th>게시 마감 날짜</th>
+                            <th>재고</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach var="product" items="${popularProducts}">
+                            <tr>
+                                <td>${product.title}</td>
+                                <td>${product.productNumber}</td>
+                                <td>\ ${product.productDTO.price}</td>
+                                <td><c:choose>
+                                        <c:when test="${product.status == 1}">판매중</c:when>
+                                        <c:when test="${product.status == 2}">품절</c:when>
+                                        <c:when test="${product.status == 3}">단종</c:when>
+                                        <c:when test="${product.status == 4}">중지</c:when>
+                                        <c:when test="${product.status == 5}">판매 예정</c:when>
+                                    </c:choose></td>
+                                <td>${product.lastPostDate}</td>
+                                <td>${product.productDTO.quantity}</td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
             </div>
 
+            <!-- 최근 주문 상태 그래프 -->
+<%--             <div class="recent-orders dark-mode">
+                <h2>최근 주문 상태</h2>
+                <canvas id="recentOrderStatusChart"></canvas>
+            </div> --%>
+
             <!-- 최근 가입 회원 -->
-            <div class="recent-users dark-mode">
+            <div class="recent-orders dark-mode">
                 <h2>최근 가입 회원</h2>
                 <table>
                     <tr>
@@ -132,6 +167,9 @@
             </div>
         </div>
         <button id="toggleMode">Toggle Mode</button>
+        <script id="recentOrderStatusCounts" type="application/json">
+            ${fn:escapeXml(recentOrderStatusCounts)}
+        </script>
         <script src="<c:url value='/js/admin/productNumber.js'/>"></script>
         <script src="<c:url value='/js/admin/editDiscount.js'/>"></script>
         <script src="<c:url value='/js/admin/starRating.js'/>"></script>
