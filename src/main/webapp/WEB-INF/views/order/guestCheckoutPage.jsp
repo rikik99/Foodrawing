@@ -191,7 +191,7 @@
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <!-- iamport.payment.js -->
 <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
-<script src="js/guestorder/guestid.js"></script>
+<script src="/js/guestorder/guestid.js"></script>
 
 </head>
 <body>

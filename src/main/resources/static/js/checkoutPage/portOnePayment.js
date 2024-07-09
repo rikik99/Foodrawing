@@ -88,8 +88,8 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
             var randomPgProvider = pgProviders[Math.floor(Math.random() * pgProviders.length)];
 
             IMP.request_pay({
-            		pg: randomPgProvider,
-                //pg: "uplus.tlgdacomxpay",
+            		//pg: randomPgProvider,
+                pg: "kicc.T5102001",
                 pay_method: "card",
                 merchant_uid: 'merchant_' + orderNumber,
                 name: '주문명:결제테스트',
@@ -114,7 +114,7 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
                     const { imp_uid } = response;
                     //verifyPayment(imp_uid);
                     // 결제가 성공한 경우 필요한 정보를 서버로 전달
-
+									onPaymentSuccess();
 		            	fetch('/payment/result', {
 		                    method: 'POST',
 		                    headers: {
@@ -433,7 +433,7 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
                     const { imp_uid } = response;
                     //verifyPayment(imp_uid);
                     // 결제가 성공한 경우 필요한 정보를 서버로 전달
-
+									onPaymentSuccess();
 		            	fetch('/payment/result', {
 		                    method: 'POST',
 		                    headers: {
@@ -510,7 +510,7 @@ const userCode = "imp16305777"; // 고객사 식별코드로 변경해야 합니
                     const { imp_uid } = response;
                     //verifyPayment(imp_uid);
                     // 결제가 성공한 경우 필요한 정보를 서버로 전달
-
+									onPaymentSuccess();
 		            	fetch('/payment/result', {
 		                    method: 'POST',
 		                    headers: {

@@ -427,20 +427,23 @@ document.querySelectorAll('.payment-method').forEach(function (method) {
 
 //주문 페이지에서 나갈 때 재고 복구
 window.addEventListener('beforeunload', function(event) {
-    // 재고 복구 AJAX 요청
-    restoreStock();
-    event.returnValue = ''; // 이 줄은 브라우저의 기본 대화상자가 표시되도록 합니다.
+    if (!isPaymentSuccessful) {
+        restoreStock();
+        event.returnValue = ''; // 이 줄은 브라우저의 기본 대화상자가 표시되도록 합니다.
+    }
 });
 
 window.addEventListener('popstate', function(event) {
-    // 뒤로가기, 앞으로가기 버튼을 눌렀을 때 재고 복구 AJAX 요청
-    restoreStock();
+    if (!isPaymentSuccessful) {
+        restoreStock();
+    }
 });
 
 function goBack() {
-    // 재고 복구 AJAX 요청
-    restoreStock();
-    history.back();
+    if (!isPaymentSuccessful) {
+        restoreStock();
+        history.back();
+    }
 }
 
 function restoreStock() {
@@ -465,10 +468,13 @@ function restoreStock() {
           console.log('재고 복구 완료:', data);
       })
       .catch(error => {
-          //console.error('재고 복구 중 오류 발생:', error);
-          console.log(JSON.stringify(jsonData))
-          alert('재고 복구 중 오류 발생:', error);
+          console.error('재고 복구 중 오류 발생:', error);
       });
+}
+
+// 결제 성공 시 호출되는 함수
+function onPaymentSuccess() {
+    isPaymentSuccessful = true;
 }
 </script>
 <script src="/js/checkoutPage/postCode.js"></script> <!-- 우편번호 -->

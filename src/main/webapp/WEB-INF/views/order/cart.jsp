@@ -264,7 +264,7 @@
 		<!-- 장바구니 아이템 -->
 		<c:forEach var="item" items="${cartItems}">
 			<form action="/productDetail/${item.salesPostId}" method="POST">
-				<input type="hidden" name="salesPostId" value="${item.salesPostId}">
+				<input type="hidden" id="salesPostId" class="salesPostId" name="id" value="${item.salesPostId}">
 				<div class="order-cart-item" data-item-id="${item.productNumber}">
 					<input type="checkbox" class="select-item"
 						onclick="toggleSelectItem()">
@@ -629,6 +629,60 @@ function checkoutSelectedItemsRequest(selectedIds, customerId, isGuest) {
     .catch(error => {
         console.error('결제 준비 오류:', error);
         alert('결제 준비 중 오류가 발생했습니다.');
+    });
+}
+
+function deleteSelectedItems() {
+    const loginCustomerId = document.getElementById('loginCustomerId').value;
+    let cookieGuestId = getCookie('guestId');
+    const selectedItems = document.querySelectorAll('.select-item:checked');
+
+    selectedItems.forEach(item => {
+        const productNumber = item.closest('.order-cart-item').getAttribute('data-item-id');
+
+        if (!loginCustomerId && !cookieGuestId) {
+            ensureGuestId().then(guestId => {
+                deleteCartItemRequest(productNumber, guestId, true);
+            });
+        } else {
+            const customerId = loginCustomerId || cookieGuestId;
+            deleteCartItemRequest(productNumber, customerId, !loginCustomerId);
+        }
+    });
+}
+
+function deleteCartItemRequest(productNumber, customerId, isGuest) {
+    const data = isGuest ? { guestId: customerId, productNumber } : { customerId, productNumber };
+    const url = isGuest ? '/guest/cart/deleteCartItem' : '/cart/deleteCartItem';
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => {
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            return response.text().then(text => { throw new Error('Invalid content type: ' + contentType + '\nResponse: ' + text) });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!data.success) {
+            alert('삭제에 문제가 발생했습니다.');
+            return;
+        }
+        const cartItem = document.querySelector('.order-cart-item[data-item-id="' + productNumber + '"]');
+        cartItem.remove();
+        alert('항목이 성공적으로 삭제되었습니다.');
+        calculateTotal();
+        updateCartCount(-1); // 삭제된 항목 수만큼 배지를 감소시킴
+    })
+    .catch(error => {
+        console.error('삭제 오류:', error);
+        alert('항목 삭제 중 오류가 발생했습니다. 에러 메시지: ' + error.message);
     });
 }
 
