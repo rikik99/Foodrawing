@@ -1,6 +1,5 @@
 package com.food.domain.product.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,33 +20,11 @@ public class ProductService {
         return productMapper.selectByCriteria(productNutrition);
     }
 
-    public List<ProductDTO> getProductName(List<ProductNutritionDTO> results) {
-        List<ProductDTO> products = new ArrayList<>();
-        for (ProductNutritionDTO result : results) {
-            ProductDTO product = productMapper.selectByResults(result);
-            products.add(product);
-        }
-        return products;
-    }
-
-    public List<ProductFileDTO> getProductFile(List<ProductNutritionDTO> results) {
-        List<ProductFileDTO> files = new ArrayList<>();
-        for (ProductNutritionDTO result : results) {
-            String productNumber = result.getProductNumber();
-            ProductFileDTO file = productMapper.fileByResults(productNumber);
-            if (file != null) {
-                files.add(file);
-            }
-        }
-        return files;
-    }
-
     public ProductDTO findById(String productNumber) {
         return productMapper.findById(productNumber);
     }
 
-	public ProductDTO getProductById(String productId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public ProductFileDTO getFileByProductNumber(String productNumber) {
+        return productMapper.fileByResults(productNumber);
+    }
 }

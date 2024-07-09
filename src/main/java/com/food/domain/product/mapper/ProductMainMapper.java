@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.food.domain.product.dto.ProductDTO;
 import com.food.domain.product.dto.ProductFileDTO;
+import com.food.domain.sales.dto.SalesPostDTO;
 
 @Mapper
 public interface ProductMainMapper {
@@ -18,4 +19,6 @@ public interface ProductMainMapper {
     ProductFileDTO fileByResults(@Param("productNumber") String productNumber);
 
     List<ProductDTO> findProductsByCategory(@Param("categoryId") int categoryId);
+
+	SalesPostDTO getSalesPostByProductNumber(String productNumber);
 }

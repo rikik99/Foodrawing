@@ -363,7 +363,10 @@ function displayData(data) {
 
   container.innerHTML = '';
 
+  console.log('Received data:', data); // 데이터 확인을 위한 로그
+
   data.forEach(item => {
+    console.log('Item:', item); // 각 항목을 로그로 출력
     const div = document.createElement('div');
     div.className = 'data-item';
     div.onclick = () => drawGraph(item); // 클릭 시 그래프 업데이트
@@ -401,19 +404,19 @@ function displayData(data) {
 
     const p8 = document.createElement('p');
     p8.textContent = 'Carbohydrate: ' + item.carbohydrate;
-    
-    const div2 = document.createElement('div')
-    div2.className = 'buy-div'
-    
+
+    const div2 = document.createElement('div');
+    div2.className = 'buy-div';
+
     const btn1 = document.createElement('a');
-    btn1.href = '/productDetail?productNumber=' + item.productNumber; //바로 구매하기 기능 만들면 연결하면됨
-    btn1.className = 'buy-btn'
-    btn1.textContent = '구매하기'
-    
+    btn1.href = '/productDetail/' + item.id; //바로 구매하기 기능 만들면 연결하면됨
+    btn1.className = 'buy-btn';
+    btn1.textContent = '구매하기';
+
     const btn2 = document.createElement('a');
-    btn2.href = '/productDetail?productNumber=' + item.productNumber; //장바구니 넣기 기능 만들면 연결하면 됨
-    btn2.className = 'cart-btn'
-    btn2.textContent = '장바구니'
+    btn2.href = '/productDetail?productNumber=' + item.productNumber; //장바구니 넣기 기능 만들면 됨
+    btn2.className = 'cart-btn';
+    btn2.textContent = '장바구니';
 
     div.appendChild(img);
     div.appendChild(h3);
@@ -435,6 +438,7 @@ function displayData(data) {
 
   containerWrapper.style.display = 'block'; // 데이터를 불러온 후에 데이터 컨테이너를 표시
 }
+
 
 /* 그래프를 그리는 함수 */
 function drawGraph(nutrition) {

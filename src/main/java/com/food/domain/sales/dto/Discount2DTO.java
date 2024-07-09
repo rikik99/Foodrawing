@@ -23,9 +23,11 @@ public class Discount2DTO {
     private int maxDiscount;
     private String description;
     private int minPrice;
+    private String productNumber;
     private String productName;
     private String productDescription;
     private int originalPrice;
     private double discountedPrice; 
     private String productFilePath; // 새 필드 추가
+    private Long salesPostId;
 }

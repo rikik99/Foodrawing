@@ -211,34 +211,35 @@
                 </c:when>
             </c:choose>
 
-            <div class="container">
-                <div class="product-slider">
-                    <c:forEach var="product" items="${recommendedProducts}">
-                        <div class="product-card">
-                            <div class="product-top">
-                                <a class="product-card-href" href="/ProductDetail?productNumber=${product.productNumber}">
-                                    <img src="${product.productFileDTO.filePath}" alt="${product.name}">
-                                </a>
-                            </div>
-                            <div class="product-details">
-                                <div class="product-title">
-                                    <span class="product-name">${product.name}</span><br>
-                                    <span class="product-description">${product.description}</span>
-                                </div>
-                                <div class="product-price">
-                                    ${product.price}원
-                                </div>
-                                <div class="product-rating">★ 4.7 (64)</div>
-                                <div class="delivery-info">
-                                    내일 <span>꼭! 도착</span><br>
-                                    내일 도착예정
-                                </div>
-                            </div>
-                        </div>
-                    </c:forEach>
+<div class="container">
+    <div class="product-slider">
+        <c:forEach var="product" items="${recommendedProducts}">
+            <div class="product-card">
+                <div class="product-top">
+                    <a class="product-card-href" href="<c:url value='/productDetail/${product.salesPostDTO.id}'/>">
+                        <img src="${product.productFileDTO.filePath}" alt="${product.name}">
+                    </a>
+                </div>
+                <div class="product-details">
+                    <div class="product-title">
+                        <span class="product-name">${product.name}</span><br>
+                        <span class="product-description">${product.description}</span>
+                    </div>
+                    <div class="product-price">
+                        ${product.price}원
+                    </div>
+                    <div class="product-rating">★ 4.7 (64)</div>
+                    <div class="delivery-info">
+                        내일 <span>꼭! 도착</span><br>
+                        내일 도착예정
+                    </div>
                 </div>
             </div>
-        </section>
+        </c:forEach>
+    </div>
+</div>
+
+
 
 <div class="section grid" style="border: 1px solid #ccc; padding: 20px; margin-top: 20px;">
     <div class="grid-item">
@@ -248,7 +249,7 @@
         <div class="now-top item-area" id="discountMainArea">
             <c:set var="firstDiscountProduct" value="${discountProducts[0]}" />
             <div class="box">
-                <a href="#" class="item-link">
+                <a href="<c:url value='/productDetail/${firstDiscountProduct.salesPostId}'/>" class="item-link">
                     <img src="${firstDiscountProduct.productFilePath}" style="margin: 10px; min-width: 230px; max-width: 400px; width: 100%;">
                     <div class="badge">SALE</div>
                     <div class="box_list_title">${firstDiscountProduct.productName}</div>
@@ -267,7 +268,7 @@
                 <c:if test="${status.index != 0}">
                     <div class="slide_div">
                         <div class="content-wrapper">
-                            <a href="#" class="item-link"><img src="${product.productFilePath}" alt="${product.productName}"></a>
+                            <a href="<c:url value='/productDetail/${product.salesPostId}'/>" class="item-link"><img src="${product.productFilePath}" alt="${product.productName}"></a>
                             <div>
                                 <div class="badge">SALE</div>
                                 <h4>${product.productName}</h4>
@@ -294,7 +295,7 @@
         <div class="now-top item-area" id="bestMainArea">
             <c:set var="firstBestProduct" value="${bestSellingProducts[0]}" />
             <div class="box">
-                <a href="#" class="item-link">
+                <a href="<c:url value='/productDetail/${firstBestProduct.salesPostId}'/>" class="item-link">
                     <img src="${firstBestProduct.filePath}" style="margin: 10px; min-width: 230px; max-width: 400px; width: 100%;">
                     <div class="badge">BEST</div>
                     <div class="box_list_title">${firstBestProduct.salesPostTitle}</div>
@@ -310,7 +311,9 @@
                 <c:if test="${status.index != 0}">
                     <div class="slide_div">
                         <div class="content-wrapper">
-                            <a href="#" class="item-link"><img src="${product.filePath}" alt="${product.salesPostTitle}"></a>
+                            <a href="<c:url value='/productDetail/${product.salesPostId}'/>" class="item-link">
+                                <img src="${product.filePath}" alt="${product.salesPostTitle}">
+                            </a>
                             <div>
                                 <div class="badge">BEST</div>
                                 <h4>${product.salesPostTitle}</h4>
@@ -325,41 +328,41 @@
     </div>
 </div>
 
-        <div class="section">
-            <h1 style="text-align: center;">메인 품목</h1>
-            <div class="container">
-                <div class="row">
-                    <c:forEach var="product" items="${products}">
-                        <div class="col-md-4 mb-5">
-                            <div class="product-card">
-                                <div class="product-top">
-                                    <a class="product-card-href" href="/ProductDetail">
-                                        <img src="${product.productFileDTO.filePath}" alt="${product.name}">
-                                    </a>
-                                    <a class="product-card-cart-href" href="#">
-                                        <div class="cart-icon">
-                                            <img src="/images/basket-icon.png" alt="Cart Icon">
-                                        </div>
-                                    </a>
+<div class="section">
+    <h1 style="text-align: center;">메인 품목</h1>
+    <div class="container">
+        <div class="row">
+            <c:forEach var="product" items="${products}">
+                <div class="col-md-4 mb-5">
+                    <div class="product-card">
+                        <div class="product-top">
+                            <a class="product-card-href" href="<c:url value='/productDetail/${product.salesPostDTO.id}'/>">
+                                <img src="${product.productFileDTO.filePath}" alt="${product.name}">
+                            </a>
+                            <a class="product-card-cart-href" href="#">
+                                <div class="cart-icon">
+                                    <img src="/images/basket-icon.png" alt="Cart Icon">
                                 </div>
-                                <a class="product-card-href" href="/ProductDetail">
-                                    <div class="product-details">
-                                        <div class="product-title">
-                                            <span class="product-name">${product.name}</span><br>
-                                            <span class="product-description">${product.description}</span>
-                                        </div>
-                                        <div class="product-price">
-                                            ${product.price}원
-                                        </div>
-
-                                    </div>
-                                </a>
-                            </div>
+                            </a>
                         </div>
-                    </c:forEach>
+                        <a class="product-card-href" href="<c:url value='/productDetail/${product.salesPostDTO.id}'/>">
+                            <div class="product-details">
+                                <div class="product-title">
+                                    <span class="product-name">${product.name}</span><br>
+                                    <span class="product-description">${product.description}</span>
+                                </div>
+                                <div class="product-price">
+                                    ${product.price}원
+                                </div>
+                            </div>
+                        </a>
+                    </div>
                 </div>
-            </div>
+            </c:forEach>
         </div>
+    </div>
+</div>
+
     </main>
     <%@ include file="/WEB-INF/include/footer.jsp" %>
     <script>

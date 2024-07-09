@@ -125,7 +125,7 @@ th {
                                     <c:if test="${order.orderStatus == '결제완료'}">
                                         <form action="${pageContext.request.contextPath}/user/confirmOrder" method="post">
                                             <input type="hidden" name="orderId" value="${order.orderId}" />
-                                            <button type="submit" class="btn btn-success">구매 확정</button>
+                                            <button type="submit" class="btn btn-success">구매확정</button>
                                         </form>
                                     </c:if>
                                     <c:if test="${order.orderStatus == '구매확정'}">

@@ -204,13 +204,7 @@ $(document).ready(function() {
                 </div>
             </section>
 
-            <hr class="section-divider">
 
-            <section>
-                <div style="text-align: center;">여기다 위시리스트</div>
-            </section>
-        </div>
-    </div>
 
     <!-- Bootstrap Modal -->
     <div class="modal fade" id="couponModal" tabindex="-1" role="dialog" aria-labelledby="couponModalLabel" aria-hidden="true">

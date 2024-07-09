@@ -16,18 +16,22 @@
 <select id="findDiscountProductsQuery" resultType="com.food.domain.sales.dto.Discount2DTO">
     SELECT DISTINCT 
            D.*, 
+           p.product_number as productNumber,
            P.NAME AS PRODUCT_NAME, 
            P.DESCRIPTION AS PRODUCT_DESCRIPTION, 
            P.PRICE AS ORIGINAL_PRICE, 
            ((P.PRICE * (100 - D.DISCOUNT_VALUE)) / 100) AS DISCOUNTED_PRICE,
-           PF.FILE_PATH AS productFilePath
+           PF.FILE_PATH AS productFilePath,
+           SP.ID AS salesPostId
     FROM DISCOUNT_TB D 
     JOIN DISCOUNT_TARGET_TB DT ON D.ID = DT.DISCOUNT_ID 
     JOIN PRODUCT_TB P ON DT.TARGET_ID = P.PRODUCT_NUMBER 
     JOIN PRODUCT_FILE_TB PF ON P.PRODUCT_NUMBER = PF.PRODUCT_NUMBER
+    JOIN SALES_POST_TB SP ON P.PRODUCT_NUMBER = SP.PRODUCT_NUMBER
     WHERE DT.TARGET_TYPE = 'PRODUCT' 
       AND SYSDATE BETWEEN D.START_DATE AND D.END_DATE
 </select>
+
 
 
 	<select id="getCategroyTargetDiscount">

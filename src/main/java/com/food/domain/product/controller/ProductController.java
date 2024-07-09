@@ -58,46 +58,37 @@ public class ProductController {
 
         logger.info("Results: {}", results);
 
-        List<ProductDTO> productList = productService.getProductName(results);
-        List<ProductFileDTO> fileList = productService.getProductFile(results);
-
         List<CustomPageDTO> customList = new ArrayList<>();
 
-        for (int i = 0; i < results.size(); i++) {
-            String productName = (i < productList.size()) ? productList.get(i).getName() : null;
-            String productDescription = (i < productList.size()) ? productList.get(i).getDescription() : null;
-            Long productPrice = (i < productList.size()) ? productList.get(i).getPrice() : null;
-            Long productQuantity = (i < productList.size()) ? productList.get(i).getQuantity() : null;
-            LocalDateTime productCreatedDate = (i < productList.size()) ? productList.get(i).getCreatedDate() : null;
+        for (ProductNutritionDTO result : results) {
+            ProductDTO product = productService.findById(result.getProductNumber());
+            ProductFileDTO file = productService.getFileByProductNumber(result.getProductNumber());
 
-            Long fileId = (i < fileList.size() && fileList.get(i) != null) ? fileList.get(i).getId() : null;
-            String fileOriginalName = (i < fileList.size() && fileList.get(i) != null) ? fileList.get(i).getOriginalName() : null;
-            String filePath = (i < fileList.size() && fileList.get(i) != null) ? fileList.get(i).getFilePath() : null;
-            String fileType = (i < fileList.size() && fileList.get(i) != null) ? fileList.get(i).getFileType() : null;
-            LocalDateTime fileUploadDate = (i < fileList.size() && fileList.get(i) != null) ? fileList.get(i).getUploadDate() : null;
-            customList.add(new CustomPageDTO(
-                results.get(i).getProductNumber(),
-                results.get(i).getCalorie(),
-                results.get(i).getProtein(),
-                results.get(i).getFat(),
-                results.get(i).getTransFat(),
-                results.get(i).getSaturatedFat(),
-                results.get(i).getCarbohydrate(),
-                results.get(i).getSugar(),
-                results.get(i).getSodium(),
-                results.get(i).getCholesterol(),
-                results.get(i).getWeight(),
-                productName,
-                productDescription,
-                productPrice,
-                productQuantity,
-                productCreatedDate,
-                fileId,
-                fileOriginalName,
-                filePath,
-                fileType,
-                fileUploadDate
-            ));
+            if (product != null) {
+                customList.add(new CustomPageDTO(
+                    result.getProductNumber(),
+                    result.getCalorie(),
+                    result.getProtein(),
+                    result.getFat(),
+                    result.getTransFat(),
+                    result.getSaturatedFat(),
+                    result.getCarbohydrate(),
+                    result.getSugar(),
+                    result.getSodium(),
+                    result.getCholesterol(),
+                    result.getWeight(),
+                    product.getName(),
+                    product.getDescription(),
+                    product.getPrice(),
+                    product.getQuantity(),
+                    product.getCreatedDate(),
+                    file != null ? file.getId() : null,
+                    file != null ? file.getOriginalName() : null,
+                    file != null ? file.getFilePath() : null,
+                    file != null ? file.getFileType() : null,
+                    file != null ? file.getUploadDate() : null
+                ));
+            }
         }
 
         logger.info("Custom List: {}", customList);

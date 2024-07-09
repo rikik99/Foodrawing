@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.food.domain.product.dto.BestDTO;
@@ -30,7 +31,16 @@ public class ProductMainController {
     }
 
     @GetMapping("/mainpage")
-    public String getAllProducts(@RequestParam("category") int category, Model model, Authentication authentication) {
+    public String getAllProductsGet(@RequestParam("category") int category, Model model, Authentication authentication) {
+        return getAllProducts(category, model, authentication);
+    }
+
+    @PostMapping("/mainpage")
+    public String getAllProductsPost(@RequestParam("category") int category, Model model, Authentication authentication) {
+        return getAllProducts(category, model, authentication);
+    }
+
+    private String getAllProducts(int category, Model model, Authentication authentication) {
         List<ProductDTO> recommendedProducts = productMainService.getProductsByCategory(category);
         List<ProductDTO> allProducts = productMainService.getAllProducts();
         List<ProductFileDTO> productFiles = productMainService.getAllProductFiles();
@@ -38,7 +48,7 @@ public class ProductMainController {
         List<BestDTO> bestSellingProducts = productMainService.getBestSellingProducts();
         List<Discount2DTO> discountProducts = productMainService.getDiscountProducts(); // 추가된 부분
         boolean isLoggedIn = (authentication != null && authentication.isAuthenticated());
-        log.info("isLoggedIn = {}",isLoggedIn);
+        log.info("isLoggedIn = {}", isLoggedIn);
         model.addAttribute("isLoggedIn", isLoggedIn);
         model.addAttribute("category", category);
         log.info("category = {}", category);

@@ -5,9 +5,27 @@
 
 <mapper namespace="com.food.domain.product.mapper.ProductMainMapper">
 
-    <select id="selectAllProducts" resultType="com.food.domain.product.dto.ProductDTO">
-        SELECT PRODUCT_NUMBER, NAME, DESCRIPTION, PRICE, QUANTITY, CREATED_DATE
-        FROM PRODUCT_TB
+    <select id="selectAllProducts" resultMap="ProductWithSalesPostResultMap">
+        SELECT 
+            p.PRODUCT_NUMBER, 
+            p.NAME, 
+            p.DESCRIPTION, 
+            p.PRICE, 
+            p.QUANTITY, 
+            p.CREATED_DATE,
+            s.ID as salesPostId, 
+            s.PRODUCT_NUMBER as salesPostProductNumber, 
+            s.TITLE as salesPostTitle, 
+            s.DESCRIPTION as salesPostDescription, 
+            s.CREATED_DATE as salesPostCreatedDate, 
+            s.UPDATED_DATE as salesPostUpdatedDate, 
+            s.START_POST_DATE as salesPostStartPostDate, 
+            s.LAST_POST_DATE as salesPostLastPostDate, 
+            s.STATUS as salesPostStatus
+        FROM 
+            PRODUCT_TB p
+        LEFT JOIN 
+            SALES_POST_TB s ON p.PRODUCT_NUMBER = s.PRODUCT_NUMBER
     </select>
 
     <select id="selectAllProductFiles" resultType="com.food.domain.product.dto.ProductFileDTO">
@@ -26,5 +44,30 @@
         FROM PRODUCT_TB
         JOIN PRODUCT_CATEGORY_MAPPING_TB ON PRODUCT_TB.PRODUCT_NUMBER = PRODUCT_CATEGORY_MAPPING_TB.PRODUCT_NUMBER
         WHERE PRODUCT_CATEGORY_MAPPING_TB.CATEGORY_ID = #{categoryId}
+    </select>
+    
+        <resultMap id="ProductWithSalesPostResultMap" type="com.food.domain.product.dto.ProductDTO">
+        <id property="productNumber" column="PRODUCT_NUMBER" />
+        <result property="name" column="NAME" />
+        <result property="description" column="DESCRIPTION" />
+        <result property="price" column="PRICE" />
+        <result property="quantity" column="QUANTITY" />
+        <result property="createdDate" column="CREATED_DATE" />
+        <association property="salesPostDTO" javaType="com.food.domain.sales.dto.SalesPostDTO">
+            <id property="id" column="salesPostId" />
+            <result property="productNumber" column="salesPostProductNumber" />
+            <result property="title" column="salesPostTitle" />
+            <result property="description" column="salesPostDescription" />
+            <result property="createdDate" column="salesPostCreatedDate" />
+            <result property="updatedDate" column="salesPostUpdatedDate" />
+            <result property="startPostDate" column="salesPostStartPostDate" />
+            <result property="lastPostDate" column="salesPostLastPostDate" />
+            <result property="status" column="salesPostStatus" />
+        </association>
+    </resultMap>
+    
+    <select id="getSalesPostByProductNumber">
+    	SELECT * FROM SALES_POST_TB
+    	WHERE PRODUCT_NUMBER = #{productNumber}
     </select>
 </mapper>

@@ -15,6 +15,7 @@ import com.food.domain.product.mapper.BestMapper;
 import com.food.domain.product.mapper.CategoryMapper;
 import com.food.domain.product.mapper.ProductMainMapper;
 import com.food.domain.sales.dto.Discount2DTO;
+import com.food.domain.sales.dto.SalesPostDTO;
 import com.food.domain.sales.mapper.DiscountMapper; // 추가된 부분
 
 @Service
@@ -34,6 +35,12 @@ public class ProductMainService {
 
     public List<ProductDTO> getAllProducts() {
         List<ProductDTO> products = productMainMapper.selectAllProducts();
+        //System.out.println("products: " + products);
+        for(ProductDTO product : products) {
+        	SalesPostDTO salesPost = new SalesPostDTO();
+        	salesPost = productMainMapper.getSalesPostByProductNumber(product.getProductNumber());
+        	product.setSalesPostDTO(salesPost);
+        }
         return addFileInfoToProducts(products);
     }
 
@@ -43,6 +50,11 @@ public class ProductMainService {
 
     public List<ProductDTO> getProductsByCategory(int categoryId) {
         List<ProductDTO> products = productMainMapper.findProductsByCategory(categoryId);
+        for(ProductDTO product : products) {
+        	SalesPostDTO salesPost = new SalesPostDTO();
+        	salesPost = productMainMapper.getSalesPostByProductNumber(product.getProductNumber());
+        	product.setSalesPostDTO(salesPost);
+        }
         return addFileInfoToProducts(products);
     }
 
@@ -58,7 +70,7 @@ public class ProductMainService {
         return bestMapper.selectBestSellingProducts();
     }
 
-    public List<Discount2DTO> getDiscountProducts() { // 추가된 메서드
+    public List<Discount2DTO> getDiscountProducts() { 
         return discountMapper.findDiscountProductsQuery();
     }
 
@@ -72,4 +84,5 @@ public class ProductMainService {
         }
         return productList;
     }
+
 }

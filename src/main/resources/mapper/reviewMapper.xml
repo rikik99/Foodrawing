@@ -40,8 +40,10 @@
     	WHERE ID = #{customerId}
     </select>
 
-		<select id="getAverageRating" parameterType="Long" resultType="double">
-        SELECT AVG(RATING) FROM REVIEW_TB WHERE SALES_POST_ID = #{salesPostId}
+<select id="getAverageRating" parameterType="Long" resultType="double">
+        SELECT NVL(AVG(RATING), 0)
+          FROM REVIEW_TB
+          WHERE SALES_POST_ID = #{salesPostId}
     </select>
     
     <!-- 점수별 리뷰 개수를 가져오는 쿼리 -->
