@@ -572,7 +572,7 @@ public class AdminController {
 		System.out.println("Request Parameters: " + allParams);
 
 		adminService.insertDiscountTarget(allParams);
-		return ResponseEntity.ok("Discount targets added successfully");
+		return ResponseEntity.ok("할인 대상 정보 추가에 성공했습니다.");
 	}
 
 	@GetMapping("/getTargets")
@@ -657,6 +657,22 @@ public class AdminController {
 
 		try {
 			adminService.deleteCouponIssuancesById(couponIssuanceIds);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ResponseEntity.ok("선택된 항목이 성공적으로 삭제되었습니다.");
+	}
+	@DeleteMapping("/deleteSalesPosts")
+	@ResponseBody	 
+	public ResponseEntity<String> deleteSalesPosts(@RequestBody Map<String, List<Long>> requestBody) {
+		List<Long> salesPostIds = requestBody.get("salesPostIds");
+		if (salesPostIds == null || salesPostIds.isEmpty()) {
+			return ResponseEntity.badRequest().body("삭제할 판매글 정보가 없습니다.");
+		}
+		
+		try {
+			adminService.deleteSalesPostsById(salesPostIds);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

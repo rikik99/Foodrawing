@@ -24,15 +24,15 @@ document.addEventListener('DOMContentLoaded', function() {
 		loadContent('/admin/mainContent', 'mainContent', false);
 	}
 
-   const recentOrderStatusCountsElement = document.getElementById('recentOrderStatusCounts');
-    if (recentOrderStatusCountsElement) {
-        try {
-            const recentOrderStatusCounts = JSON.parse(recentOrderStatusCountsElement.textContent);
-            initializeOrderStatusChart(recentOrderStatusCounts);
-        } catch (error) {
-            console.error('Error parsing recent order status counts JSON:', error);
-        }
-    }
+	const recentOrderStatusCountsElement = document.getElementById('recentOrderStatusCounts');
+	if (recentOrderStatusCountsElement) {
+		try {
+			const recentOrderStatusCounts = JSON.parse(recentOrderStatusCountsElement.textContent);
+			initializeOrderStatusChart(recentOrderStatusCounts);
+		} catch (error) {
+			console.error('Error parsing recent order status counts JSON:', error);
+		}
+	}
 });
 
 window.addEventListener('beforeunload', function() {
@@ -650,7 +650,14 @@ function setupCheckboxEventListeners() {
 				checkbox.checked = selectAllCheckbox.checked;
 			});
 			productCheckboxes.forEach(function(checkbox) {
-				checkbox.checked = selectAllCheckbox.checked;
+				checkbox.addEventListener('change', function() {
+					if (!checkbox.checked) {
+						selectAllCheckbox.checked = false;
+					} else {
+						const allChecked = Array.from(productCheckboxes).every(chk => chk.checked);
+						selectAllCheckbox.checked = allChecked;
+					}
+				});
 			});
 		});
 	}
@@ -687,8 +694,8 @@ function deleteSelectedProducts(urlPath, pageType) {
 	let bodyContent;
 
 	if (pageType === 'productManagement') {
-		const selectedProductNumbers = Array.from(productCheckboxes).map(checkbox => {
-			return checkbox.closest('tr').querySelector('td:nth-child(3) p').textContent;
+		selectedProductNumbers = Array.from(productCheckboxes).map(checkbox => {
+			return checkbox.closest('tr').getAttribute('data-productNumber');
 		});
 		selectedItems = selectedProductNumbers;
 		bodyContent = { productNumbers: selectedItems };
@@ -710,12 +717,19 @@ function deleteSelectedProducts(urlPath, pageType) {
 		});
 		selectedItems = selectedCouponListIds;
 		bodyContent = { couponIssuanceIds: selectedItems };
+	} else if (pageType === 'salesPost') {
+		const selectedCouponListIds = Array.from(productCheckboxes).map(checkbox => {
+			return checkbox.closest('tr').getAttribute('data-salesPostId');
+		});
+		selectedItems = selectedCouponListIds;
+		bodyContent = { salesPostIds: selectedItems };
 	}
 
 	if (selectedItems.length > 0) {
-		const endpoint = pageType === 'productManagement' ? '/admin/deleteProducts' :
-			pageType === 'discountList' ? '/admin/deleteDiscounts' :
-				pageType === 'discountTarget' ? '/admin/discountTarget' : '/admin/deleteCoupons';
+		const endpoint = pageType === 'salesPost' ? '/admin/deleteSalesPosts' :
+			pageType === 'productManagement' ? '/admin/deleteProducts' :
+				pageType === 'discountList' ? '/admin/deleteDiscounts' :
+					pageType === 'discountTarget' ? '/admin/discountTarget' : '/admin/couponList';
 
 		fetch(endpoint, {
 			method: 'DELETE',

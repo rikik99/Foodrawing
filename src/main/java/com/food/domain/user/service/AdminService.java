@@ -1379,6 +1379,7 @@ public class AdminService {
 		statusCountsMap.put("배송 준비", 0);
 		statusCountsMap.put("배송 중", 0);
 		statusCountsMap.put("배송 완료", 0);
+		statusCountsMap.put("구매 확정", 0);
 		statusCountsMap.put("구매 확정 대기", 0);
 		statusCountsMap.put("취소", 0);
 		statusCountsMap.put("반품", 0);
@@ -1415,5 +1416,11 @@ public class AdminService {
 
 	public List<Map<String, Object>> getRecentOrderStatusCounts() {
 		return adminMapper.findRecentOrderStatusCounts();
+	}
+
+	public void deleteSalesPostsById(List<Long> salesPostIds) {
+		for (Long salesPostId : salesPostIds) {
+			adminMapper.deleteSalesPostsById(salesPostId);
+		}
 	}
 }

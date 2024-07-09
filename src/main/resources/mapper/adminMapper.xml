@@ -143,6 +143,10 @@
 		DELETE FROM PRODUCT_TB WHERE PRODUCT_NUMBER =
 		#{productNumber}
 	</delete>
+	<delete id="deleteSalesPostsById">
+		DELETE FROM SALES_POST_TB WHERE ID =
+		#{salesPostId}
+	</delete>
 
 	<select id="findStockListByProductNumber" parameterType="String">
 		SELECT *

@@ -49,8 +49,7 @@
 								checked>모두</label>
 							<label><input type="radio" name="targetType" value="ALL">전체</label> <label><input type="radio"
 								name="targetType" value="PRODUCT">상품</label> <label><input
-								type="radio" name="targetType" value="MEMBER_RATING">등급</label> <label><input type="radio" name="targetType"
-								value="CUSTOMER">회원</label> <label><input type="radio"
+								type="radio" name="targetType" value="MEMBER_RATING">등급</label>  <label><input type="radio"
 								name="targetType" value="CATEGORY">카테고리</label>
 						</div>
 					</div>

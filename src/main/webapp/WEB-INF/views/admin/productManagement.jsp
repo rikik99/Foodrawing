@@ -107,7 +107,7 @@
 				</thead>
 				<tbody>
 					<c:forEach items="${product.content}" var="product">
-						<tr>
+						<tr data-productNumber = "${product.productNumber}">
 							<td><input type="checkbox" class="selectProduct secondary"></td>
 							<td><img class="productImg"
 								src="${product.productFileDTO.filePath}" alt="상품 이미지"></td>

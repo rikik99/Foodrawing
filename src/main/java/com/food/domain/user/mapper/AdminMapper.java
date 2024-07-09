@@ -260,4 +260,6 @@ public interface AdminMapper {
 	List<SalesPostDTO> findPopularProducts();
 
 	List<Map<String, Object>> findRecentOrderStatusCounts();
+
+	void deleteSalesPostsById(Long salesPostId);
 }

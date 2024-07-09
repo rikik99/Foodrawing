@@ -21,62 +21,66 @@
             <!-- 요약 정보 -->
             <div class="summary-row dark-mode">
                 <!-- 전체 주문 현황 -->
-                <div class="summary-box dark-mode">
+                <div class="summary-box small dark-mode">
                     <h2>전체 주문 현황</h2>
-                    <table>
-                        <tr>
-                            <th>주문 수</th>
-                            <th>주문 총액</th>
-                        </tr>
-                        <tr>
-                            <td>${orderList.size()}</td>
-                            <td>${totalOrderAmount != null ? totalOrderAmount : 0}</td>
-                        </tr>
-                    </table>
+                    <div class="table-container">
+                        <table>
+                            <tr>
+                                <th>주문 수</th>
+                                <th>주문 총액</th>
+                            </tr>
+                            <tr>
+                                <td>${orderList.size()}</td>
+                                <td>${totalOrderAmount != null ? totalOrderAmount : 0}</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- 주문 상태 현황 (테이블 1) -->
-                <div class="summary-box dark-mode">
+                <div class="summary-box large dark-mode">
                     <h2>주문 상태 현황</h2>
-                    <table>
-                        <tr>
-                            <th>결제 완료</th>
-                            <th>상품 준비</th>
-                            <th>배송 준비</th>
-                            <th>배송 중</th>
-                            <th>배송 완료</th>
-                            <th>구매 확정</th>
-                            <th>구매 확정 대기</th>
-                        </tr>
-                        <tr>
-                            <td>${orderStatusCounts['결제 완료']}</td>
-                            <td>${orderStatusCounts['상품 준비']}</td>
-                            <td>${orderStatusCounts['배송 준비']}</td>
-                            <td>${orderStatusCounts['배송 중']}</td>
-                            <td>${orderStatusCounts['배송 완료']}</td>
-                            <td>${orderStatusCounts['구매 확정']}</td>
-                            <td>${orderStatusCounts['구매 확정 대기']}</td>
-                        </tr>
-                    </table>
+                    <div class="table-container">
+                        <table>
+                            <tr>
+                                <th>결제 완료</th>
+                                <th>상품 준비</th>
+                                <th>배송 준비</th>
+                                <th>배송 중</th>
+                                <th>배송 완료</th>
+                                <th>구매 확정</th>
+                            </tr>
+                            <tr>
+                                <td>${orderStatusCounts['결제 완료']}</td>
+                                <td>${orderStatusCounts['상품 준비']}</td>
+                                <td>${orderStatusCounts['배송 준비']}</td>
+                                <td>${orderStatusCounts['배송 중']}</td>
+                                <td>${orderStatusCounts['배송 완료']}</td>
+                                <td>${orderStatusCounts['구매 확정']}</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- 구매확정/클래임 현황 (테이블 2) -->
                 <div class="summary-box dark-mode">
                     <h2>구매확정/클래임 현황</h2>
-                    <table>
-                        <tr>
-                            <th>구매 확정 대기</th>
-                            <th>취소</th>
-                            <th>반품</th>
-                            <th>교환</th>
-                        </tr>
-                        <tr>
-                            <td>${orderStatusCounts['구매 확정 대기']}</td>
-                            <td>${orderStatusCounts['취소']}</td>
-                            <td>${orderStatusCounts['반품']}</td>
-                            <td>${orderStatusCounts['교환']}</td>
-                        </tr>
-                    </table>
+                    <div class="table-container">
+                        <table>
+                            <tr>
+                                <th>구매 확정 대기</th>
+                                <th>취소</th>
+                                <th>반품</th>
+                                <th>교환</th>
+                            </tr>
+                            <tr>
+                                <td>${orderStatusCounts['구매 확정 대기']}</td>
+                                <td>${orderStatusCounts['취소']}</td>
+                                <td>${orderStatusCounts['반품']}</td>
+                                <td>${orderStatusCounts['교환']}</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
 

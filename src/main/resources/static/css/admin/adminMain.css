@@ -80,6 +80,14 @@
     color: #ffffff;
 }
 
+.summary-box.small {
+    flex: 1 1 20%; /* Smaller width for 전체 주문 현황 */
+}
+
+.summary-box.large {
+    flex: 1 1 40%; /* Larger width for 주문 상태 현황 */
+}
+
 .summary-box.light-mode {
     background: #ffffff;
     color: #212529;
