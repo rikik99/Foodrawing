@@ -101,13 +101,13 @@
 				</div>
 			</div>
 
-			<!-- 상품 목록 -->
+<!-- 상품 목록 -->
 			<div class="custom-table-header">
 				<div>
 					<span>조회된 판매글 수 : <strong>${totalElements}</strong>개</span>
-				</div>
+				</div>:
 				<div class="search-buttons">
-					<button id="deleteSelectedButton" class="danger">선택 삭제</button>
+					<button id="deleteSelectedButton" class="danger" data-url="/admin/salesPost" data-pageType="salesPost">선택 삭제</button>
 					<button id="addSalesButton" class="primary" data-target="insertSalesPost">판매글 등록</button>
 				</div>
 			</div>
@@ -127,8 +127,8 @@
 				</thead>
 				<tbody>
 					<c:forEach items="${post.content}" var="post">
-						<tr>
-							<td><input type="checkbox" class="secondary selectProduct"></td>
+						<tr data-salesPostId="${post.id}">
+							<td><input type="checkbox" class="secondary selectProduct" value="${post.productNumber}"></td>
 							<td>${post.title}</td>
 							<td>${post.adminDTO.name}</td>
 							<td>${post.productNumber}</td>
@@ -136,21 +136,11 @@
 							<td>${post.productDTO.quantity}</td>
 							<td>
 								<c:choose>
-									<c:when test="${post.status == 1}">
-							        판매중
-								    </c:when>
-										<c:when test="${post.status == 2}">
-								        품절
-								    </c:when>
-										<c:when test="${post.status == 3}">
-								        단종
-								    </c:when>
-										<c:when test="${post.status == 4}">
-								        중지
-								    </c:when>
-									<c:otherwise>
-							        알 수 없음
-							    	</c:otherwise>
+									<c:when test="${post.status == 1}">판매중</c:when>
+									<c:when test="${post.status == 2}">품절</c:when>
+									<c:when test="${post.status == 3}">단종</c:when>
+									<c:when test="${post.status == 4}">중지</c:when>
+									<c:otherwise>알 수 없음</c:otherwise>
 								</c:choose>
 							</td>
 							<td>${post.lastPostDate}</td>
@@ -163,8 +153,7 @@
 				<ul class="pagination">
 					<c:forEach begin="1" end="${pageCount}" var="i">
 						<li class="page-item ${currentPage + 1 == i ? 'active' : ''}">
-							<a class="page-link" data-page="${i - 1}"
-							data-url="/admin/salesPost" data-size="${size}">${i}</a>
+							<a class="page-link" data-page="${i - 1}" data-url="/admin/salesPost" data-size="${size}">${i}</a>
 						</li>
 					</c:forEach>
 				</ul>

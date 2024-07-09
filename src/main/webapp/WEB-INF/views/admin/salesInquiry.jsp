@@ -89,7 +89,7 @@
 							onclick="handleInquiryToggleClick(event);">
 							<td class="title-column">${inquiries.salesPotDTO.title}</td>
 							<td class="product-name-column">${inquiries.productDTO.productNumber}</td>
-							<td class="customer-id-column">${inquiries.customerDTO.nickname}</td>
+							<td class="customer-id-column">${inquiries.userDTO.username}</td>
 							<td class="inquiry-content-column">${inquiries.message}</td>
 							<td class="inquiry-date-column">${inquiries.createdDate}</td>
 							<td class="status-column"><c:choose>

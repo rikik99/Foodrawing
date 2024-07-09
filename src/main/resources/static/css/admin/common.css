@@ -243,6 +243,21 @@ button#toggleMode:hover {
 	border: 1px solid #ddd;
 }
 
+/* 새로운 스타일 추가 */
+.summary-box.small {
+    width: 30%; /* 전체 주문 현황 크기 감소 */
+}
+
+.summary-box.large {
+    width: 60%; /* 주문 상태 현황 크기 증가 */
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; /* 간격 조정 */
+}
+
 /* 반응형 스타일 */
 @media ( max-width : 768px) {
 	.sidebar {

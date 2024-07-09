@@ -241,4 +241,25 @@ public interface AdminMapper {
 
 	void updateDiscountStatus(Long discountId, String newStatus);
 
+	List<InquiriesDTO> getInquiriesByCustomerId(Long customerId);
+
+	List<AdminDTO> findAdminsWithSearch(Map<String, String> allParams);
+
+	AdminDTO findAdminDTOByUserId(Long userId);
+
+	CustomerDTO findCustomerByUserId(Long userId);
+
+	List<UserDTO> findUserListWhereDeletedY();
+
+	Long findMainTotalOrderAmount();
+
+	List<UserDTO> findAllUsers();
+
+	List<Map<String, Object>> findOrderStatusCounts();
+
+	List<SalesPostDTO> findPopularProducts();
+
+	List<Map<String, Object>> findRecentOrderStatusCounts();
+
+	void deleteSalesPostsById(Long salesPostId);
 }
