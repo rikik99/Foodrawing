@@ -54,6 +54,7 @@ import com.food.global.util.SalesPostFile;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @Service
 public class AdminService {
@@ -66,7 +67,7 @@ public class AdminService {
 
 	@Autowired
 	PasswordEncoder passwordEncoder;
-	
+
 	@Autowired
 	SalesPostFile salesPostFileUtil;
 
@@ -331,7 +332,7 @@ public class AdminService {
 	public Map<String, String> getProductDetails(String name) {
 		Map<String, String> details = new HashMap<>();
 		String productCode = adminMapper.findProductByName(name);
-		System.out.println("getProductDetails productCode = "+productCode);
+		System.out.println("getProductDetails productCode = " + productCode);
 		ProductFileDTO productFileDTO = adminMapper.findProductFileByProductNumber(productCode);
 		String filePath = productFileDTO.getFilePath();
 		details.put("productCode", productCode);
@@ -398,11 +399,14 @@ public class AdminService {
 			ProductDTO productDTO = adminMapper.findProductByProductNumber(productNumber);
 			Long customerId = Inquiry.getCustomerId();
 			CustomerDTO customerDTO = adminMapper.findCustomerByCustomerId(customerId);
+			Long userId = customerDTO.getUserId();
+			UserDTO userDTO = adminMapper.findUserById(userId);
 			ResponseDTO responseDTO = adminMapper.findResponseByInquiryId(InquiryId);
 			Inquiry.setSalesPotDTO(salesPotDTO);
 			Inquiry.setProductDTO(productDTO);
 			Inquiry.setCustomerDTO(customerDTO);
 			Inquiry.setResponseDTO(responseDTO);
+			Inquiry.setUserDTO(userDTO);
 			inquirieList.add(Inquiry);
 		}
 		System.out.println(" inquirieList = " + inquirieList);
@@ -422,9 +426,12 @@ public class AdminService {
 			ProductDTO productDTO = adminMapper.findProductByProductNumber(productNumber);
 			Long customerId = Inquiry.getCustomerId();
 			CustomerDTO customerDTO = adminMapper.findCustomerByCustomerId(customerId);
+			Long userId = customerDTO.getUserId();
+			UserDTO userDTO = adminMapper.findUserById(userId);
 			Inquiry.setSalesPotDTO(salesPotDTO);
 			Inquiry.setProductDTO(productDTO);
 			Inquiry.setCustomerDTO(customerDTO);
+			Inquiry.setUserDTO(userDTO);
 			inquirieList.add(Inquiry);
 		}
 
@@ -796,39 +803,38 @@ public class AdminService {
 	}
 
 	public Page<CouponIssuanceDTO> findCouponIssuances(Pageable pageable, Map<String, String> allParams) {
-	    List<CouponIssuanceDTO> couponIssuances = adminMapper.findCouponIssuances();
-	    List<CouponIssuanceDTO> resultList = new ArrayList<>();
+		List<CouponIssuanceDTO> couponIssuances = adminMapper.findCouponIssuances();
+		List<CouponIssuanceDTO> resultList = new ArrayList<>();
 
-	    for (CouponIssuanceDTO couponIssuance : couponIssuances) {
-	        Long discountId = couponIssuance.getDiscountId();
-	        DiscountDTO discount = adminMapper.findDiscountById(discountId);
+		for (CouponIssuanceDTO couponIssuance : couponIssuances) {
+			Long discountId = couponIssuance.getDiscountId();
+			DiscountDTO discount = adminMapper.findDiscountById(discountId);
 
-	        Long customerId = couponIssuance.getCustomerId();
-	        CustomerDTO customer = adminMapper.findCustomerByCustomerId(customerId);
-	        
-	        // 고객이 없는 경우 예외 처리
-	        if (customer == null) {
-	            log.error("Customer not found for customerId: {}", customerId);
-	            continue;
-	        }
+			Long customerId = couponIssuance.getCustomerId();
+			CustomerDTO customer = adminMapper.findCustomerByCustomerId(customerId);
 
-	        Long userId = customer.getUserId();
-	        String userName = adminMapper.findUserNameById(userId);
+			// 고객이 없는 경우 예외 처리
+			if (customer == null) {
+				log.error("Customer not found for customerId: {}", customerId);
+				continue;
+			}
 
-	        couponIssuance.setDiscountDTO(discount);
-	        couponIssuance.setCustomerDTO(customer);
-	        couponIssuance.setUsername(userName);
+			Long userId = customer.getUserId();
+			String userName = adminMapper.findUserNameById(userId);
 
-	        resultList.add(couponIssuance);
-	    }
+			couponIssuance.setDiscountDTO(discount);
+			couponIssuance.setCustomerDTO(customer);
+			couponIssuance.setUsername(userName);
 
-	    int start = (int) pageable.getOffset();
-	    int end = Math.min((start + pageable.getPageSize()), resultList.size());
-	    Page<CouponIssuanceDTO> page = new PageImpl<>(resultList.subList(start, end), pageable, resultList.size());
+			resultList.add(couponIssuance);
+		}
 
-	    return page;
+		int start = (int) pageable.getOffset();
+		int end = Math.min((start + pageable.getPageSize()), resultList.size());
+		Page<CouponIssuanceDTO> page = new PageImpl<>(resultList.subList(start, end), pageable, resultList.size());
+
+		return page;
 	}
-
 
 	public void deleteCouponIssuancesById(List<Long> couponIssuanceIds) {
 		for (Long couponIssuanceId : couponIssuanceIds) {
@@ -911,177 +917,177 @@ public class AdminService {
 	}
 
 	public Page<OrderDTO> findOrders(Pageable pageable, Map<String, String> allParams) {
-	    boolean hasSearchParams = allParams.keySet().stream()
-	            .anyMatch(key -> !key.equals("page") && !key.equals("size") && allParams.get(key) != null && !allParams.get(key).isEmpty());
-	    List<OrderDTO> orders = new ArrayList<>();
-	    
-	    if (hasSearchParams) {
-	        orders = adminMapper.findOrdersWithSearch(allParams);
-	    } else {
-	        orders = adminMapper.findOrders();
-	    }
-	    
-	    for (OrderDTO order : orders) {
-	        Long identifierId;
+		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
+				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
+		List<OrderDTO> orders = new ArrayList<>();
 
-	        if ("CUSTOMER".equals(order.getIdentifierType())) {
-	            Long orderId = order.getId();
-	            identifierId = Long.valueOf(order.getIdentifierId());
-	            CustomerDTO customer = adminMapper.findCustomerByCustomerId(identifierId);
-	            Long userId = customer.getUserId();
-	            UserDTO user = adminMapper.findUserById(userId);
-	            customer.setUserDTO(user);
-	            OrderStatusDTO orderStatus = adminMapper.findOrderStatusByOrderId(orderId);
-	            List<OrderDetailDTO> orderDetailList = adminMapper.findOrderDetailListByOrderId(orderId);
-	            
-	            for (OrderDetailDTO orderDetail : orderDetailList) {
-	                Long salesPostId = orderDetail.getSalesPostId();
-	                SalesPostDTO salesPostDto = adminMapper.findSalesPostById(salesPostId);
-	                String productNumber = salesPostDto.getProductNumber();
-	                ProductDTO product = adminMapper.findProductByProductNumber(productNumber);
-	                salesPostDto.setProductDTO(product);
-	                orderDetail.setSales(salesPostDto);
-	            }
-	            
-	            order.setOrderDetailList(orderDetailList);
-	            order.setOrderStatus(orderStatus);
-	            order.setCustomer(customer);
-	        }
-	    }
-	    
-	    int start = (int) pageable.getOffset();
-	    int end = Math.min((start + pageable.getPageSize()), orders.size());
-	    return new PageImpl<>(orders.subList(start, end), pageable, orders.size());
+		if (hasSearchParams) {
+			orders = adminMapper.findOrdersWithSearch(allParams);
+		} else {
+			orders = adminMapper.findOrders();
+		}
+
+		for (OrderDTO order : orders) {
+			Long identifierId;
+
+			if ("CUSTOMER".equals(order.getIdentifierType())) {
+				Long orderId = order.getId();
+				identifierId = Long.valueOf(order.getIdentifierId());
+				CustomerDTO customer = adminMapper.findCustomerByCustomerId(identifierId);
+				Long userId = customer.getUserId();
+				UserDTO user = adminMapper.findUserById(userId);
+				customer.setUserDTO(user);
+				OrderStatusDTO orderStatus = adminMapper.findOrderStatusByOrderId(orderId);
+				List<OrderDetailDTO> orderDetailList = adminMapper.findOrderDetailListByOrderId(orderId);
+
+				for (OrderDetailDTO orderDetail : orderDetailList) {
+					Long salesPostId = orderDetail.getSalesPostId();
+					SalesPostDTO salesPostDto = adminMapper.findSalesPostById(salesPostId);
+					String productNumber = salesPostDto.getProductNumber();
+					ProductDTO product = adminMapper.findProductByProductNumber(productNumber);
+					salesPostDto.setProductDTO(product);
+					orderDetail.setSales(salesPostDto);
+				}
+
+				order.setOrderDetailList(orderDetailList);
+				order.setOrderStatus(orderStatus);
+				order.setCustomer(customer);
+			}
+		}
+
+		int start = (int) pageable.getOffset();
+		int end = Math.min((start + pageable.getPageSize()), orders.size());
+		return new PageImpl<>(orders.subList(start, end), pageable, orders.size());
 	}
 
 	public Page<OrderDTO> findPaymentCompletedOrders(Pageable pageable, Map<String, String> allParams) {
-	    boolean hasSearchParams = allParams.keySet().stream()
-	            .anyMatch(key -> !key.equals("page") && !key.equals("size") && allParams.get(key) != null && !allParams.get(key).isEmpty());
-	    List<OrderDTO> orders = new ArrayList<>();
-	    
-	    if (hasSearchParams) {
-	        orders = adminMapper.findPaymentCompletedOrdersWithSearch(allParams);
-	    } else {
-	        orders = adminMapper.findPaymentCompletedOrders();
-	    }
-	    
-	    for (OrderDTO order : orders) {
-	        Long identifierId;
+		boolean hasSearchParams = allParams.keySet().stream().anyMatch(key -> !key.equals("page") && !key.equals("size")
+				&& allParams.get(key) != null && !allParams.get(key).isEmpty());
+		List<OrderDTO> orders = new ArrayList<>();
 
-	        if ("CUSTOMER".equals(order.getIdentifierType())) {
-	            Long orderId = order.getId();
-	            identifierId = Long.valueOf(order.getIdentifierId());
-	            CustomerDTO customer = adminMapper.findCustomerByCustomerId(identifierId);
-	            Long userId = customer.getUserId();
-	            UserDTO user = adminMapper.findUserById(userId);
-	            customer.setUserDTO(user);
-	            OrderStatusDTO orderStatus = adminMapper.findOrderStatusByOrderId(orderId);
-	            List<OrderDetailDTO> orderDetailList = adminMapper.findOrderDetailListByOrderId(orderId);
-	            
-	            for (OrderDetailDTO orderDetail : orderDetailList) {
-	                Long salesPostId = orderDetail.getSalesPostId();
-	                SalesPostDTO salesPostDto = adminMapper.findSalesPostById(salesPostId);
-	                String productNumber = salesPostDto.getProductNumber();
-	                ProductDTO product = adminMapper.findProductByProductNumber(productNumber);
-	                salesPostDto.setProductDTO(product);
-	                orderDetail.setSales(salesPostDto);
-	            }
-	            
-	            order.setOrderDetailList(orderDetailList);
-	            order.setOrderStatus(orderStatus);
-	            order.setCustomer(customer);
-	        }
-	    }
-	    
-	    int start = (int) pageable.getOffset();
-	    int end = Math.min((start + pageable.getPageSize()), orders.size());
-	    return new PageImpl<>(orders.subList(start, end), pageable, orders.size());
+		if (hasSearchParams) {
+			orders = adminMapper.findPaymentCompletedOrdersWithSearch(allParams);
+		} else {
+			orders = adminMapper.findPaymentCompletedOrders();
+		}
+
+		for (OrderDTO order : orders) {
+			Long identifierId;
+
+			if ("CUSTOMER".equals(order.getIdentifierType())) {
+				Long orderId = order.getId();
+				identifierId = Long.valueOf(order.getIdentifierId());
+				CustomerDTO customer = adminMapper.findCustomerByCustomerId(identifierId);
+				Long userId = customer.getUserId();
+				UserDTO user = adminMapper.findUserById(userId);
+				customer.setUserDTO(user);
+				OrderStatusDTO orderStatus = adminMapper.findOrderStatusByOrderId(orderId);
+				List<OrderDetailDTO> orderDetailList = adminMapper.findOrderDetailListByOrderId(orderId);
+
+				for (OrderDetailDTO orderDetail : orderDetailList) {
+					Long salesPostId = orderDetail.getSalesPostId();
+					SalesPostDTO salesPostDto = adminMapper.findSalesPostById(salesPostId);
+					String productNumber = salesPostDto.getProductNumber();
+					ProductDTO product = adminMapper.findProductByProductNumber(productNumber);
+					salesPostDto.setProductDTO(product);
+					orderDetail.setSales(salesPostDto);
+				}
+
+				order.setOrderDetailList(orderDetailList);
+				order.setOrderStatus(orderStatus);
+				order.setCustomer(customer);
+			}
+		}
+
+		int start = (int) pageable.getOffset();
+		int end = Math.min((start + pageable.getPageSize()), orders.size());
+		return new PageImpl<>(orders.subList(start, end), pageable, orders.size());
 	}
 
-	 public boolean updateOrderStatus(List<Long> orderIds, String progress) {
-	        String status;
-	        switch (progress) {
-	            case "결제 완료":
-	                status = "상품 준비";
-	                break;
-	            case "상품 준비":
-	                status = "배송 준비";
-	                break;
-	            case "배송 준비":
-	                status = "배송 중";
-	                break;
-	            case "배송 중":
-	                status = "배송 완료";
-	                break;
-	            case "배송 완료":
-	            	status = "구매 확정 대기";
-	            	break;
-	            case "취소":
-	            	status = "취소 완료";
-	            	break;
-	            case "반품":
-	            	status = "반품 완료";
-	            	break;
-	            case "교환":
-	            	status = "교환 준비";
-	            	break;
-	            case "교환 준비":
-	            	status = "배송 중";
-	            	break;
-	            default:
-	                throw new IllegalArgumentException("Invalid progress: " + progress);
-	        }
-	        
-	        try {
-	            for (Long orderId : orderIds) {
-	                log.info("Updating order ID: {} to status: {}", orderId, status);
-	                int updatedRows = adminMapper.updateOrderStatus(orderId, status);
-	                if (updatedRows == 0) {
-	                    log.error("Failed to update order ID: {}", orderId);
-	                    return false;
-	                }
-	            }
-	            return true;
-	        } catch (Exception e) {
-	            log.error("Exception occurred while updating order status", e);
-	            return false;
-	        }
-	    }
+	public boolean updateOrderStatus(List<Long> orderIds, String progress) {
+		String status;
+		switch (progress) {
+		case "결제 완료":
+			status = "상품 준비";
+			break;
+		case "상품 준비":
+			status = "배송 준비";
+			break;
+		case "배송 준비":
+			status = "배송 중";
+			break;
+		case "배송 중":
+			status = "배송 완료";
+			break;
+		case "배송 완료":
+			status = "구매 확정 대기";
+			break;
+		case "취소":
+			status = "취소 완료";
+			break;
+		case "반품":
+			status = "반품 완료";
+			break;
+		case "교환":
+			status = "교환 준비";
+			break;
+		case "교환 준비":
+			status = "배송 중";
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid progress: " + progress);
+		}
+
+		try {
+			for (Long orderId : orderIds) {
+				log.info("Updating order ID: {} to status: {}", orderId, status);
+				int updatedRows = adminMapper.updateOrderStatus(orderId, status);
+				if (updatedRows == 0) {
+					log.error("Failed to update order ID: {}", orderId);
+					return false;
+				}
+			}
+			return true;
+		} catch (Exception e) {
+			log.error("Exception occurred while updating order status", e);
+			return false;
+		}
+	}
 
 	// AdminService.java
-	 public Map<String, String> getProductInfo(String name) {
-	     Map<String, String> details = new HashMap<>();
-	     String productNumber = adminMapper.findProductByName(name);
-	     
-	     // Check if productNumber is correctly retrieved
-	     if (productNumber == null || productNumber.isEmpty()) {
-	         throw new IllegalArgumentException("Product not found for name: " + name);
-	     }
-	     
-	     SalesPostDTO sales = adminMapper.findSalesPostByProductNumber(productNumber);
-	     String salesPostId = String.valueOf(sales.getId());
-	     String title = sales.getTitle();
-	     String description = sales.getDescription();
-	     
-	     // DateTimeFormatter to format the dates in yyyy-MM-dd
-	     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-	     
-	     String lastPostDate = sales.getLastPostDate() != null ? sales.getLastPostDate().format(formatter) : "";
-	     String startPostDate = sales.getStartPostDate() != null ? sales.getStartPostDate().format(formatter) : "";
+	public Map<String, String> getProductInfo(String name) {
+		Map<String, String> details = new HashMap<>();
+		String productNumber = adminMapper.findProductByName(name);
 
-	     ProductFileDTO productFileDTO = adminMapper.findProductFileByProductNumber(productNumber);
-	     String filePath = productFileDTO.getFilePath();
-	     
-	     details.put("salesPostId", salesPostId);
-	     details.put("productNumber", productNumber);
-	     details.put("imagePath", filePath);
-	     details.put("lastPostDate", lastPostDate);
-	     details.put("startPostDate", startPostDate);
-	     details.put("description", description);
-	     details.put("title", title);
-	     
-	     return details;
-	 }
+		// Check if productNumber is correctly retrieved
+		if (productNumber == null || productNumber.isEmpty()) {
+			throw new IllegalArgumentException("Product not found for name: " + name);
+		}
+
+		SalesPostDTO sales = adminMapper.findSalesPostByProductNumber(productNumber);
+		String salesPostId = String.valueOf(sales.getId());
+		String title = sales.getTitle();
+		String description = sales.getDescription();
+
+		// DateTimeFormatter to format the dates in yyyy-MM-dd
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+		String lastPostDate = sales.getLastPostDate() != null ? sales.getLastPostDate().format(formatter) : "";
+		String startPostDate = sales.getStartPostDate() != null ? sales.getStartPostDate().format(formatter) : "";
+
+		ProductFileDTO productFileDTO = adminMapper.findProductFileByProductNumber(productNumber);
+		String filePath = productFileDTO.getFilePath();
+
+		details.put("salesPostId", salesPostId);
+		details.put("productNumber", productNumber);
+		details.put("imagePath", filePath);
+		details.put("lastPostDate", lastPostDate);
+		details.put("startPostDate", startPostDate);
+		details.put("description", description);
+		details.put("title", title);
+
+		return details;
+	}
 
 	public void updateSalesPost(Map<String, Object> allParams, List<SalesPostFileDTO> fileDTOList) {
 		Long userId = null;
@@ -1090,9 +1096,9 @@ public class AdminService {
 			CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 			userId = userDetails.getId();
 		}
-		System.out.println("updateSalesPost userId = "+userId );
+		System.out.println("updateSalesPost userId = " + userId);
 		Long adminId = adminMapper.findAdminByUserId(userId);
-		System.out.println("updateSalesPost adminId = "+adminId );
+		System.out.println("updateSalesPost adminId = " + adminId);
 		SalesPostDTO salesPost = new SalesPostDTO();
 		salesPost.setId(Long.valueOf((String) allParams.get("salesPostId")));
 		salesPost.setAdminId(adminId);
@@ -1132,86 +1138,84 @@ public class AdminService {
 		product.setProductFileDTO(file);
 		return product;
 	}
-	
+
 	@Transactional
 	public void updateProduct(Map<String, String> allParams, MultipartFile file) {
-	    String oldProductNumber = allParams.get("oldProductNumber");
-	    String newProductNumber = allParams.get("productNumber");
-	    int categoryId = Integer.parseInt(allParams.get("category"));
+		String oldProductNumber = allParams.get("oldProductNumber");
+		String newProductNumber = allParams.get("productNumber");
+		int categoryId = Integer.parseInt(allParams.get("category"));
 
-	    // 기존 제품이 존재하는지 확인
-	    ProductDTO existingProduct = adminMapper.findProductByProductNumber(oldProductNumber);
-	    if (existingProduct == null) {
-	        throw new IllegalArgumentException("Product not found for product number: " + oldProductNumber);
-	    }
+		// 기존 제품이 존재하는지 확인
+		ProductDTO existingProduct = adminMapper.findProductByProductNumber(oldProductNumber);
+		if (existingProduct == null) {
+			throw new IllegalArgumentException("Product not found for product number: " + oldProductNumber);
+		}
 
-	    // 기존 카테고리 ID 가져오기
-	    Integer existingCategoryId = adminMapper.findCategoryIdByProductNumber(oldProductNumber);
+		// 기존 카테고리 ID 가져오기
+		Integer existingCategoryId = adminMapper.findCategoryIdByProductNumber(oldProductNumber);
 
-	    // 기존 카테고리 ID와 새로운 카테고리 ID가 다른 경우에만 updateCategoryById 실행
-	    if (existingCategoryId != categoryId) {
-	        adminMapper.updateCategoryById(categoryId);
-	    }
+		// 기존 카테고리 ID와 새로운 카테고리 ID가 다른 경우에만 updateCategoryById 실행
+		if (existingCategoryId != categoryId) {
+			adminMapper.updateCategoryById(categoryId);
+		}
 
-	    // 부모 테이블에서 제품 번호 업데이트
-	    adminMapper.updateProductNumber(oldProductNumber, newProductNumber);
+		// 부모 테이블에서 제품 번호 업데이트
+		adminMapper.updateProductNumber(oldProductNumber, newProductNumber);
 
-	    // 제품 정보 업데이트
-	    adminMapper.updateProduct(allParams);
+		// 제품 정보 업데이트
+		adminMapper.updateProduct(allParams);
 
-	    // 파일 정보 파싱 및 삽입
-	    try {
-	        ProductFileDTO productFile = productFileUtil.parseFileInfo(newProductNumber, file);
-	        if (productFile != null) {
-	            adminMapper.deleteProductFile(oldProductNumber);
-	            adminMapper.insertProductFile(productFile);
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+		// 파일 정보 파싱 및 삽입
+		try {
+			ProductFileDTO productFile = productFileUtil.parseFileInfo(newProductNumber, file);
+			if (productFile != null) {
+				adminMapper.deleteProductFile(oldProductNumber);
+				adminMapper.insertProductFile(productFile);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public Page<CustomerDTO> findCustomers(Pageable pageable, Map<String, String> allParams) {
-	    List<CustomerDTO> customers = adminMapper.findCustomerList();
-	    List<CustomerDTO> customerList = new ArrayList<>();
+		List<CustomerDTO> customers = adminMapper.findCustomerList();
+		List<CustomerDTO> customerList = new ArrayList<>();
 
-	    for (CustomerDTO customer : customers) {
-	        Long userId = customer.getUserId();
-	        UserDTO user = adminMapper.findUserById(userId);
-	        Long customerId = customer.getId();
-	        Long totalAmount = adminMapper.getTotalAmountByCustomerId(customerId);
-	        if (totalAmount == null) {
-	            totalAmount = 0L;
-	        }
-	        MemberRatingDTO member = adminMapper.getMemberRatingByTotalAmount(totalAmount);
-	        List<CouponIssuanceDTO> couponIssuances = adminMapper.findCouponIssuancesByCustomerId(customerId);
-	        List<OrderDTO> orders = adminMapper.findOrdersByCustomerId(customerId);
-	        List<InquiriesDTO> inquiries = adminMapper.findInquiriesByCustomerId(customerId);
-	        Long totalOrderAmount = adminMapper.findTotalOrderAmount(customerId);
-	        Long totalReserves = adminMapper.findTotalReservesByCustomerId(customerId);
+		for (CustomerDTO customer : customers) {
+			Long userId = customer.getUserId();
+			UserDTO user = adminMapper.findUserById(userId);
+			Long customerId = customer.getId();
+			Long totalAmount = adminMapper.getTotalAmountByCustomerId(customerId);
+			if (totalAmount == null) {
+				totalAmount = 0L;
+			}
+			MemberRatingDTO member = adminMapper.getMemberRatingByTotalAmount(totalAmount);
+			List<CouponIssuanceDTO> couponIssuances = adminMapper.findCouponIssuancesByCustomerId(customerId);
+			List<OrderDTO> orders = adminMapper.findOrdersByCustomerId(customerId);
+			List<InquiriesDTO> inquiries = adminMapper.findInquiriesByCustomerId(customerId);
+			Long totalOrderAmount = adminMapper.findTotalOrderAmount(customerId);
+			Long totalReserves = adminMapper.findTotalReservesByCustomerId(customerId);
 
-	        for (CouponIssuanceDTO couponIssuance : couponIssuances) {
-	            Long discountId = couponIssuance.getDiscountId();
-	            DiscountDTO discount = adminMapper.findDiscountById(discountId);
-	            couponIssuance.setDiscountDTO(discount);
-	        }
+			for (CouponIssuanceDTO couponIssuance : couponIssuances) {
+				Long discountId = couponIssuance.getDiscountId();
+				DiscountDTO discount = adminMapper.findDiscountById(discountId);
+				couponIssuance.setDiscountDTO(discount);
+			}
 
-	        customer.setCouponIssuances(couponIssuances == null ? new ArrayList<>() : couponIssuances);
-	        customer.setUserDTO(user == null ? new UserDTO() : user);
-	        customer.setMember(member == null ? new MemberRatingDTO() : member);
-	        customer.setOrders(orders == null ? new ArrayList<>() : orders);
-	        customer.setInquiries(inquiries == null ? new ArrayList<>() : inquiries);
-	        customer.setTotalOrderAmount(totalOrderAmount == null ? 0L : totalOrderAmount);
-	        customer.setTotalReserves(totalReserves == null ? 0L : totalReserves);
-	        customerList.add(customer);
-	    }
-	    System.out.println("customerList = " + customerList);
-	    int start = (int) pageable.getOffset();
-	    int end = Math.min((start + pageable.getPageSize()), customerList.size());
-	    return new PageImpl<>(customerList.subList(start, end), pageable, customerList.size());
+			customer.setCouponIssuances(couponIssuances == null ? new ArrayList<>() : couponIssuances);
+			customer.setUserDTO(user == null ? new UserDTO() : user);
+			customer.setMember(member == null ? new MemberRatingDTO() : member);
+			customer.setOrders(orders == null ? new ArrayList<>() : orders);
+			customer.setInquiries(inquiries == null ? new ArrayList<>() : inquiries);
+			customer.setTotalOrderAmount(totalOrderAmount == null ? 0L : totalOrderAmount);
+			customer.setTotalReserves(totalReserves == null ? 0L : totalReserves);
+			customerList.add(customer);
+		}
+		System.out.println("customerList = " + customerList);
+		int start = (int) pageable.getOffset();
+		int end = Math.min((start + pageable.getPageSize()), customerList.size());
+		return new PageImpl<>(customerList.subList(start, end), pageable, customerList.size());
 	}
-
-
 
 	public Page<CustomerDTO> findCustomersWithSearch(Pageable pageable, Map<String, String> allParams) {
 		// TODO Auto-generated method stub
@@ -1224,61 +1228,199 @@ public class AdminService {
 	}
 
 	public Page<AdminDTO> findAdmins(Pageable pageable, Map<String, String> allParams) {
-		List<AdminDTO> admins  = adminMapper.findAdminList();
+		List<AdminDTO> admins = adminMapper.findAdminList();
 		List<AdminDTO> adminList = new ArrayList<>();
-	    for (AdminDTO admin : admins) {
-	        Long userId = admin.getUserId();
-	        UserDTO user = adminMapper.findUserById(userId);
-	  
-	        admin.setUser(user == null ? new UserDTO() : user);
-	        adminList.add(admin);
-	    }
-	    int start = (int) pageable.getOffset();
-	    int end = Math.min((start + pageable.getPageSize()), adminList.size());
-	    return new PageImpl<>(adminList.subList(start, end), pageable, adminList.size());
+		for (AdminDTO admin : admins) {
+			Long userId = admin.getUserId();
+			UserDTO user = adminMapper.findUserById(userId);
+
+			admin.setUser(user == null ? new UserDTO() : user);
+			adminList.add(admin);
+		}
+		int start = (int) pageable.getOffset();
+		int end = Math.min((start + pageable.getPageSize()), adminList.size());
+		return new PageImpl<>(adminList.subList(start, end), pageable, adminList.size());
 	}
 
 	public Page<AdminDTO> findAdminsWithSearch(Pageable pageable, Map<String, String> allParams) {
-		// TODO Auto-generated method stub
-		return null;
+		List<AdminDTO> admins = adminMapper.findAdminsWithSearch(allParams);
+		List<AdminDTO> adminList = new ArrayList<>();
+		for (AdminDTO admin : admins) {
+			Long userId = admin.getUserId();
+			UserDTO user = adminMapper.findUserById(userId);
+
+			admin.setUser(user == null ? new UserDTO() : user);
+			adminList.add(admin);
+		}
+		int start = (int) pageable.getOffset();
+		int end = Math.min((start + pageable.getPageSize()), adminList.size());
+		return new PageImpl<>(adminList.subList(start, end), pageable, adminList.size());
 	}
 
 	@Transactional
 	public void createAdmin(Map<String, Object> allParams) {
-	    // 비밀번호 인코딩
-	    String rawPassword = (String) allParams.get("password");
-	    String encodedPassword = passwordEncoder.encode(rawPassword);
-	    allParams.put("password", encodedPassword);
+		// 비밀번호 인코딩
+		String rawPassword = (String) allParams.get("password");
+		String encodedPassword = passwordEncoder.encode(rawPassword);
+		allParams.put("password", encodedPassword);
 
-	    // 유저 생성
-	    adminMapper.createAdminUser(allParams);
+		// 유저 생성
+		adminMapper.createAdminUser(allParams);
 
-	    // 생성된 유저 ID를 allParams에 추가
-	    Long userId = ((BigDecimal) allParams.get("userId")).longValue();
-	    allParams.put("userId", userId);
+		// 생성된 유저 ID를 allParams에 추가
+		Long userId = ((BigDecimal) allParams.get("userId")).longValue();
+		allParams.put("userId", userId);
 
-	    // 관리자 생성
-	    adminMapper.createAdmin(allParams);
+		// 관리자 생성
+		adminMapper.createAdmin(allParams);
 	}
 
 	@Transactional
 	public boolean updateDiscountStatus(Long discountId, String newStatus) {
-	    try {
-	        adminMapper.updateDiscountStatus(discountId, newStatus);
-	        return true;
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return false;
-	    }
+		try {
+			adminMapper.updateDiscountStatus(discountId, newStatus);
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
+	public List<InquiriesDTO> getInquiriesByCustomerId(Long customerId) {
+		List<InquiriesDTO> inquiries = adminMapper.getInquiriesByCustomerId(customerId);
+		return inquiries;
+	}
 
+	public Page<UserDTO> findWithdrawalUserList(Pageable pageable, Map<String, String> allParams) {
+		List<UserDTO> users = adminMapper.findUserListWhereDeletedY();
+		List<UserDTO> userList = new ArrayList<>();
 
+		for (UserDTO user : users) {
+			Long userId = user.getId();
+			Long userRole = user.getRole();
+			if (userRole != null) {
+				if (userRole == 1) {
+					CustomerDTO customer = adminMapper.findCustomerByUserId(userId);
+					user.setCustomer(customer);
+				} else {
 
+					if (userRole == 2) {
+						AdminDTO admin = adminMapper.findAdminDTOByUserId(userId);
+						user.setAdmin(admin);
+					}
+				}
+			}
+			userList.add(user);
 
+		}
 
+		// 페이지 객체 생성
+		int start = (int) pageable.getOffset();
+		int end = Math.min((start + pageable.getPageSize()), userList.size());
+		Page<UserDTO> page = new PageImpl<>(userList.subList(start, end), pageable, userList.size());
 
+		return page;
+	}
 
+	public Page<UserDTO> findWithdrawalUserListWithSearch(Pageable pageable, Map<String, String> allParams) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-	
+	public Map<String, Object> adminMain() {
+		Map<String, Object> adminMain = new HashMap<>();
+
+		// orderStatusCounts를 로그로 확인
+		List<Map<String, Object>> orderStatusCounts = adminMapper.findOrderStatusCounts();
+
+		Long totalOrderAmount = adminMapper.findMainTotalOrderAmount();
+		List<OrderDTO> orderList = adminMapper.findOrders();
+		List<UserDTO> userList = adminMapper.findAllUsers();
+
+		// 사용자 리스트 초기화
+		for (UserDTO user : userList) {
+			Long userId = user.getId();
+			CustomerDTO customerDTO = adminMapper.findCustomerByUserId(userId);
+			user.setCustomer(customerDTO);
+		}
+
+		// 주문 리스트 초기화
+		for (OrderDTO order : orderList) {
+			Long identifierId;
+			if ("CUSTOMER".equals(order.getIdentifierType())) {
+				Long orderId = order.getId();
+				identifierId = Long.valueOf(order.getIdentifierId());
+				CustomerDTO customer = adminMapper.findCustomerByCustomerId(identifierId);
+				Long userId = customer.getUserId();
+				UserDTO user = adminMapper.findUserById(userId);
+				customer.setUserDTO(user);
+				OrderStatusDTO orderStatus = adminMapper.findOrderStatusByOrderId(orderId);
+				List<OrderDetailDTO> orderDetailList = adminMapper.findOrderDetailListByOrderId(orderId);
+
+				for (OrderDetailDTO orderDetail : orderDetailList) {
+					Long salesPostId = orderDetail.getSalesPostId();
+					SalesPostDTO salesPostDto = adminMapper.findSalesPostById(salesPostId);
+					String productNumber = salesPostDto.getProductNumber();
+					ProductDTO product = adminMapper.findProductByProductNumber(productNumber);
+					salesPostDto.setProductDTO(product);
+					orderDetail.setSales(salesPostDto);
+				}
+
+				order.setOrderDetailList(orderDetailList);
+				order.setOrderStatus(orderStatus);
+				order.setCustomer(customer);
+			}
+		}
+
+		// 모든 가능한 주문 상태를 0으로 초기화
+		Map<String, Integer> statusCountsMap = new HashMap<>();
+		statusCountsMap.put("결제 완료", 0);
+		statusCountsMap.put("상품 준비", 0);
+		statusCountsMap.put("배송 준비", 0);
+		statusCountsMap.put("배송 중", 0);
+		statusCountsMap.put("배송 완료", 0);
+		statusCountsMap.put("구매 확정", 0);
+		statusCountsMap.put("구매 확정 대기", 0);
+		statusCountsMap.put("취소", 0);
+		statusCountsMap.put("반품", 0);
+		statusCountsMap.put("교환", 0);
+
+		// 데이터베이스에서 상태별 주문 수 업데이트
+		for (Map<String, Object> statusCount : orderStatusCounts) {
+			String status = (String) statusCount.get("ORDER_STATUS");
+			Integer count = ((BigDecimal) statusCount.get("STATUSCOUNT")).intValue();
+
+			statusCountsMap.put(status, count);
+		}
+		log.info("statusCountsMapList = {}", statusCountsMap);
+
+		adminMain.put("orderStatusCounts", statusCountsMap);
+		adminMain.put("totalOrderAmount", totalOrderAmount != null ? totalOrderAmount : 0);
+		adminMain.put("orderList", orderList);
+		adminMain.put("userList", userList);
+
+		return adminMain;
+	}
+
+	public List<SalesPostDTO> getPopularProducts() {
+		List<SalesPostDTO> popularProducts = adminMapper.findPopularProducts();
+
+		for (SalesPostDTO sales : popularProducts) {
+			String productNumber = sales.getProductNumber();
+			ProductDTO product = adminMapper.findProductByProductNumber(productNumber);
+			sales.setProductDTO(product);
+		}
+
+		return popularProducts;
+	}
+
+	public List<Map<String, Object>> getRecentOrderStatusCounts() {
+		return adminMapper.findRecentOrderStatusCounts();
+	}
+
+	public void deleteSalesPostsById(List<Long> salesPostIds) {
+		for (Long salesPostId : salesPostIds) {
+			adminMapper.deleteSalesPostsById(salesPostId);
+		}
+	}
 }

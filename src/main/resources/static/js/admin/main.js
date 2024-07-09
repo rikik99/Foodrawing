@@ -23,6 +23,16 @@ document.addEventListener('DOMContentLoaded', function() {
 	} else {
 		loadContent('/admin/mainContent', 'mainContent', false);
 	}
+
+	const recentOrderStatusCountsElement = document.getElementById('recentOrderStatusCounts');
+	if (recentOrderStatusCountsElement) {
+		try {
+			const recentOrderStatusCounts = JSON.parse(recentOrderStatusCountsElement.textContent);
+			initializeOrderStatusChart(recentOrderStatusCounts);
+		} catch (error) {
+			console.error('Error parsing recent order status counts JSON:', error);
+		}
+	}
 });
 
 window.addEventListener('beforeunload', function() {
@@ -189,31 +199,39 @@ document.addEventListener('click', function(e) {
 		openWindow(`/admin/updateProduct/${productNumber}`, 'EditWindow');
 	}
 
-    if (e.target.classList.contains('discount-status-column')) {
-        let discountId = e.target.closest('tr').getAttribute('data-discountId');
-        let currentStatus = e.target.innerText.trim();
-        let newStatus = (currentStatus === 'Y') ? 'N' : 'Y';
-        fetch('/admin/updateDiscountStatus', {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ discountId: discountId, onsaleYn: newStatus })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('진행 여부 변경에 성공했습니다.');
-                loadContent('/admin/discountList', 'discountList', true);
-            } else {
-                alert('진행 여부 변경에 실패했습니다.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('진행 여부 변경 중 오류가 발생했습니다.');
-        });
-    }
+	if (e.target.classList.contains('discount-status-column')) {
+		let discountId = e.target.closest('tr').getAttribute('data-discountId');
+		let currentStatus = e.target.innerText.trim();
+		let newStatus = (currentStatus === 'Y') ? 'N' : 'Y';
+		fetch('/admin/updateDiscountStatus', {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ discountId: discountId, onsaleYn: newStatus })
+		})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					alert('진행 여부 변경에 성공했습니다.');
+					loadContent('/admin/discountList', 'discountList', true);
+				} else {
+					alert('진행 여부 변경에 실패했습니다.');
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				alert('진행 여부 변경 중 오류가 발생했습니다.');
+			});
+	}
+	if (e.target.classList.contains('userCoupon-count-column')) {
+		const customerId = e.target.getAttribute('data-customer-id');
+		loadContent(`/admin/couponList?searchInput=${customerId}&page=0&size=5`, 'couponList');
+	}
+	if (e.target.classList.contains('userOrder-count-column')) {
+		const customerId = e.target.getAttribute('data-customer-id');
+		loadContent(`/admin/orderList?searchInput=${customerId}&page=0&size=5`, 'orderList');
+	}
 
 });
 
@@ -410,7 +428,8 @@ function performSearch(urlPath) {
 		{ id: 'fr_min', name: 'fr_min' },
 		{ id: 'to_min', name: 'to_min' },
 		{ id: 'fr_max', name: 'fr_max' },
-		{ id: 'to_max', name: 'to_max' }
+		{ id: 'to_max', name: 'to_max' },
+		{ id: 'accessLevel', name: 'accessLevel' },
 	];
 
 	fields.forEach(field => {
@@ -631,7 +650,14 @@ function setupCheckboxEventListeners() {
 				checkbox.checked = selectAllCheckbox.checked;
 			});
 			productCheckboxes.forEach(function(checkbox) {
-				checkbox.checked = selectAllCheckbox.checked;
+				checkbox.addEventListener('change', function() {
+					if (!checkbox.checked) {
+						selectAllCheckbox.checked = false;
+					} else {
+						const allChecked = Array.from(productCheckboxes).every(chk => chk.checked);
+						selectAllCheckbox.checked = allChecked;
+					}
+				});
 			});
 		});
 	}
@@ -668,8 +694,8 @@ function deleteSelectedProducts(urlPath, pageType) {
 	let bodyContent;
 
 	if (pageType === 'productManagement') {
-		const selectedProductNumbers = Array.from(productCheckboxes).map(checkbox => {
-			return checkbox.closest('tr').querySelector('td:nth-child(3) p').textContent;
+		selectedProductNumbers = Array.from(productCheckboxes).map(checkbox => {
+			return checkbox.closest('tr').getAttribute('data-productNumber');
 		});
 		selectedItems = selectedProductNumbers;
 		bodyContent = { productNumbers: selectedItems };
@@ -691,12 +717,19 @@ function deleteSelectedProducts(urlPath, pageType) {
 		});
 		selectedItems = selectedCouponListIds;
 		bodyContent = { couponIssuanceIds: selectedItems };
+	} else if (pageType === 'salesPost') {
+		const selectedCouponListIds = Array.from(productCheckboxes).map(checkbox => {
+			return checkbox.closest('tr').getAttribute('data-salesPostId');
+		});
+		selectedItems = selectedCouponListIds;
+		bodyContent = { salesPostIds: selectedItems };
 	}
 
 	if (selectedItems.length > 0) {
-		const endpoint = pageType === 'productManagement' ? '/admin/deleteProducts' :
-			pageType === 'discountList' ? '/admin/deleteDiscounts' :
-				pageType === 'discountTarget' ? '/admin/discountTarget' : '/admin/deleteCoupons';
+		const endpoint = pageType === 'salesPost' ? '/admin/deleteSalesPosts' :
+			pageType === 'productManagement' ? '/admin/deleteProducts' :
+				pageType === 'discountList' ? '/admin/deleteDiscounts' :
+					pageType === 'discountTarget' ? '/admin/discountTarget' : '/admin/couponList';
 
 		fetch(endpoint, {
 			method: 'DELETE',
@@ -743,7 +776,6 @@ function progressSelectedOrder(urlPath) {
 	} else {
 		alert('변경할 항목을 선택해주세요.');
 	}
-
 }
 
 function setDateRange(range, group) {
@@ -821,6 +853,66 @@ function handleInquiryToggleClick(event) {
 		inquiryToggleMenu.classList.toggle('visible');
 	}
 }
+
+function handleInquiryCountClick(event) {
+	const customerId = event.target.getAttribute('data-customer-id');
+	const inquiryListRow = document.querySelector(`.inquiry-list-row[data-customer-id="${customerId}"]`);
+	const inquiryListContainer = document.getElementById(`inquiry-list-${customerId}`);
+
+	if (inquiryListRow.style.display === 'none') {
+		inquiryListRow.style.display = 'table-row';
+
+		fetch(`/admin/getInquiries?customerId=${customerId}`)
+			.then(response => response.json())
+			.then(data => {
+				inquiryListContainer.innerHTML = ''; // 기존 내용을 지우기
+
+				if (data.length > 0) {
+					const table = document.createElement('table');
+					table.classList.add('inquiry-table', 'custom-table', 'dark-mode');
+
+					const thead = document.createElement('thead');
+					thead.innerHTML = `
+                        <tr>
+                            <th>문의 ID</th>
+                            <th>문의 제목</th>
+                            <th>문의 타입</th>
+                            <th>비밀글 여부</th>
+                            <th>문의 내용</th>
+                            <th>해결 여부</th>
+                            <th>문의 날짜</th>
+                        </tr>
+                    `;
+					table.appendChild(thead);
+
+					const tbody = document.createElement('tbody');
+					data.forEach(inquiry => {
+						const tr = document.createElement('tr');
+						tr.innerHTML = `
+                            <td>${inquiry.id}</td>
+                            <td>${inquiry.subject}</td>
+                            <td>${inquiry.type == '1' ? '1:1 문의' : '상품 문의'}</td>
+                            <td>${inquiry.secret === '1' ? '공개' : '비공개'}</td>
+                            <td>${inquiry.message}</td>
+                            <td>${inquiry.resolvedYn === 'Y' ? '답변 완료' : '답변 대기'}</td>
+                            <td>${inquiry.formattedCreatedDate}</td>
+                        `;
+						tbody.appendChild(tr);
+					});
+					table.appendChild(tbody);
+					inquiryListContainer.appendChild(table);
+				} else {
+					inquiryListContainer.innerHTML = '<p>문의 내역이 없습니다.</p>';
+				}
+			})
+			.catch(error => {
+				console.error('Error fetching inquiry list:', error);
+			});
+	} else {
+		inquiryListRow.style.display = 'none';
+	}
+}
+
 function handleReviewToggleClick(event) {
 	event.preventDefault();
 	const reviewToggle = event.target.closest('.reviewToggle');
@@ -829,3 +921,47 @@ function handleReviewToggleClick(event) {
 		reviewToggleMenu.classList.toggle('visible');
 	}
 }
+
+function initializeOrderStatusChart(data) {
+	const ctx = document.getElementById('recentOrderStatusChart').getContext('2d');
+	const chartData = {
+		labels: ['결제 완료', '상품 준비', '배송 준비', '배송 중', '배송 완료', '구매 확정', '구매 확정 대기'],
+		datasets: [{
+			label: '주문 수',
+			data: data.map(item => item.STATUSCOUNT),
+			backgroundColor: [
+				'rgba(75, 192, 192, 0.2)',
+				'rgba(54, 162, 235, 0.2)',
+				'rgba(255, 206, 86, 0.2)',
+				'rgba(75, 192, 192, 0.2)',
+				'rgba(153, 102, 255, 0.2)',
+				'rgba(255, 159, 64, 0.2)',
+				'rgba(255, 99, 132, 0.2)'
+			],
+			borderColor: [
+				'rgba(75, 192, 192, 1)',
+				'rgba(54, 162, 235, 1)',
+				'rgba(255, 206, 86, 1)',
+				'rgba(75, 192, 192, 1)',
+				'rgba(153, 102, 255, 1)',
+				'rgba(255, 159, 64, 1)',
+				'rgba(255, 99, 132, 1)'
+			],
+			borderWidth: 1
+		}]
+	};
+
+	new Chart(ctx, {
+		type: 'bar',
+		data: chartData,
+		options: {
+			scales: {
+				y: {
+					beginAtZero: true
+				}
+			}
+		}
+	});
+}
+
+

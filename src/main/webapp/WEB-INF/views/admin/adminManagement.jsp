@@ -23,9 +23,10 @@
                         <label for="accessLevel">관리자 레벨</label>
                         <select id="accessLevel" name="accessLevel" class="secondary">
                             <option value="">전체</option>
-                            <c:forEach items="${accessLevels}" var="level">
-                                <option value="${level.id}">${level.level}</option>
-                            </c:forEach>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
                         </select>
                     </div>
                 </div>
