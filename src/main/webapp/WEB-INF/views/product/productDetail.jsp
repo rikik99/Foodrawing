@@ -743,7 +743,7 @@
             <div class="slide" style="display: inline-block; width: calc(25% - 20px); vertical-align: top;">
                 <div class="product-card" style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative; background-color: white; text-align: center;">
                     <div class="product-top" style="position: relative;">
-                        <form method="get" action="/productDetail/${product.salesPostId}" style="margin: 0;">
+                        <form method="POST" action="/productDetail/${product.salesPostId}" style="margin: 0;">
                             <input type="hidden" id="salesPostId" class="salesPostId" name="id" value="${product.salesPostId}" />
                             <button type="submit" class="product-card-href" style="border: none; padding: 0; background: none; cursor: pointer;">
                                 <img src="${product.filePath}" alt="${product.name}" style="width: 100%; height: auto; border-bottom: 1px solid #e0e0e0;">
@@ -936,7 +936,7 @@
 					<!-- 구매 정보 추가 -->
 					<div class="inquiry-section">
 						<div class="inquiry-header">
-							<h2>상품문의 1건</h2>
+							<h2>상품문의 ${inquiriesCount}건</h2>
 							<button class="btn btn-primary" onclick="showInquiryPopup()">상품문의 하기</button>
 						</div>
 

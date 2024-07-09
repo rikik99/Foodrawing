@@ -12,7 +12,7 @@ public interface SalesMapper {
 	Long getIdBySalesPostId(SalesPostDTO salesPost);
 
 	String getIdByProductNumber(SalesPostDTO salesPost);
-
+	
 	SalesPostDTO findSalesPostById(Long id);
 
 	//SalesPostFileDTO getSalesFileById(SalesPostDTO salesPost);
